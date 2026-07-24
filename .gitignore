@@ -1,0 +1,29 @@
+# Environments
+.venv/
+venv/
+ENV/
+env/
+
+# Python cache & build outputs
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.pytest_cache/
+
+# Local uploads & ChromaDB Vector Store
+app/static/uploads/*
+!app/static/uploads/.gitkeep
+chroma_db/
+.chroma/
+
+# Environment Variables & Secrets
+.env
+.env.local
+*.log
+
+# IDE & OS Files
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db

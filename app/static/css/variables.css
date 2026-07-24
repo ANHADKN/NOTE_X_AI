@@ -1,0 +1,65 @@
+/* noteX AI - Design System Variables & Theme Tokens */
+:root {
+  /* Font Family */
+  --font-family-primary: 'Outfit', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  
+  /* Dark Theme Tokens (Default) */
+  --bg-color-dark: #090d16;
+  --bg-gradient-dark: radial-gradient(circle at 15% 15%, rgba(30, 41, 78, 0.4) 0%, rgba(9, 13, 22, 1) 60%),
+                      radial-gradient(circle at 85% 85%, rgba(67, 56, 202, 0.25) 0%, rgba(9, 13, 22, 1) 70%);
+  --surface-dark: rgba(22, 30, 50, 0.65);
+  --surface-hover-dark: rgba(30, 41, 68, 0.8);
+  --border-color-dark: rgba(255, 255, 255, 0.12);
+  --text-primary-dark: #f8fafc;
+  --text-secondary-dark: #94a3b8;
+
+  /* Light Theme Tokens */
+  --bg-color-light: #f1f5f9;
+  --bg-gradient-light: radial-gradient(circle at 15% 15%, rgba(224, 231, 255, 0.7) 0%, rgba(241, 245, 249, 1) 60%),
+                       radial-gradient(circle at 85% 85%, rgba(238, 242, 255, 0.8) 0%, rgba(241, 245, 249, 1) 70%);
+  --surface-light: rgba(255, 255, 255, 0.75);
+  --surface-hover-light: rgba(255, 255, 255, 0.95);
+  --border-color-light: rgba(203, 213, 225, 0.6);
+  --text-primary-light: #0f172a;
+  --text-secondary-light: #475569;
+
+  /* Primary Brand Colors & Accents */
+  --accent-cyan: #06b6d4;
+  --accent-cyan-glow: rgba(6, 182, 212, 0.4);
+  --accent-indigo: #6366f1;
+  --accent-indigo-glow: rgba(99, 102, 241, 0.4);
+  --accent-purple: #a855f7;
+  --accent-emerald: #10b981;
+  --accent-amber: #f59e0b;
+  --accent-rose: #f43f5e;
+
+  /* Glassmorphism Specs */
+  --glass-blur: blur(18px);
+  --glass-radius: 16px;
+  --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+  --glass-glow: 0 0 20px rgba(99, 102, 241, 0.25);
+
+  /* Transitions & Animation Duration */
+  --transition-fast: 0.2s ease;
+  --transition-normal: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+[data-theme="dark"] {
+  --bg-color: var(--bg-color-dark);
+  --bg-gradient: var(--bg-gradient-dark);
+  --surface: var(--surface-dark);
+  --surface-hover: var(--surface-hover-dark);
+  --border-color: var(--border-color-dark);
+  --text-primary: var(--text-primary-dark);
+  --text-secondary: var(--text-secondary-dark);
+}
+
+[data-theme="light"] {
+  --bg-color: var(--bg-color-light);
+  --bg-gradient: var(--bg-gradient-light);
+  --surface: var(--surface-light);
+  --surface-hover: var(--surface-hover-light);
+  --border-color: var(--border-color-light);
+  --text-primary: var(--text-primary-light);
+  --text-secondary: var(--text-secondary-light);
+}

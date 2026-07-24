@@ -1,0 +1,277 @@
+import random
+import datetime
+from flask import Blueprint, request
+from bson import ObjectId
+from app.utils.auth import hash_password, verify_password, generate_tokens, decode_token, token_required
+from app.utils.response import api_response
+from app.models.mongo import mongo_manager
+from app.models.schemas import UserModel, OTPModel, BaseModel
+from app.utils.logger import logger
+
+auth_bp = Blueprint('auth_bp', __name__, url_prefix='/api/auth')
+
+IN_MEMORY_USERS = {}
+IN_MEMORY_OTPS = {}
+
+def generate_otp():
+    """Generates a 6-digit numeric OTP."""
+    return str(random.randint(100000, 999999))
+
+@auth_bp.route('/register', methods=['POST'])
+def register():
+    """Register a new student account and issue OTP for verification."""
+    try:
+        data = request.get_json() or {}
+        name = data.get('name', '').strip()
+        email = data.get('email', '').strip().lower()
+        password = data.get('password', '')
+        student_class = data.get('student_class', 'Class 10')
+        role = data.get('role', 'student')
+        target_exam = data.get('target_exam', 'Board Exam')
+
+        if not name or not email or not password:
+            return api_response(success=False, message="Name, email, and password are required.", status_code=400)
+
+        if len(password) < 6:
+            return api_response(success=False, message="Password must be at least 6 characters long.", status_code=400)
+
+        valid_classes = [f"Class {i}" for i in range(1, 13)]
+        if student_class not in valid_classes:
+            student_class = "Class 10"
+
+        db = mongo_manager.get_db()
+        hashed_pwd = hash_password(password)
+
+        if db is not None:
+            existing = db.users.find_one({"email": email})
+            if existing:
+                return api_response(success=False, message="An account with this email already exists.", status_code=409)
+
+            user_doc = UserModel.create_user_doc(
+                name=name, email=email, password_hash=hashed_pwd,
+                student_class=student_class, role=role, target_exam=target_exam
+            )
+            res = db.users.insert_one(user_doc)
+            user_id = str(res.inserted_id)
+
+            # Generate OTP
+            otp_code = generate_otp()
+            otp_doc = OTPModel.create_otp_doc(email=email, otp_code=otp_code, purpose="email_verification")
+            db.otps.insert_one(otp_doc)
+        else:
+            if email in IN_MEMORY_USERS:
+                return api_response(success=False, message="An account with this email already exists.", status_code=409)
+
+            user_id = f"mem_{len(IN_MEMORY_USERS) + 1}"
+            IN_MEMORY_USERS[email] = {
+                "_id": user_id, "name": name, "email": email, "password_hash": hashed_pwd,
+                "student_class": student_class, "role": role, "target_exam": target_exam,
+                "is_verified": False, "study_streak": 1, "total_points": 50,
+                "created_at": datetime.datetime.utcnow().isoformat()
+            }
+
+            otp_code = generate_otp()
+            IN_MEMORY_OTPS[email] = {
+                "otp_code": otp_code, "purpose": "email_verification", "is_used": False,
+                "expires_at": (datetime.datetime.utcnow() + datetime.timedelta(minutes=10)).isoformat()
+            }
+
+        access_token, refresh_token = generate_tokens(user_id, email, role, student_class)
+
+        logger.info(f"User registered: {email} [OTP: {otp_code}]")
+
+        return api_response(
+            success=True,
+            message="User registered successfully! Please verify your email using the OTP provided.",
+            data={
+                "user": {
+                    "id": user_id, "name": name, "email": email,
+                    "student_class": student_class, "role": role, "is_verified": False
+                },
+                "otp_preview": otp_code,  # For local testing without SMTP server
+                "access_token": access_token,
+                "refresh_token": refresh_token
+            },
+            status_code=201
+        )
+    except Exception as e:
+        logger.error(f"Registration Error: {str(e)}")
+        return api_response(success=False, message=f"Registration failed: {str(e)}", status_code=500)
+
+@auth_bp.route('/login', methods=['POST'])
+def login():
+    """Authenticate student/admin with JWT tokens."""
+    try:
+        data = request.get_json() or {}
+        email = data.get('email', '').strip().lower()
+        password = data.get('password', '')
+
+        if not email or not password:
+            return api_response(success=False, message="Email and password are required.", status_code=400)
+
+        db = mongo_manager.get_db()
+        user = db.users.find_one({"email": email}) if db is not None else IN_MEMORY_USERS.get(email)
+
+        if not user or not verify_password(password, user.get('password_hash', '')):
+            return api_response(success=False, message="Invalid email or password.", status_code=401)
+
+        user_id = str(user.get('_id'))
+        role = user.get('role', 'student')
+        student_class = user.get('student_class', 'Class 10')
+
+        access_token, refresh_token = generate_tokens(user_id, email, role, student_class)
+        serialized = BaseModel.serialize_doc(user)
+        if serialized and 'password_hash' in serialized:
+            del serialized['password_hash']
+
+        return api_response(
+            success=True,
+            message="Login successful!",
+            data={
+                "user": serialized,
+                "access_token": access_token,
+                "refresh_token": refresh_token
+            },
+            status_code=200
+        )
+    except Exception as e:
+        logger.error(f"Login Error: {str(e)}")
+        return api_response(success=False, message=f"Login failed: {str(e)}", status_code=500)
+
+@auth_bp.route('/verify-otp', methods=['POST'])
+def verify_otp():
+    """Verify OTP for email validation or password reset."""
+    try:
+        data = request.get_json() or {}
+        email = data.get('email', '').strip().lower()
+        otp_code = data.get('otp_code', '').strip()
+
+        if not email or not otp_code:
+            return api_response(success=False, message="Email and OTP code are required.", status_code=400)
+
+        db = mongo_manager.get_db()
+        matched = False
+
+        if db is not None:
+            otp_record = db.otps.find_one({"email": email, "otp_code": otp_code, "is_used": False})
+            if otp_record:
+                db.otps.update_one({"_id": otp_record['_id']}, {"$set": {"is_used": True}})
+                db.users.update_one({"email": email}, {"$set": {"is_verified": True}})
+                matched = True
+        else:
+            record = IN_MEMORY_OTPS.get(email)
+            if record and record.get('otp_code') == otp_code and not record.get('is_used'):
+                record['is_used'] = True
+                if email in IN_MEMORY_USERS:
+                    IN_MEMORY_USERS[email]['is_verified'] = True
+                matched = True
+
+        if not matched:
+            return api_response(success=False, message="Invalid or expired OTP code.", status_code=400)
+
+        return api_response(success=True, message="Email verified successfully!", status_code=200)
+    except Exception as e:
+        logger.error(f"Verify OTP Error: {str(e)}")
+        return api_response(success=False, message=str(e), status_code=500)
+
+@auth_bp.route('/forgot-password', methods=['POST'])
+def forgot_password():
+    """Request a password reset OTP."""
+    try:
+        data = request.get_json() or {}
+        email = data.get('email', '').strip().lower()
+
+        if not email:
+            return api_response(success=False, message="Email is required.", status_code=400)
+
+        db = mongo_manager.get_db()
+        user = db.users.find_one({"email": email}) if db is not None else IN_MEMORY_USERS.get(email)
+
+        if not user:
+            return api_response(success=False, message="No user found with this email address.", status_code=404)
+
+        otp_code = generate_otp()
+
+        if db is not None:
+            otp_doc = OTPModel.create_otp_doc(email=email, otp_code=otp_code, purpose="forgot_password")
+            db.otps.insert_one(otp_doc)
+        else:
+            IN_MEMORY_OTPS[email] = {
+                "otp_code": otp_code, "purpose": "forgot_password", "is_used": False,
+                "expires_at": (datetime.datetime.utcnow() + datetime.timedelta(minutes=10)).isoformat()
+            }
+
+        logger.info(f"Password Reset OTP generated for {email}: {otp_code}")
+
+        return api_response(
+            success=True,
+            message="Password reset OTP sent to your email.",
+            data={"otp_preview": otp_code},
+            status_code=200
+        )
+    except Exception as e:
+        logger.error(f"Forgot Password Error: {str(e)}")
+        return api_response(success=False, message=str(e), status_code=500)
+
+@auth_bp.route('/reset-password', methods=['POST'])
+def reset_password():
+    """Reset password using verified OTP."""
+    try:
+        data = request.get_json() or {}
+        email = data.get('email', '').strip().lower()
+        otp_code = data.get('otp_code', '').strip()
+        new_password = data.get('new_password', '')
+
+        if not email or not otp_code or not new_password:
+            return api_response(success=False, message="Email, OTP, and new password are required.", status_code=400)
+
+        if len(new_password) < 6:
+            return api_response(success=False, message="Password must be at least 6 characters long.", status_code=400)
+
+        db = mongo_manager.get_db()
+        hashed_pwd = hash_password(new_password)
+        updated = False
+
+        if db is not None:
+            otp_record = db.otps.find_one({"email": email, "otp_code": otp_code, "purpose": "forgot_password", "is_used": False})
+            if otp_record:
+                db.otps.update_one({"_id": otp_record['_id']}, {"$set": {"is_used": True}})
+                db.users.update_one({"email": email}, {"$set": {"password_hash": hashed_pwd, "updated_at": datetime.datetime.utcnow()}})
+                updated = True
+        else:
+            record = IN_MEMORY_OTPS.get(email)
+            if record and record.get('otp_code') == otp_code and record.get('purpose') == 'forgot_password':
+                record['is_used'] = True
+                if email in IN_MEMORY_USERS:
+                    IN_MEMORY_USERS[email]['password_hash'] = hashed_pwd
+                updated = True
+
+        if not updated:
+            return api_response(success=False, message="Invalid OTP or request expired.", status_code=400)
+
+        return api_response(success=True, message="Password has been reset successfully. You can now login.", status_code=200)
+    except Exception as e:
+        logger.error(f"Reset Password Error: {str(e)}")
+        return api_response(success=False, message=str(e), status_code=500)
+
+@auth_bp.route('/profile', methods=['GET'])
+@token_required
+def profile():
+    """Get active user profile session information."""
+    try:
+        user_info = request.user
+        email = user_info.get('email')
+        db = mongo_manager.get_db()
+
+        user = db.users.find_one({"email": email}) if db is not None else IN_MEMORY_USERS.get(email)
+        if not user:
+            return api_response(success=False, message="User profile not found.", status_code=404)
+
+        serialized = BaseModel.serialize_doc(user)
+        if 'password_hash' in serialized:
+            del serialized['password_hash']
+
+        return api_response(success=True, data={"user": serialized}, status_code=200)
+    except Exception as e:
+        logger.error(f"Profile Error: {str(e)}")
+        return api_response(success=False, message=str(e), status_code=500)

@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>noteX AI - Modern AI Study Platform for Class 1 to Class 12</title>
+  <meta name="description" content="noteX AI is a production-ready AI-powered study platform featuring RAG chatbots, smart notes, quiz generators, doubt solvers, and progress analytics for Class 1-12 students.">
+  
+  <!-- Fonts & Icons -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <!-- CSS Stylesheets -->
+  <link rel="stylesheet" href="/static/css/variables.css">
+  <link rel="stylesheet" href="/static/css/main.css">
+  <link rel="stylesheet" href="/static/css/glassmorphism.css">
+  <link rel="stylesheet" href="/static/css/components.css">
+
+  <!-- Chart.js & Code Highlighting CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/atom-one-dark.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
+</head>
+<body>
+  <!-- Animated Background Canvas -->
+  <canvas id="particle-canvas"></canvas>
+
+  <div class="app-wrapper">
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="brand-logo">X</div>
+        <div class="brand-title">noteX AI</div>
+      </div>
+      
+      <ul class="nav-list">
+        <li class="nav-item active" data-view="chat">
+          <a href="#chat"><i class="fa-solid fa-comments"></i> <span>💬 AI Chat (Home)</span></a>
+        </li>
+        <li class="nav-item" data-view="dashboard">
+          <a href="#dashboard"><i class="fa-solid fa-house"></i> <span>🏠 Dashboard</span></a>
+        </li>
+        <li class="nav-item" data-view="library">
+          <a href="#library"><i class="fa-solid fa-book-bookmark"></i> <span>📚 My Library</span></a>
+        </li>
+        <li class="nav-item" data-view="rag">
+          <a href="#rag"><i class="fa-solid fa-file-pdf"></i> <span>📄 PDF Assistant</span></a>
+        </li>
+        <li class="nav-item" data-view="notes">
+          <a href="#notes"><i class="fa-solid fa-pen-to-square"></i> <span>📝 AI Notes</span></a>
+        </li>
+        <li class="nav-item" data-view="study-plan">
+          <a href="#study-plan"><i class="fa-solid fa-calendar-days"></i> <span>📅 Study Planner</span></a>
+        </li>
+        <li class="nav-item" data-view="flashcards">
+          <a href="#flashcards"><i class="fa-solid fa-layer-group"></i> <span>🧠 Flashcards</span></a>
+        </li>
+        <li class="nav-item" data-view="quizzes">
+          <a href="#quizzes"><i class="fa-solid fa-circle-question"></i> <span>❓ AI Quiz</span></a>
+        </li>
+        <li class="nav-item" data-view="analytics">
+          <a href="#analytics"><i class="fa-solid fa-chart-column"></i> <span>📊 Learning Analytics</span></a>
+        </li>
+        <li class="nav-item" data-view="settings">
+          <a href="#settings"><i class="fa-solid fa-gear"></i> <span>⚙ Settings</span></a>
+        </li>
+      </ul>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="main-content">
+      <!-- Top Header -->
+      <header class="top-header">
+        <div style="display: flex; align-items: center; gap: 1rem;">
+          <button id="classSelectorBtn" class="grade-badge-selector">
+            <i class="fa-solid fa-graduation-cap"></i> <span id="currentGradeLabel">Class 10</span> <i class="fa-solid fa-chevron-down" style="font-size: 0.75rem;"></i>
+          </button>
+        </div>
+
+        <div style="display: flex; align-items: center; gap: 1rem;">
+          <button id="themeToggleBtn" class="btn-glass-secondary" style="padding: 0.5rem 0.85rem; border-radius: 50%;">
+            <i class="fa-solid fa-moon" id="themeIcon"></i>
+          </button>
+          
+          <button id="authBtn" class="btn-glass">
+            <i class="fa-solid fa-user"></i> <span id="authBtnText">Login / Register</span>
+          </button>
+        </div>
+      </header>
+
+      <!-- View Container (Renders active module UI) -->
+      <div id="app-view-container" class="animate-fade-in">
+        <!-- Dynamic module content rendered here via JS -->
+      </div>
+    </main>
+  </div>
+
+  <!-- Class 1 to Class 12 Grade Selector Modal -->
+  <div id="gradeModal" class="glass-card" style="display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 1000; width: 90%; max-width: 500px; padding: 2rem;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+      <h3 style="font-weight: 700;">Select Target Grade Level</h3>
+      <i id="closeGradeModal" class="fa-solid fa-xmark" style="cursor: pointer; font-size: 1.2rem;"></i>
+    </div>
+    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.75rem;">
+      <button class="btn-glass-secondary grade-opt-btn" data-class="Class 1">Class 1</button>
+      <button class="btn-glass-secondary grade-opt-btn" data-class="Class 2">Class 2</button>
+      <button class="btn-glass-secondary grade-opt-btn" data-class="Class 3">Class 3</button>
+      <button class="btn-glass-secondary grade-opt-btn" data-class="Class 4">Class 4</button>
+      <button class="btn-glass-secondary grade-opt-btn" data-class="Class 5">Class 5</button>
+      <button class="btn-glass-secondary grade-opt-btn" data-class="Class 6">Class 6</button>
+      <button class="btn-glass-secondary grade-opt-btn" data-class="Class 7">Class 7</button>
+      <button class="btn-glass-secondary grade-opt-btn" data-class="Class 8">Class 8</button>
+      <button class="btn-glass-secondary grade-opt-btn" data-class="Class 9">Class 9</button>
+      <button class="btn-glass-secondary grade-opt-btn" data-class="Class 10">Class 10</button>
+      <button class="btn-glass-secondary grade-opt-btn" data-class="Class 11">Class 11</button>
+      <button class="btn-glass-secondary grade-opt-btn" data-class="Class 12">Class 12</button>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="/static/js/config.js"></script>
+  <script src="/static/js/theme.js"></script>
+  <script src="/static/js/auth.js"></script>
+  <script src="/static/js/api.js"></script>
+  <script src="/static/js/modules/dashboard.js"></script>
+  <script src="/static/js/modules/chatbot.js"></script>
+  <script src="/static/js/modules/rag.js"></script>
+  <script src="/static/js/modules/study_planner.js"></script>
+  <script src="/static/js/modules/notes.js"></script>
+  <script src="/static/js/modules/quiz.js"></script>
+  <script src="/static/js/modules/flashcards.js"></script>
+  <script src="/static/js/modules/analytics.js"></script>
+  <script src="/static/js/modules/library.js"></script>
+  <script src="/static/js/modules/admin.js"></script>
+  <script src="/static/js/app.js"></script>
+</body>
+</html>

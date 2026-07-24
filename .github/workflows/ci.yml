@@ -1,0 +1,40 @@
+name: noteX AI Integration CI
+
+on:
+  push:
+    branches: [ main, master, release/* ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    services:
+      mongodb:
+        image: mongo:6.0
+        ports:
+          - 27017:27017
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Set up Python 3.11
+      uses: actions/setup-python@v4
+      with:
+        python-version: "3.11"
+
+    - name: Install Dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+
+    - name: Run Master System Integration Suite
+      env:
+        FLASK_ENV: testing
+        SECRET_KEY: ci-secret-key-123
+        JWT_SECRET_KEY: ci-jwt-secret-456
+        MONGO_URI: mongodb://localhost:27017/notex_ai_test
+        OPENAI_API_KEY: mock_key_for_dev_mode
+      run: |
+        python scratch/test_all_modules.py
