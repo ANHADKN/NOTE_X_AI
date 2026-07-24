@@ -273,6 +273,18 @@ const ChatbotModule = {
         `;
 
         if (typeof hljs !== 'undefined') hljs.highlightAll();
+        if (typeof renderMathInElement !== 'undefined') {
+          try {
+            renderMathInElement(aiBubbleContainer, {
+              delimiters: [
+                {left: '$$', right: '$$', display: true},
+                {left: '\\[', right: '\\]', display: true},
+                {left: '\\(', right: '\\)', display: false},
+                {left: '$', right: '$', display: false}
+              ]
+            });
+          } catch(err) { console.log('KaTeX render warning:', err); }
+        }
         await this.loadConversationHistory();
       } else {
         aiBubble.textContent = "I could not process this request. Please try again.";

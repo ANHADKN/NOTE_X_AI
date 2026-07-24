@@ -9,8 +9,13 @@
   <!-- Fonts & Icons -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <!-- KaTeX LaTeX Math Engine CDN -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js"></script>
   
   <!-- CSS Stylesheets -->
   <link rel="stylesheet" href="/static/css/variables.css">
@@ -25,15 +30,18 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
 </head>
 <body>
-  <!-- Animated Background Canvas -->
-  <canvas id="particle-canvas"></canvas>
+  <!-- Floating Scientific Education Elements Container -->
+  <div id="scientific-bg-elements" class="scientific-bg"></div>
 
   <div class="app-wrapper">
     <!-- Sidebar Navigation -->
     <aside class="sidebar">
       <div class="brand">
-        <div class="brand-logo">X</div>
-        <div class="brand-title">noteX AI</div>
+        <div class="brand-logo" title="noteX AI - Book + AI Brain + Circuit">
+          <i class="fa-solid fa-book-bookmark" style="font-size: 0.95rem;"></i>
+          <i class="fa-solid fa-brain" style="font-size: 0.95rem; margin-left: -4px;"></i>
+        </div>
+        <div class="brand-title">note<span style="color: var(--accent-cyan);">X</span> AI</div>
       </div>
       
       <ul class="nav-list">

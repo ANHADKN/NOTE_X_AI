@@ -1,81 +1,98 @@
-/* noteX AI - Glassmorphism UI Components & Cards */
+/* noteX AI - Glassmorphism UI Components & KaTeX Styling */
 .glass-card {
   background: var(--surface);
   backdrop-filter: var(--glass-blur);
   -webkit-backdrop-filter: var(--glass-blur);
   border: 1px solid var(--border-color);
-  border-radius: var(--glass-radius);
+  border-radius: var(--radius-md);
   box-shadow: var(--glass-shadow);
-  transition: transform var(--transition-normal), border-color var(--transition-normal), box-shadow var(--transition-normal);
+  transition: all var(--transition-normal);
 }
 
 .glass-card:hover {
-  border-color: rgba(99, 102, 241, 0.35);
-  box-shadow: var(--glass-shadow), var(--glass-glow);
+  border-color: var(--border-active);
+  box-shadow: 0 12px 40px 0 rgba(14, 165, 233, 0.15);
 }
 
-.glass-card-interactive:hover {
-  transform: translateY(-4px);
-}
-
-/* Glass Inputs & Controls */
 .glass-input {
-  background: rgba(15, 23, 42, 0.3);
+  width: 100%;
+  background: rgba(15, 23, 42, 0.6);
   border: 1px solid var(--border-color);
-  border-radius: 10px;
+  border-radius: var(--radius-sm);
   padding: 0.75rem 1rem;
   color: var(--text-primary);
+  font-family: var(--font-body);
+  font-size: 0.92rem;
+  transition: border-color var(--transition-fast);
   outline: none;
-  font-size: 0.95rem;
-  width: 100%;
-  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
-}
-
-[data-theme="light"] .glass-input {
-  background: rgba(255, 255, 255, 0.6);
 }
 
 .glass-input:focus {
-  border-color: var(--accent-cyan);
-  box-shadow: 0 0 12px var(--accent-cyan-glow);
+  border-color: var(--accent-sky);
+  box-shadow: 0 0 12px rgba(14, 165, 233, 0.3);
 }
 
-/* Glass Buttons */
 .btn-glass {
-  background: linear-gradient(135deg, rgba(99, 102, 241, 0.8), rgba(6, 182, 212, 0.8));
-  color: #ffffff;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: 10px;
-  padding: 0.75rem 1.5rem;
+  background: linear-gradient(135deg, var(--accent-blue), var(--accent-sky));
+  color: white;
+  border: none;
+  padding: 0.6rem 1.25rem;
+  border-radius: var(--radius-sm);
+  font-family: var(--font-heading);
   font-weight: 600;
+  font-size: 0.9rem;
   cursor: pointer;
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
   transition: transform var(--transition-fast), box-shadow var(--transition-fast);
-  backdrop-filter: blur(8px);
 }
 
 .btn-glass:hover {
-  transform: scale(1.02);
-  box-shadow: 0 0 20px var(--accent-cyan-glow);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 20px rgba(14, 165, 233, 0.4);
 }
 
 .btn-glass-secondary {
-  background: var(--surface);
+  background: rgba(255, 255, 255, 0.05);
   color: var(--text-primary);
   border: 1px solid var(--border-color);
-  border-radius: 10px;
-  padding: 0.75rem 1.25rem;
+  padding: 0.5rem 1rem;
+  border-radius: var(--radius-sm);
+  font-family: var(--font-heading);
   font-weight: 500;
+  font-size: 0.85rem;
   cursor: pointer;
   display: inline-flex;
   align-items: center;
-  gap: 0.5rem;
-  transition: background var(--transition-fast), border-color var(--transition-fast);
+  gap: 0.4rem;
+  transition: all var(--transition-fast);
 }
 
 .btn-glass-secondary:hover {
-  background: var(--surface-hover);
-  border-color: var(--accent-indigo);
+  background: rgba(255, 255, 255, 0.1);
+  border-color: var(--accent-sky);
+}
+
+/* AI Avatar & Chat Styling */
+.ai-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-sm);
+  background: linear-gradient(135deg, var(--accent-blue), var(--accent-teal));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 1rem;
+  box-shadow: 0 0 12px rgba(20, 184, 166, 0.4);
+}
+
+/* KaTeX Math Equation Render Override */
+.katex-display {
+  margin: 0.75rem 0 !important;
+  padding: 0.5rem;
+  background: rgba(15, 23, 42, 0.5);
+  border-radius: 8px;
+  overflow-x: auto;
 }
