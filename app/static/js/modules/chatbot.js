@@ -49,26 +49,27 @@ const ChatbotModule = {
               <div style="font-size: 3.5rem; margin-bottom: 1rem; background: linear-gradient(135deg, var(--accent-cyan), var(--accent-indigo)); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
                 <i class="fa-solid fa-wand-magic-sparkles"></i>
               </div>
-              <h1 style="font-size: 2.2rem; font-weight: 800; margin-bottom: 0.5rem; color: var(--text-primary);">Hello, Student!</h1>
-              <h3 style="font-size: 1.25rem; font-weight: 600; color: var(--accent-cyan); margin-bottom: 1.5rem;">What would you like to learn today?</h3>
+              <h1 style="font-size: 2.3rem; font-weight: 800; margin-bottom: 0.4rem; color: var(--text-primary);">Hello 👋</h1>
+              <h2 style="font-size: 1.4rem; font-weight: 700; background: linear-gradient(90deg, var(--text-primary), var(--accent-cyan)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 0.5rem;">Welcome back to noteX AI</h2>
+              <p style="color: var(--text-secondary); font-size: 1rem; margin-bottom: 1.5rem;">Ask anything — learn smarter with your intelligent AI tutor.</p>
 
-              <!-- Suggested Prompt Pills -->
-              <div style="display: flex; gap: 0.75rem; flex-wrap: wrap; justify-content: center; margin-bottom: 2rem;">
-                <button class="btn-glass-secondary" style="font-size: 0.85rem; padding: 0.5rem 1rem;" onclick="ChatbotModule.useSuggestedPrompt('Summarize my uploaded Science PDF chapter')">
-                  📄 Summarize this PDF
-                </button>
-                <button class="btn-glass-secondary" style="font-size: 0.85rem; padding: 0.5rem 1rem;" onclick="ChatbotModule.useSuggestedPrompt('Generate 5 MCQs from Chemical Reactions chapter')">
-                  🎯 Generate MCQs
-                </button>
-                <button class="btn-glass-secondary" style="font-size: 0.85rem; padding: 0.5rem 1rem;" onclick="ChatbotModule.useSuggestedPrompt('Create flashcards for Electricity and Magnetism')">
-                  🧠 Create Flashcards
-                </button>
-                <button class="btn-glass-secondary" style="font-size: 0.85rem; padding: 0.5rem 1rem;" onclick="ChatbotModule.useSuggestedPrompt('Explain Newton\'s Laws of Motion with real world examples')">
+              <!-- Suggested Prompt Chips -->
+              <div style="display: flex; gap: 0.6rem; flex-wrap: wrap; justify-content: center; margin-bottom: 2rem;">
+                <div class="prompt-chip" onclick="ChatbotModule.useSuggestedPrompt('Explain Newton\'s Laws of Motion with real world examples')">
                   ⚡ Explain Newton's Laws
-                </button>
-                <button class="btn-glass-secondary" style="font-size: 0.85rem; padding: 0.5rem 1rem;" onclick="ChatbotModule.useSuggestedPrompt('Create a 30-day exam revision study plan')">
-                  📅 Prepare Exam Plan
-                </button>
+                </div>
+                <div class="prompt-chip" onclick="ChatbotModule.useSuggestedPrompt('Generate a 5-question MCQ quiz for Science')">
+                  🎯 Generate Quiz
+                </div>
+                <div class="prompt-chip" onclick="ChatbotModule.useSuggestedPrompt('Summarize my uploaded Science PDF chapter')">
+                  📄 Summarize PDF
+                </div>
+                <div class="prompt-chip" onclick="ChatbotModule.useSuggestedPrompt('Create flashcards for Chemical Reactions')">
+                  🧠 Create Flashcards
+                </div>
+                <div class="prompt-chip" onclick="ChatbotModule.useSuggestedPrompt('Create a personalized exam revision study plan')">
+                  📅 Study Planner
+                </div>
               </div>
             </div>
           </div>
