@@ -19,16 +19,21 @@
   50% { opacity: 0.1; }
 }
 
-/* 1. Bento Box Cards */
+/* 1. Bento Box Cards & Micro Animations */
 .hyper-card {
   background-color: var(--hyper-bg-card);
   border: 1px solid var(--hyper-border-subtle);
   border-radius: var(--hyper-radius-lg);
   padding: 1.5rem;
   box-shadow: var(--hyper-shadow-subtle);
-  transition: all var(--hyper-transition-normal);
+  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s ease, border-color 0.3s ease;
   position: relative;
   overflow: hidden;
+}
+
+.hyper-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 16px 36px -8px rgba(15, 23, 42, 0.09), 0 4px 12px -2px rgba(15, 23, 42, 0.04);
 }
 
 .hyper-card-interactive {
@@ -36,9 +41,44 @@
 }
 
 .hyper-card-interactive:hover {
-  border-color: var(--hyper-border-focus);
-  box-shadow: var(--hyper-shadow-card);
-  transform: translateY(-2px);
+  border-color: var(--hyper-accent-primary);
+  transform: translateY(-6px);
+  box-shadow: 0 20px 40px -10px rgba(14, 165, 233, 0.18);
+}
+
+/* Button Ripple & Hover Animations */
+.hyper-btn {
+  position: relative;
+  overflow: hidden;
+}
+
+.hyper-btn::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 5px;
+  height: 5px;
+  background: rgba(255, 255, 255, 0.5);
+  opacity: 0;
+  border-radius: 100%;
+  transform: scale(1, 1) translate(-50%);
+  transform-origin: 50% 50%;
+}
+
+.hyper-btn:focus:not(:active)::after, .hyper-btn:active::after {
+  animation: hyperRipple 0.6s ease-out;
+}
+
+@keyframes hyperRipple {
+  0% {
+    transform: scale(0, 0);
+    opacity: 0.5;
+  }
+  100% {
+    transform: scale(40, 40);
+    opacity: 0;
+  }
 }
 
 .hyper-card-header {
