@@ -75,6 +75,9 @@
         <li class="hyper-nav-item" data-view="analytics">
           <a href="#analytics"><i data-lucide="bar-chart-3"></i> <span>Analytics</span></a>
         </li>
+        <li class="hyper-nav-item" data-view="settings">
+          <a href="#settings"><i data-lucide="settings"></i> <span>Settings</span></a>
+        </li>
         <li class="hyper-nav-item" data-view="admin">
           <a href="#admin"><i data-lucide="shield-check"></i> <span>Admin Console</span></a>
         </li>
@@ -145,6 +148,9 @@
         <div class="hyper-btn hyper-btn-ghost" style="justify-content: flex-start;" onclick="location.hash='#quizzes'; document.getElementById('commandPaletteModal').style.display='none';">
           <i data-lucide="help-circle" style="color: var(--hyper-accent-emerald); width: 18px; margin-right: 0.5rem;"></i> Start AI Quiz Challenge
         </div>
+        <div class="hyper-btn hyper-btn-ghost" style="justify-content: flex-start;" onclick="location.hash='#settings'; document.getElementById('commandPaletteModal').style.display='none';">
+          <i data-lucide="settings" style="color: var(--hyper-text-secondary); width: 18px; margin-right: 0.5rem;"></i> Open Settings & Preferences
+        </div>
       </div>
       <div style="display: flex; justify-content: flex-end; margin-top: 1rem; border-top: 1px solid var(--hyper-border-subtle); padding-top: 0.75rem;">
         <button class="hyper-btn hyper-btn-glass hyper-btn-sm" onclick="document.getElementById('commandPaletteModal').style.display='none'">Close ESC</button>
@@ -191,6 +197,7 @@
   <script src="/static/js/modules/flashcards.js"></script>
   <script src="/static/js/modules/quiz.js"></script>
   <script src="/static/js/modules/analytics.js"></script>
+  <script src="/static/js/modules/settings.js"></script>
   <script src="/static/js/modules/admin.js"></script>
   <script src="/static/js/app.js"></script>
   <script src="/static/js/theme.js"></script>

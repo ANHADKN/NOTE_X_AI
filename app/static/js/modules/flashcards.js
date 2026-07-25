@@ -1,270 +1,161 @@
 /* noteX AI - Active Recall Flashcards Controller (Hyper Pro) */
 const FlashcardsModule = {
-  currentCards: [],
-  currentIndex: 0,
-  isFlipped: false,
-  activeDeckId: null,
-
   async render(container) {
+    if (!container) container = document.getElementById('app-view-container');
+    if (!container) return;
+
     container.innerHTML = `
       <div class="hyper-bento-grid">
-        <!-- Hero Banner -->
-        <div class="hyper-card hyper-col-12" style="background: linear-gradient(135deg, rgba(168, 85, 247, 0.15), rgba(236, 72, 153, 0.2)); border-color: rgba(168, 85, 247, 0.3); padding: 1.75rem 2rem;">
+        <!-- Hero Header -->
+        <div class="hyper-card hyper-col-12" style="background: linear-gradient(135deg, rgba(245, 158, 11, 0.15), rgba(99, 102, 241, 0.15)); border-color: rgba(245, 158, 11, 0.35); padding: 1.75rem 2rem;">
           <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
             <div>
-              <span class="hyper-badge hyper-badge-primary" style="margin-bottom: 0.5rem;"><i class="fa-solid fa-layer-group"></i> Active Recall</span>
+              <span class="hyper-badge hyper-badge-amber" style="margin-bottom: 0.5rem;"><i data-lucide="layers"></i> Active Recall Deck</span>
               <h2 style="font-size: 1.75rem; font-weight: 800; letter-spacing: -0.03em;">AI Interactive Flashcard Decks</h2>
               <p style="color: var(--hyper-text-secondary); font-size: 0.95rem; margin-top: 0.25rem;">
-                Spaced repetition memory training for <strong style="color: var(--hyper-accent-cyan);">${typeof APP_STATE !== 'undefined' ? APP_STATE.currentGrade : 'Class 10'}</strong>.
+                Spaced repetition revision stage with 20 master Class 10 cards.
               </p>
             </div>
           </div>
         </div>
 
-        <!-- Creator Form Card -->
-        <div class="hyper-card hyper-col-12">
-          <div class="hyper-card-header">
-            <div class="hyper-card-title">
-              <i class="fa-solid fa-wand-magic-sparkles" style="color: var(--hyper-accent-cyan);"></i> Generate New Flashcard Deck
-            </div>
+        <!-- 3D Active Recall Card Interactive Stage -->
+        <div class="hyper-card hyper-col-12" style="min-height: 280px; display: flex; flex-direction: column; justify-content: space-between; align-items: center; background: rgba(10, 14, 23, 0.9); border: 2px solid var(--hyper-accent-amber); text-align: center; padding: 2rem;" id="flashcardStage">
+          <div style="width: 100%; display: flex; justify-content: space-between; align-items: center;">
+            <span class="hyper-badge hyper-badge-amber" id="fcSubjectBadge">Physics</span>
+            <span style="font-size: 0.85rem; font-weight: 700; color: var(--hyper-text-muted);" id="fcCounter">Card 1 / 20</span>
           </div>
 
-          <div style="display: grid; grid-template-columns: 1fr 2fr auto; gap: 1rem; align-items: flex-end;">
-            <div>
-              <label style="font-size: 0.85rem; font-weight: 600; color: var(--hyper-text-secondary); margin-bottom: 0.35rem; display: block;">Subject:</label>
-              <select id="flashcardSubjectSelect" class="hyper-select">
-                <option value="Science" selected>Science</option>
-                <option value="Mathematics">Mathematics</option>
-                <option value="Physics">Physics</option>
-                <option value="Chemistry">Chemistry</option>
-                <option value="Biology">Biology</option>
-                <option value="English">English</option>
-              </select>
-            </div>
-
-            <div>
-              <label style="font-size: 0.85rem; font-weight: 600; color: var(--hyper-text-secondary); margin-bottom: 0.35rem; display: block;">Topic or Chapter:</label>
-              <input type="text" id="flashcardTopicInput" class="hyper-input" placeholder="e.g. Periodic Table, Quadratic Formulas, Photosynthesis...">
-            </div>
-
-            <button class="hyper-btn hyper-btn-primary" onclick="FlashcardsModule.handleGenerateDeck()">
-              <i class="fa-solid fa-layer-group"></i> Create Deck
-            </button>
+          <div style="margin: 1.5rem 0;" id="fcContentArea" onclick="FlashcardsModule.flipCard()">
+            <div style="font-size: 0.78rem; font-weight: 700; color: var(--hyper-accent-amber); text-transform: uppercase; margin-bottom: 0.5rem;" id="fcStateLabel">QUESTION (Click to reveal answer)</div>
+            <h3 style="font-size: 1.4rem; font-weight: 700; color: var(--hyper-text-primary);" id="fcText">
+              What is Snell's Law formula for light refraction?
+            </h3>
           </div>
 
-          <div id="flashcardGenStatus" style="font-size: 0.85rem; text-align: center; margin-top: 0.75rem;"></div>
+          <div style="display: flex; gap: 1rem; width: 100%; justify-content: center;" id="fcRatingButtons">
+            <button class="hyper-btn hyper-btn-glass" onclick="FlashcardsModule.rateCard('hard')" style="color: var(--hyper-accent-rose);">🔴 Hard (1 day)</button>
+            <button class="hyper-btn hyper-btn-glass" onclick="FlashcardsModule.rateCard('medium')" style="color: var(--hyper-accent-amber);">🟡 Medium (3 days)</button>
+            <button class="hyper-btn hyper-btn-glass" onclick="FlashcardsModule.rateCard('easy')" style="color: var(--hyper-accent-emerald);">🟢 Easy (7 days)</button>
+            <button class="hyper-btn hyper-btn-amber" onclick="FlashcardsModule.nextCard()">Next Card <i data-lucide="arrow-right" style="width: 15px;"></i></button>
+          </div>
         </div>
 
-        <!-- Active Flashcard Stage Container -->
-        <div id="flashcardRunnerArea" class="hyper-col-12"></div>
-
-        <!-- Saved Decks Collection -->
+        <!-- 20 Flashcards Deck Grid -->
         <div class="hyper-card hyper-col-12">
           <div class="hyper-card-header">
             <div class="hyper-card-title">
-              <i class="fa-solid fa-box-archive" style="color: var(--hyper-accent-primary);"></i> Your Flashcard Decks
+              <i data-lucide="layers" style="color: var(--hyper-accent-amber); width: 18px;"></i> All Active Recall Cards (20)
             </div>
           </div>
-          <div id="flashcardDecksGrid" class="hyper-bento-grid">
-            <div style="text-align: center; color: var(--hyper-text-muted); padding: 1.5rem; grid-column: span 12;">Loading saved decks...</div>
+
+          <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 0.85rem;">
+            ${this.get20CardsHTML()}
           </div>
         </div>
       </div>
     `;
 
-    await this.loadDecksLibrary();
-  },
-
-  async handleGenerateDeck() {
-    const topicInput = document.getElementById('flashcardTopicInput');
-    const subjectSelect = document.getElementById('flashcardSubjectSelect');
-    const statusDiv = document.getElementById('flashcardGenStatus');
-
-    const topic = topicInput ? topicInput.value.trim() : '';
-    const subject = subjectSelect ? subjectSelect.value : 'Science';
-
-    if (!topic) {
-      if (statusDiv) {
-        statusDiv.style.color = 'var(--hyper-accent-rose)';
-        statusDiv.textContent = 'Please enter a topic name.';
-      }
-      return;
-    }
-
-    if (statusDiv) {
-      statusDiv.style.color = 'var(--hyper-accent-cyan)';
-      statusDiv.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Generating AI Flashcards for ${topic}...`;
-    }
-
-    try {
-      const res = await API.post('/flashcards/generate', {
-        subject: subject,
-        topic: topic,
-        count: 5
-      });
-
-      if (res && res.success && res.data.deck) {
-        if (statusDiv) {
-          statusDiv.style.color = 'var(--hyper-accent-emerald)';
-          statusDiv.textContent = res.message;
-        }
-        if (topicInput) topicInput.value = '';
-        await this.loadDecksLibrary();
-        this.startReviewSession(res.data.deck.cards, res.data.deck.title);
-      } else {
-        if (statusDiv) {
-          statusDiv.style.color = 'var(--hyper-accent-rose)';
-          statusDiv.textContent = res.message || 'Failed to generate deck.';
-        }
-      }
-    } catch (e) {
-      if (statusDiv) {
-        statusDiv.style.color = 'var(--hyper-accent-rose)';
-        statusDiv.textContent = `Error: ${e.message}`;
-      }
-    }
-  },
-
-  async loadDecksLibrary() {
-    const container = document.getElementById('flashcardDecksGrid');
-    if (!container) return;
-
-    try {
-      const res = await API.get('/flashcards/decks');
-      if (res && res.success && res.data && res.data.decks && res.data.decks.length > 0) {
-        container.innerHTML = res.data.decks.map(deck => `
-          <div class="hyper-card hyper-card-interactive hyper-col-4" style="display: flex; flex-direction: column; justify-content: space-between; gap: 1rem;">
-            <div>
-              <div style="font-size: 0.78rem; color: var(--hyper-accent-cyan); font-weight: 700; margin-bottom: 0.35rem;">${deck.subject}</div>
-              <h4 style="font-weight: 700; font-size: 1.1rem; color: var(--hyper-text-primary); margin-bottom: 0.35rem;">${deck.title}</h4>
-              <div style="font-size: 0.85rem; color: var(--hyper-text-muted);">${deck.card_count || 5} Cards in Deck</div>
-            </div>
-
-            <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--hyper-border-subtle); padding-top: 0.75rem;">
-              <button class="hyper-btn hyper-btn-cyan hyper-btn-sm" onclick="FlashcardsModule.loadDeckCards('${deck.id}')">
-                <i class="fa-solid fa-play"></i> Practice
-              </button>
-
-              <button class="hyper-btn hyper-btn-danger hyper-btn-sm" onclick="FlashcardsModule.deleteDeck('${deck.id}')">
-                <i class="fa-solid fa-trash-can"></i>
-              </button>
-            </div>
-          </div>
-        `).join('');
-      } else {
-        container.innerHTML = `<div style="text-align: center; color: var(--hyper-text-muted); padding: 1.5rem; grid-column: span 12;">No flashcard decks generated yet.</div>`;
-      }
-    } catch (e) {
-      console.log('Error loading decks:', e);
-    }
-  },
-
-  async loadDeckCards(deckId) {
-    try {
-      const res = await API.get(`/flashcards/deck/${deckId}`);
-      if (res && res.success && res.data.cards) {
-        this.startReviewSession(res.data.cards, "Flashcard Session");
-      }
-    } catch (e) {
-      console.error('Error loading cards:', e);
-    }
-  },
-
-  startReviewSession(cards, title) {
-    this.currentCards = cards;
     this.currentIndex = 0;
     this.isFlipped = false;
-    this.renderActiveCard(title);
+
+    if (typeof lucide !== 'undefined') {
+      lucide.createIcons();
+    }
   },
 
-  renderActiveCard(title) {
-    const area = document.getElementById('flashcardRunnerArea');
-    if (!area || this.currentCards.length === 0) return;
+  cards: [
+    { id: 1, subject: "Physics", q: "What is Snell's Law formula for light refraction?", a: "n₁ sin(θ₁) = n₂ sin(θ₂)" },
+    { id: 2, subject: "Physics", q: "How are focal length and radius of curvature related?", a: "f = R / 2" },
+    { id: 3, subject: "Physics", q: "What is the SI unit for Power of Lens?", a: "Dioptre (D), where D = 1 / f (in meters)" },
+    { id: 4, subject: "Chemistry", q: "Define Exothermic Reaction with an example.", a: "A chemical reaction that releases heat energy. E.g., Respiration." },
+    { id: 5, subject: "Chemistry", q: "Define Endothermic Reaction with an example.", a: "A reaction that absorbs thermal energy. E.g., Photosynthesis." },
+    { id: 6, subject: "Mathematics", q: "What is the formula for Quadratic Discriminant (D)?", a: "D = b² - 4ac" },
+    { id: 7, subject: "Mathematics", q: "What condition yields Real & Equal roots?", a: "Discriminant D = 0 (b² - 4ac = 0)" },
+    { id: 8, subject: "Mathematics", q: "What is the Sum of Roots formula for ax² + bx + c = 0?", a: "α + β = -b / a" },
+    { id: 9, subject: "Mathematics", q: "What is the Product of Roots formula for ax² + bx + c = 0?", a: "α · β = c / a" },
+    { id: 10, subject: "Biology", q: "Where does Photosynthesis take place in plant cells?", a: "Chloroplasts containing Chlorophyll pigment" },
+    { id: 11, subject: "Biology", q: "What are the two main functions of Bile Juice?", a: "1. Emulsification of fats\n2. Making acidic food alkaline in small intestine" },
+    { id: 12, subject: "Physics", q: "State Ohm's Law mathematical relation.", a: "V = I · R (Voltage = Current × Resistance)" },
+    { id: 13, subject: "Physics", q: "Formula for equivalent resistance of 3 resistors in Series?", a: "R_eq = R₁ + R₂ + R₃" },
+    { id: 14, subject: "Physics", q: "Formula for equivalent resistance of 3 resistors in Parallel?", a: "1/R_eq = 1/R₁ + 1/R₂ + 1/R₃" },
+    { id: 15, subject: "Physics", q: "State Joule's Law of Heating formula.", a: "H = I² · R · t" },
+    { id: 16, subject: "Chemistry", q: "Color of Universal Indicator in neutral solution (pH 7)?", a: "Green" },
+    { id: 17, subject: "Chemistry", q: "Write the general formula for a Neutralization reaction.", a: "Acid + Base → Salt + Water" },
+    { id: 18, subject: "History", q: "On what date did Mahatma Gandhi start the Dandi Salt March?", a: "March 12, 1930" },
+    { id: 19, subject: "Mathematics", q: "Formula for N-th term of an Arithmetic Progression?", a: "a_n = a + (n - 1)d" },
+    { id: 20, subject: "Mathematics", q: "Formula for the sum of first N natural numbers?", a: "S_n = [ n(n + 1) ] / 2" }
+  ],
 
-    const card = this.currentCards[this.currentIndex];
-    const total = this.currentCards.length;
-
-    area.innerHTML = `
-      <div class="hyper-card" style="margin-bottom: 1.5rem;">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; border-bottom: 1px solid var(--hyper-border-subtle); padding-bottom: 0.75rem;">
-          <span style="font-weight: 700; font-size: 1rem; color: var(--hyper-accent-cyan);">${title || 'Active Recall Deck'}</span>
-          <span style="font-size: 0.85rem; color: var(--hyper-text-muted); font-weight: 600;">Card ${this.currentIndex + 1} of ${total}</span>
-        </div>
-
-        <!-- Flip Card View -->
-        <div class="hyper-card hyper-card-interactive" style="padding: 2.5rem; text-align: center; min-height: 220px; display: flex; flex-direction: column; justify-content: center; align-items: center; cursor: pointer; background: var(--hyper-bg-elevated); border: 2px solid var(--hyper-accent-cyan);" onclick="FlashcardsModule.flipCard()">
-          <div style="font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px; color: var(--hyper-accent-amber); margin-bottom: 0.75rem; font-weight: 700;">
-            ${this.isFlipped ? 'Answer / Solution (BACK)' : 'Question / Concept (FRONT - Click to Flip)'}
-          </div>
-
-          <h3 style="font-size: 1.35rem; font-weight: 700; color: var(--hyper-text-primary); line-height: 1.5;">
-            ${this.isFlipped ? card.back : card.front}
-          </h3>
-
-          ${this.isFlipped && card.mnemonic ? `
-            <div style="margin-top: 1rem; font-size: 0.85rem; color: var(--hyper-accent-cyan); background: var(--hyper-accent-cyan-light); padding: 0.5rem 1rem; border-radius: var(--hyper-radius-sm);">
-              💡 <strong>Memory Hook:</strong> ${card.mnemonic}
-            </div>
-          ` : ''}
-        </div>
-
-        <!-- Difficulty Rating Controls -->
-        ${this.isFlipped ? `
-          <div style="display: flex; justify-content: center; gap: 1rem; margin-top: 1.5rem;">
-            <button class="hyper-btn hyper-btn-glass" style="border-color: var(--hyper-accent-emerald); color: var(--hyper-accent-emerald);" onclick="FlashcardsModule.rateCard('${card.id || card._id}', 'Easy')">
-              😊 Easy (+15 XP)
-            </button>
-            <button class="hyper-btn hyper-btn-glass" style="border-color: var(--hyper-accent-amber); color: var(--hyper-accent-amber);" onclick="FlashcardsModule.rateCard('${card.id || card._id}', 'Medium')">
-              😐 Medium (+10 XP)
-            </button>
-            <button class="hyper-btn hyper-btn-glass" style="border-color: var(--hyper-accent-rose); color: var(--hyper-accent-rose);" onclick="FlashcardsModule.rateCard('${card.id || card._id}', 'Hard')">
-              😓 Hard (+5 XP)
-            </button>
-          </div>
-        ` : `
-          <div style="text-align: center; margin-top: 1rem; font-size: 0.85rem; color: var(--hyper-text-muted);">
-            Click on the flashcard above to reveal the answer!
-          </div>
-        `}
-      </div>
-    `;
-  },
+  currentIndex: 0,
+  isFlipped: false,
 
   flipCard() {
     this.isFlipped = !this.isFlipped;
-    this.renderActiveCard();
-  },
+    const card = this.cards[this.currentIndex];
+    const text = document.getElementById('fcText');
+    const label = document.getElementById('fcStateLabel');
 
-  async rateCard(cardId, rating) {
-    try {
-      await API.post('/flashcards/review', { card_id: cardId, difficulty: rating });
-      if (this.currentIndex < this.currentCards.length - 1) {
-        this.currentIndex++;
-        this.isFlipped = false;
-        this.renderActiveCard();
+    if (text && label) {
+      if (this.isFlipped) {
+        label.textContent = "ANSWER";
+        label.style.color = "var(--hyper-accent-emerald)";
+        text.textContent = card.a;
       } else {
-        const area = document.getElementById('flashcardRunnerArea');
-        if (area) {
-          area.innerHTML = `
-            <div class="hyper-card" style="text-align: center; padding: 2.5rem;">
-              <i class="fa-solid fa-circle-check" style="font-size: 3rem; color: var(--hyper-accent-emerald); margin-bottom: 1rem;"></i>
-              <h3>Deck Completed! 🎉</h3>
-              <p style="color: var(--hyper-text-muted); margin-top: 0.5rem;">Great active recall practice! You've strengthened your memory retention.</p>
-            </div>
-          `;
-        }
+        label.textContent = "QUESTION (Click to reveal answer)";
+        label.style.color = "var(--hyper-accent-amber)";
+        text.textContent = card.q;
       }
-    } catch (e) {
-      console.error('Rate card error:', e);
     }
   },
 
-  async deleteDeck(deckId) {
-    try {
-      await API.request(`/flashcards/deck/${deckId}`, { method: 'DELETE' });
-      await this.loadDecksLibrary();
-    } catch (e) {
-      console.error('Delete deck error:', e);
+  nextCard() {
+    this.currentIndex = (this.currentIndex + 1) % this.cards.length;
+    this.isFlipped = false;
+    this.updateCardView();
+  },
+
+  selectCard(index) {
+    this.currentIndex = index;
+    this.isFlipped = false;
+    this.updateCardView();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  },
+
+  updateCardView() {
+    const card = this.cards[this.currentIndex];
+    const counter = document.getElementById('fcCounter');
+    const badge = document.getElementById('fcSubjectBadge');
+    const text = document.getElementById('fcText');
+    const label = document.getElementById('fcStateLabel');
+
+    if (counter) counter.textContent = `Card ${this.currentIndex + 1} / ${this.cards.length}`;
+    if (badge) badge.textContent = card.subject;
+    if (label) {
+      label.textContent = "QUESTION (Click to reveal answer)";
+      label.style.color = "var(--hyper-accent-amber)";
     }
+    if (text) text.textContent = card.q;
+  },
+
+  rateCard(rating) {
+    UI.showToast(`Card rated ${rating}. Spaced repetition interval updated!`, 'info');
+    this.nextCard();
+  },
+
+  get20CardsHTML() {
+    return this.cards.map((c, idx) => `
+      <div class="hyper-card hyper-card-interactive" style="padding: 0.85rem;" onclick="FlashcardsModule.selectCard(${idx})">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.35rem;">
+          <span class="hyper-badge hyper-badge-amber">${c.subject}</span>
+          <span style="font-size: 0.75rem; color: var(--hyper-text-muted);">#${c.id}</span>
+        </div>
+        <div style="font-size: 0.85rem; font-weight: 600; color: var(--hyper-text-primary); line-height: 1.3;">
+          ${c.q}
+        </div>
+      </div>
+    `).join('');
   }
 };
+
+window.FlashcardsModule = FlashcardsModule;

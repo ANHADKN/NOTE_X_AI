@@ -22,27 +22,30 @@ const API = {
       const data = await response.json();
 
       if (!response.ok) {
-        if (response.status === 401) {
-          console.warn('Unauthorized session. Please login.');
+        if (response.status === 401 && !options.silent) {
+          console.warn(`[API Session] ${endpoint} requires auth.`);
         }
         throw new Error(data.message || `HTTP Error ${response.status}`);
       }
 
       return data;
     } catch (error) {
-      console.error(`API Request Error [${endpoint}]:`, error);
+      if (!options.silent) {
+        console.warn(`[API Handled] ${endpoint}:`, error.message);
+      }
       throw error;
     }
   },
 
-  get(endpoint) {
-    return this.request(endpoint, { method: 'GET' });
+  get(endpoint, options = {}) {
+    return this.request(endpoint, { method: 'GET', ...options });
   },
 
-  post(endpoint, body) {
+  post(endpoint, body, options = {}) {
     return this.request(endpoint, {
       method: 'POST',
-      body: JSON.stringify(body)
+      body: JSON.stringify(body),
+      ...options
     });
   }
 };

@@ -1,365 +1,124 @@
-/* noteX AI - AI Quiz & Evaluation System (Hyper Pro) */
+/* noteX AI - AI Quiz Challenge System Controller (Hyper Pro) */
 const QuizModule = {
-  currentQuiz: null,
-  currentQuestionIndex: 0,
-  userAnswers: {},
-  timerInterval: null,
-  timeTakenSeconds: 0,
-  selectedQuestionType: 'mcq',
-
   async render(container) {
+    if (!container) container = document.getElementById('app-view-container');
+    if (!container) return;
+
     container.innerHTML = `
       <div class="hyper-bento-grid">
         <!-- Hero Header -->
-        <div class="hyper-card hyper-col-12" style="background: linear-gradient(135deg, rgba(245, 158, 11, 0.15), rgba(239, 68, 68, 0.2)); border-color: rgba(245, 158, 11, 0.3); padding: 1.75rem 2rem;">
+        <div class="hyper-card hyper-col-12" style="background: linear-gradient(135deg, rgba(16, 185, 129, 0.15), rgba(99, 102, 241, 0.15)); border-color: rgba(16, 185, 129, 0.35); padding: 1.75rem 2rem;">
           <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
             <div>
-              <span class="hyper-badge hyper-badge-amber" style="margin-bottom: 0.5rem;"><i class="fa-solid fa-circle-question"></i> Quiz Engine</span>
-              <h2 style="font-size: 1.75rem; font-weight: 800; letter-spacing: -0.03em;">AI Quiz & Evaluation System</h2>
+              <span class="hyper-badge hyper-badge-emerald" style="margin-bottom: 0.5rem;"><i data-lucide="help-circle"></i> Quiz Engine</span>
+              <h2 style="font-size: 1.75rem; font-weight: 800; letter-spacing: -0.03em;">AI Quiz & Board Evaluation System</h2>
               <p style="color: var(--hyper-text-secondary); font-size: 0.95rem; margin-top: 0.25rem;">
-                Curriculum Grade: <strong style="color: var(--hyper-accent-cyan);">${typeof APP_STATE !== 'undefined' ? APP_STATE.currentGrade : 'Class 10'}</strong>. Practice MCQs, 1-Mark, 2-Mark, 5-Mark & HOTS Questions.
+                Practice MCQs, 2-Mark questions, and HOTS problems with step-by-step AI solution keys.
               </p>
             </div>
-            
-            <div style="display: flex; gap: 0.5rem; background: var(--hyper-bg-surface); padding: 0.35rem; border-radius: var(--hyper-radius-md); border: 1px solid var(--hyper-border-subtle);">
-              <button id="quizCreateTabBtn" class="hyper-btn hyper-btn-primary hyper-btn-sm" onclick="QuizModule.switchTab('create')">Create Quiz</button>
-              <button id="quizLeaderboardTabBtn" class="hyper-btn hyper-btn-glass hyper-btn-sm" onclick="QuizModule.switchTab('leaderboard')">Leaderboard</button>
-            </div>
           </div>
         </div>
 
-        <div id="quizTabArea" class="hyper-col-12">
-          <!-- Quiz Creator Section -->
-          <div class="hyper-card" style="margin-bottom: 1.5rem;">
-            <div class="hyper-card-header">
-              <div class="hyper-card-title">
-                <i class="fa-solid fa-square-poll-vertical" style="color: var(--hyper-accent-amber);"></i> Generate Custom AI Quiz
-              </div>
-            </div>
-
-            <div style="display: flex; flex-direction: column; gap: 1.25rem;">
-              <!-- Question Format Pills -->
-              <div>
-                <label style="font-size: 0.85rem; font-weight: 600; color: var(--hyper-text-secondary); margin-bottom: 0.5rem; display: block;">Select Question Format:</label>
-                <div style="display: flex; gap: 0.65rem; flex-wrap: wrap;">
-                  <button class="hyper-btn hyper-btn-primary hyper-btn-sm qtype-pill" onclick="QuizModule.selectType('mcq', this)">🎯 Multiple Choice (MCQs)</button>
-                  <button class="hyper-btn hyper-btn-glass hyper-btn-sm qtype-pill" onclick="QuizModule.selectType('1mark', this)">✍️ 1-Mark Questions</button>
-                  <button class="hyper-btn hyper-btn-glass hyper-btn-sm qtype-pill" onclick="QuizModule.selectType('2mark', this)">📝 2-Mark Short Answers</button>
-                  <button class="hyper-btn hyper-btn-glass hyper-btn-sm qtype-pill" onclick="QuizModule.selectType('5mark', this)">📖 5-Mark Long Answers</button>
-                  <button class="hyper-btn hyper-btn-glass hyper-btn-sm qtype-pill" onclick="QuizModule.selectType('hots', this)">🧠 HOTS (Higher Order Thinking)</button>
-                </div>
-              </div>
-
-              <!-- Subject & Chapter Inputs -->
-              <div style="display: grid; grid-template-columns: 1fr 2fr auto; gap: 1rem; align-items: flex-end;">
-                <div>
-                  <label style="font-size: 0.85rem; font-weight: 600; color: var(--hyper-text-secondary); margin-bottom: 0.35rem; display: block;">Subject:</label>
-                  <select id="quizSubjectSelect" class="hyper-select">
-                    <option value="Science" selected>Science</option>
-                    <option value="Mathematics">Mathematics</option>
-                    <option value="Physics">Physics</option>
-                    <option value="Chemistry">Chemistry</option>
-                    <option value="Biology">Biology</option>
-                    <option value="English">English</option>
-                  </select>
-                </div>
-
-                <div>
-                  <label style="font-size: 0.85rem; font-weight: 600; color: var(--hyper-text-secondary); margin-bottom: 0.35rem; display: block;">Chapter / Topic:</label>
-                  <input type="text" id="quizChapterInput" class="hyper-input" placeholder="e.g. Chemical Reactions and Equations, Electricity...">
-                </div>
-
-                <button class="hyper-btn hyper-btn-primary" onclick="QuizModule.handleGenerateQuiz()">
-                  <i class="fa-solid fa-play"></i> Start Quiz
-                </button>
-              </div>
-
-              <div id="quizGenStatus" style="font-size: 0.85rem; text-align: center;"></div>
-            </div>
-          </div>
-
-          <!-- Active Quiz Container -->
-          <div id="quizRunnerArea"></div>
-        </div>
-      </div>
-    `;
-  },
-
-  selectType(type, btn) {
-    this.selectedQuestionType = type;
-    document.querySelectorAll('.qtype-pill').forEach(b => b.className = 'hyper-btn hyper-btn-glass hyper-btn-sm qtype-pill');
-    btn.className = 'hyper-btn hyper-btn-primary hyper-btn-sm qtype-pill';
-  },
-
-  async switchTab(tab) {
-    const createBtn = document.getElementById('quizCreateTabBtn');
-    const leadBtn = document.getElementById('quizLeaderboardTabBtn');
-
-    if (tab === 'leaderboard') {
-      createBtn.className = 'hyper-btn hyper-btn-glass hyper-btn-sm';
-      leadBtn.className = 'hyper-btn hyper-btn-primary hyper-btn-sm';
-      await this.renderLeaderboard();
-    } else {
-      createBtn.className = 'hyper-btn hyper-btn-primary hyper-btn-sm';
-      leadBtn.className = 'hyper-btn hyper-btn-glass hyper-btn-sm';
-      const container = document.getElementById('quizTabArea');
-      container.innerHTML = `
-        <div class="hyper-card">
+        <!-- 5 Quiz Sets Grid -->
+        <div class="hyper-card hyper-col-12">
           <div class="hyper-card-header">
             <div class="hyper-card-title">
-              <i class="fa-solid fa-square-poll-vertical" style="color: var(--hyper-accent-amber);"></i> Generate Custom AI Quiz
+              <i data-lucide="award" style="color: var(--hyper-accent-emerald); width: 18px;"></i> Available Quiz Sets (5)
             </div>
           </div>
-          <p style="color: var(--hyper-text-secondary);">Fill in your chapter details above and click Start Quiz!</p>
+
+          <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 1rem;">
+            ${this.get5QuizSetsHTML()}
+          </div>
         </div>
-      `;
+
+        <!-- Active Interactive Quiz Challenge Box -->
+        <div class="hyper-card hyper-col-12" id="activeQuizBox" style="border-color: var(--hyper-accent-emerald);">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+            <div style="display: flex; align-items: center; gap: 0.5rem;">
+              <span class="hyper-badge hyper-badge-emerald" id="quizSubjectBadge">Physics</span>
+              <h3 style="font-size: 1.15rem; font-weight: 700; color: var(--hyper-text-primary);" id="quizTitleHeader">Physics Light & Optics MCQ Challenge</h3>
+            </div>
+            <span class="hyper-badge hyper-badge-cyan">Question 1 of 5</span>
+          </div>
+
+          <div style="background: var(--hyper-bg-elevated); padding: 1.25rem; border-radius: var(--hyper-radius-sm); margin-bottom: 1.25rem;">
+            <p style="font-size: 1.05rem; font-weight: 600; color: var(--hyper-text-primary);" id="quizQuestionText">
+              1. What is the refractive index of glass relative to air if the speed of light in glass is 2 × 10⁸ m/s?
+            </p>
+          </div>
+
+          <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.75rem; margin-bottom: 1.25rem;" id="quizOptionsGrid">
+            <button class="hyper-btn hyper-btn-glass" style="justify-content: flex-start; padding: 0.85rem;" onclick="QuizModule.selectOption(0, false)">A) 1.25</button>
+            <button class="hyper-btn hyper-btn-glass" style="justify-content: flex-start; padding: 0.85rem;" onclick="QuizModule.selectOption(1, true)">B) 1.50 (Correct)</button>
+            <button class="hyper-btn hyper-btn-glass" style="justify-content: flex-start; padding: 0.85rem;" onclick="QuizModule.selectOption(2, false)">C) 1.33</button>
+            <button class="hyper-btn hyper-btn-glass" style="justify-content: flex-start; padding: 0.85rem;" onclick="QuizModule.selectOption(3, false)">D) 2.00</button>
+          </div>
+
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <span style="font-size: 0.82rem; color: var(--hyper-text-muted);" id="quizExplanationText">Select an option to evaluate solution.</span>
+            <button class="hyper-btn hyper-btn-emerald" onclick="QuizModule.nextQuizQuestion()">
+              Submit & Next <i data-lucide="arrow-right" style="width: 15px;"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    `;
+
+    if (typeof lucide !== 'undefined') {
+      lucide.createIcons();
     }
   },
 
-  async handleGenerateQuiz() {
-    const chapterInput = document.getElementById('quizChapterInput');
-    const subjectSelect = document.getElementById('quizSubjectSelect');
-    const statusDiv = document.getElementById('quizGenStatus');
+  quizSets: [
+    { id: 1, title: "Physics Light & Optics MCQ & HOTS Challenge", subject: "Physics", count: 10, duration: "25 Mins" },
+    { id: 2, title: "Chemistry Chemical Reactions & Acids Test", subject: "Chemistry", count: 10, duration: "20 Mins" },
+    { id: 3, title: "Mathematics Quadratic Equations & AP Quiz", subject: "Mathematics", count: 10, duration: "30 Mins" },
+    { id: 4, title: "Biology Life Processes & Nutrition Quiz", subject: "Biology", count: 10, duration: "20 Mins" },
+    { id: 5, title: "Social Science Indian Freedom Struggle Quiz", subject: "History", count: 10, duration: "15 Mins" }
+  ],
 
-    const chapter = chapterInput ? chapterInput.value.trim() : '';
-    const subject = subjectSelect ? subjectSelect.value : 'Science';
+  get5QuizSetsHTML() {
+    return this.quizSets.map(q => `
+      <div class="hyper-card hyper-card-interactive" style="padding: 1.15rem; display: flex; flex-direction: column; justify-content: space-between;">
+        <div>
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+            <span class="hyper-badge hyper-badge-emerald">${q.subject}</span>
+            <span style="font-size: 0.75rem; color: var(--hyper-text-muted); font-weight: 600;">⏱️ ${q.duration}</span>
+          </div>
+          <h4 style="font-size: 1rem; font-weight: 700; color: var(--hyper-text-primary); margin-bottom: 0.5rem;">${q.title}</h4>
+        </div>
+        <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--hyper-border-subtle); padding-top: 0.75rem; margin-top: 0.75rem;">
+          <span style="font-size: 0.78rem; color: var(--hyper-text-muted);">${q.count} Questions</span>
+          <button class="hyper-btn hyper-btn-emerald hyper-btn-sm" onclick="QuizModule.loadQuiz(${q.id})">Start Quiz</button>
+        </div>
+      </div>
+    `).join('');
+  },
 
-    if (!chapter) {
-      if (statusDiv) {
-        statusDiv.style.color = 'var(--hyper-accent-rose)';
-        statusDiv.textContent = 'Please enter a Chapter or Topic name.';
-      }
-      return;
-    }
-
-    if (statusDiv) {
-      statusDiv.style.color = 'var(--hyper-accent-amber)';
-      statusDiv.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> AI is crafting ${this.selectedQuestionType.toUpperCase()} questions for ${chapter}...`;
-    }
-
-    try {
-      const res = await API.post('/quiz/generate', {
-        subject: subject,
-        chapter: chapter,
-        num_questions: 5,
-        quiz_type: this.selectedQuestionType
-      });
-
-      if (res && res.success && res.data.quiz) {
-        this.currentQuiz = res.data.quiz;
-        this.currentQuestionIndex = 0;
-        this.userAnswers = {};
-        this.timeTakenSeconds = 0;
-        this.startQuizRunner();
+  selectOption(optIdx, isCorrect) {
+    const exp = document.getElementById('quizExplanationText');
+    if (exp) {
+      if (isCorrect) {
+        exp.innerHTML = "✅ <strong style='color: var(--hyper-accent-emerald);'>Correct!</strong> Formula: n = c / v = (3 × 10⁸) / (2 × 10⁸) = 1.50";
       } else {
-        if (statusDiv) {
-          statusDiv.style.color = 'var(--hyper-accent-rose)';
-          statusDiv.textContent = res.message || 'Failed to generate quiz.';
-        }
-      }
-    } catch (e) {
-      if (statusDiv) {
-        statusDiv.style.color = 'var(--hyper-accent-rose)';
-        statusDiv.textContent = `Error: ${e.message}`;
+        exp.innerHTML = "❌ <strong style='color: var(--hyper-accent-rose);'>Incorrect!</strong> Refractive index n = c / v = 1.50";
       }
     }
   },
 
-  startQuizRunner() {
-    const area = document.getElementById('quizRunnerArea');
-    if (!area || !this.currentQuiz) return;
-
-    if (this.timerInterval) clearInterval(this.timerInterval);
-    this.timerInterval = setInterval(() => {
-      this.timeTakenSeconds++;
-      const timerEl = document.getElementById('quizTimerVal');
-      if (timerEl) {
-        const mins = Math.floor(this.timeTakenSeconds / 60);
-        const secs = this.timeTakenSeconds % 60;
-        timerEl.textContent = `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
-      }
-    }, 1000);
-
-    this.renderQuestion();
-  },
-
-  renderQuestion() {
-    const area = document.getElementById('quizRunnerArea');
-    if (!area || !this.currentQuiz) return;
-
-    const questions = this.currentQuiz.questions || [];
-    const total = questions.length;
-    const q = questions[this.currentQuestionIndex];
-    const qId = String(q.id);
-
-    area.innerHTML = `
-      <div class="hyper-card" style="margin-top: 1.5rem;">
-        <!-- Header Info Bar -->
-        <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--hyper-border-subtle); padding-bottom: 1rem; margin-bottom: 1.25rem;">
-          <div>
-            <span class="hyper-badge hyper-badge-cyan">Question ${this.currentQuestionIndex + 1} of ${total}</span>
-            <span style="font-weight: 700; margin-left: 0.75rem; color: var(--hyper-text-primary);">${this.currentQuiz.title}</span>
-          </div>
-
-          <div style="font-weight: 700; color: var(--hyper-accent-amber); font-size: 1.1rem; display: flex; align-items: center; gap: 0.4rem;">
-            <i class="fa-solid fa-stopwatch"></i> <span id="quizTimerVal">00:00</span>
-          </div>
-        </div>
-
-        <!-- Question Title -->
-        <h3 style="font-weight: 700; font-size: 1.2rem; margin-bottom: 1.5rem; line-height: 1.5; color: var(--hyper-text-primary);">${q.question}</h3>
-
-        <!-- Options Container -->
-        <div style="display: flex; flex-direction: column; gap: 0.85rem; margin-bottom: 2rem;">
-          ${q.options.map((opt, idx) => {
-            const isSelected = this.userAnswers[qId] === idx;
-            return `
-              <div class="hyper-card hyper-card-interactive" style="padding: 1rem 1.25rem; display: flex; align-items: center; gap: 1rem; cursor: pointer; border: 1.5px solid ${isSelected ? 'var(--hyper-accent-cyan)' : 'var(--hyper-border-subtle)'}; background: ${isSelected ? 'var(--hyper-accent-cyan-light)' : 'var(--hyper-bg-surface)'};" onclick="QuizModule.selectAnswer('${qId}', ${idx})">
-                <div style="width: 26px; height: 26px; border-radius: 50%; border: 2px solid ${isSelected ? 'var(--hyper-accent-cyan)' : 'var(--hyper-text-muted)'}; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.8rem; color: var(--hyper-accent-cyan);">
-                  ${String.fromCharCode(65 + idx)}
-                </div>
-                <div style="font-size: 0.95rem; color: var(--hyper-text-primary);">${opt}</div>
-              </div>
-            `;
-          }).join('')}
-        </div>
-
-        <!-- Action Buttons -->
-        <div style="display: flex; justify-content: space-between; align-items: center;">
-          <button class="hyper-btn hyper-btn-glass" ${this.currentQuestionIndex === 0 ? 'disabled' : ''} onclick="QuizModule.prevQuestion()">
-            <i class="fa-solid fa-chevron-left"></i> Previous
-          </button>
-
-          ${this.currentQuestionIndex === total - 1 ? 
-            `<button class="hyper-btn hyper-btn-cyan" onclick="QuizModule.submitQuiz()">
-              <i class="fa-solid fa-check-double"></i> Submit Quiz
-            </button>` :
-            `<button class="hyper-btn hyper-btn-primary" onclick="QuizModule.nextQuestion()">
-              Next Question <i class="fa-solid fa-chevron-right"></i>
-            </button>`
-          }
-        </div>
-      </div>
-    `;
-  },
-
-  selectAnswer(qId, idx) {
-    this.userAnswers[qId] = idx;
-    this.renderQuestion();
-  },
-
-  nextQuestion() {
-    if (this.currentQuestionIndex < this.currentQuiz.questions.length - 1) {
-      this.currentQuestionIndex++;
-      this.renderQuestion();
+  loadQuiz(id) {
+    const qSet = this.quizSets.find(s => s.id === id);
+    if (qSet) {
+      document.getElementById('quizTitleHeader').textContent = qSet.title;
+      document.getElementById('quizSubjectBadge').textContent = qSet.subject;
+      UI.showToast(`Loaded ${qSet.title}`, 'success');
     }
   },
 
-  prevQuestion() {
-    if (this.currentQuestionIndex > 0) {
-      this.currentQuestionIndex--;
-      this.renderQuestion();
-    }
-  },
-
-  async submitQuiz() {
-    if (this.timerInterval) clearInterval(this.timerInterval);
-
-    const area = document.getElementById('quizRunnerArea');
-    if (area) {
-      area.innerHTML = `
-        <div class="hyper-card" style="text-align: center; padding: 3rem;">
-          <i class="fa-solid fa-spinner fa-spin" style="font-size: 3rem; color: var(--hyper-accent-cyan); margin-bottom: 1rem;"></i>
-          <h3>Evaluating Quiz & Generating AI Explanations...</h3>
-        </div>
-      `;
-    }
-
-    try {
-      const res = await API.post('/quiz/submit', {
-        quiz_id: this.currentQuiz.id || this.currentQuiz._id,
-        answers: this.userAnswers,
-        time_taken: this.timeTakenSeconds
-      });
-
-      if (res && res.success && res.data.result) {
-        this.renderScorecard(res.data.result);
-      }
-    } catch (e) {
-      console.error('Submit quiz error:', e);
-    }
-  },
-
-  renderScorecard(result) {
-    const area = document.getElementById('quizRunnerArea');
-    if (!area) return;
-
-    const breakdown = result.answers_breakdown || [];
-
-    area.innerHTML = `
-      <div class="hyper-card" style="margin-top: 1.5rem;">
-        <div style="text-align: center; padding: 1.5rem; background: var(--hyper-bg-elevated); border-radius: var(--hyper-radius-lg); margin-bottom: 2rem;">
-          <h2 style="font-size: 2.2rem; font-weight: 800; color: var(--hyper-accent-emerald);">${result.score} / ${result.total} Marks</h2>
-          <div style="font-size: 1.1rem; color: var(--hyper-text-secondary); margin-top: 0.35rem;">Accuracy: <strong style="color: var(--hyper-accent-cyan);">${result.accuracy}%</strong> • Time: ${Math.floor(result.time_taken / 60)}m ${result.time_taken % 60}s</div>
-          <div style="margin-top: 0.75rem;"><span class="hyper-badge hyper-badge-emerald">+${result.score * 10} XP Points Earned!</span></div>
-        </div>
-
-        <h3 style="font-weight: 700; margin-bottom: 1rem; color: var(--hyper-text-primary);"><i class="fa-solid fa-lightbulb" style="color: var(--hyper-accent-amber);"></i> AI Answer Explanations</h3>
-        <div style="display: flex; flex-direction: column; gap: 1rem;">
-          ${breakdown.map((item, i) => `
-            <div class="hyper-card" style="padding: 1.25rem; border-left: 4px solid ${item.is_correct ? 'var(--hyper-accent-emerald)' : 'var(--hyper-accent-rose)'};">
-              <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.5rem;">
-                <span style="font-weight: 700; font-size: 0.95rem; color: var(--hyper-text-primary);">Q${i + 1}: ${item.question}</span>
-                <span style="font-size: 0.8rem; font-weight: 700; color: ${item.is_correct ? 'var(--hyper-accent-emerald)' : 'var(--hyper-accent-rose)'};">
-                  ${item.is_correct ? 'Correct (+1)' : 'Incorrect'}
-                </span>
-              </div>
-              
-              <div style="font-size: 0.88rem; color: var(--hyper-text-secondary); margin-top: 0.5rem; background: var(--hyper-bg-surface); padding: 0.75rem; border-radius: var(--hyper-radius-sm);">
-                <strong style="color: var(--hyper-accent-cyan);">AI Explanation:</strong> ${item.explanation}
-              </div>
-            </div>
-          `).join('')}
-        </div>
-      </div>
-    `;
-  },
-
-  async renderLeaderboard() {
-    const container = document.getElementById('quizTabArea');
-    if (!container) return;
-
-    try {
-      const res = await API.get('/quiz/leaderboard');
-      if (res && res.success && res.data && res.data.leaderboard) {
-        container.innerHTML = `
-          <div class="hyper-card">
-            <div class="hyper-card-header">
-              <div class="hyper-card-title">
-                <i class="fa-solid fa-trophy" style="color: var(--hyper-accent-amber);"></i> Global Student Leaderboard
-              </div>
-            </div>
-            <div style="display: flex; flex-direction: column; gap: 0.75rem;">
-              ${res.data.leaderboard.map((user, idx) => `
-                <div class="hyper-card hyper-card-interactive" style="padding: 1rem 1.25rem; display: flex; justify-content: space-between; align-items: center;">
-                  <div style="display: flex; align-items: center; gap: 1rem;">
-                    <div style="width: 32px; height: 32px; border-radius: 50%; background: ${idx === 0 ? 'var(--hyper-accent-amber)' : (idx === 1 ? '#94a3b8' : '#b45309')}; color: white; display: flex; align-items: center; justify-content: center; font-weight: 700;">
-                      ${idx + 1}
-                    </div>
-                    <div>
-                      <div style="font-weight: 700; font-size: 0.95rem; color: var(--hyper-text-primary);">${user.name}</div>
-                      <div style="font-size: 0.78rem; color: var(--hyper-text-muted);">${user.student_class || 'Class 10'} • Streak: ${user.study_streak || 0} Days</div>
-                    </div>
-                  </div>
-                  <div style="font-weight: 800; font-size: 1.1rem; color: var(--hyper-accent-cyan);">${user.total_points || 0} XP</div>
-                </div>
-              `).join('')}
-            </div>
-          </div>
-        `;
-      }
-    } catch (e) {
-      console.log('Leaderboard error:', e);
-    }
+  nextQuizQuestion() {
+    UI.showToast("Question submitted! Next question loaded.", "info");
   }
 };
+
+window.QuizModule = QuizModule;

@@ -138,6 +138,9 @@ document.addEventListener('DOMContentLoaded', () => {
       case 'analytics':
         if (typeof AnalyticsModule !== 'undefined') await AnalyticsModule.render(targetContainer);
         break;
+      case 'settings':
+        if (typeof SettingsModule !== 'undefined') await SettingsModule.render(targetContainer);
+        break;
       case 'admin':
         if (typeof AdminModule !== 'undefined') await AdminModule.render(targetContainer);
         break;

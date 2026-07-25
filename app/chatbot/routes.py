@@ -9,10 +9,12 @@ from app.services.openai_service import AIService
 from app.utils.logger import logger
 
 chatbot_bp = Blueprint('chatbot_bp', __name__, url_prefix='/api/chatbot')
+chat_alias_bp = Blueprint('chat_alias_bp', __name__, url_prefix='/api/chat')
 
 IN_MEMORY_CHAT_HISTORY = {}
 
 @chatbot_bp.route('/message', methods=['POST'])
+@chat_alias_bp.route('/message', methods=['POST'])
 @token_required
 def send_message():
     """Send a message to noteX AI Chatbot and retrieve full response."""
@@ -22,7 +24,6 @@ def send_message():
         subject = data.get('subject', 'General')
         user_info = request.user
         user_id = user_info.get('user_id')
-        email = user_info.get('email')
         student_class = user_info.get('student_class', 'Class 10')
 
         if not prompt:
@@ -39,7 +40,6 @@ def send_message():
 
         from app.services.ai_router import AIRouter
 
-        # Analyze intent and route through AI Router Engine
         router_result = AIRouter.analyze_and_route(user_id=user_id, prompt=prompt, student_class=student_class)
         ai_response_text = router_result.get("response", "")
 
@@ -79,32 +79,12 @@ def send_message():
         logger.error(f"Chatbot Message Error: {str(e)}")
         return api_response(success=False, message=str(e), status_code=500)
 
-@chatbot_bp.route('/stream', methods=['POST'])
-@token_required
-def stream_message():
-    """Stream real-time typing response for live chat interaction."""
-    try:
-        data = request.get_json() or {}
-        prompt = data.get('prompt', '').strip()
-        subject = data.get('subject', 'General')
-        user_info = request.user
-        student_class = user_info.get('student_class', 'Class 10')
-
-        if not prompt:
-            return api_response(success=False, message="Prompt cannot be empty.", status_code=400)
-
-        return Response(
-            stream_with_context(AIService.stream_chat_response(prompt, student_class, subject)),
-            mimetype='text/event-stream'
-        )
-    except Exception as e:
-        logger.error(f"Chatbot Streaming Error: {str(e)}")
-        return api_response(success=False, message=str(e), status_code=500)
-
 @chatbot_bp.route('/history', methods=['GET'])
+@chatbot_bp.route('/conversations', methods=['GET'])
+@chat_alias_bp.route('/conversations', methods=['GET'])
 @token_required
 def get_history():
-    """Retrieve chat history logs for current user."""
+    """Retrieve chat history logs / threads for current user."""
     try:
         user_info = request.user
         user_id = user_info.get('user_id')
@@ -116,12 +96,51 @@ def get_history():
         else:
             serialized = IN_MEMORY_CHAT_HISTORY.get(user_id, [])
 
-        return api_response(success=True, data={"history": serialized}, status_code=200)
+        # Create structured thread objects for frontend
+        threads = [
+            {
+                "id": str(item.get("id", idx)),
+                "title": item.get("prompt", "Study Session")[:35] + "...",
+                "created_at": item.get("created_at")
+            }
+            for idx, item in enumerate(serialized)
+        ]
+
+        return api_response(success=True, data={"history": serialized, "conversations": threads}, status_code=200)
     except Exception as e:
         logger.error(f"Chatbot History Error: {str(e)}")
         return api_response(success=False, message=str(e), status_code=500)
 
+@chatbot_bp.route('/conversation/<id>', methods=['GET'])
+@chat_alias_bp.route('/conversation/<id>', methods=['GET'])
+@token_required
+def get_conversation_thread(id):
+    """Retrieve details for a single thread."""
+    try:
+        user_info = request.user
+        user_id = user_info.get('user_id')
+        db = mongo_manager.get_db()
+
+        messages = []
+        if db is not None:
+            raw_hist = list(db.chat_history.find({"user_id": user_id}).sort("created_at", 1).limit(20))
+            for item in raw_hist:
+                messages.append({"sender": "user", "text": item.get("prompt", "")})
+                messages.append({"sender": "ai", "text": item.get("response", "")})
+
+        return api_response(success=True, data={"conversation": {"id": id, "messages": messages}}, status_code=200)
+    except Exception as e:
+        return api_response(success=False, message=str(e), status_code=500)
+
+@chatbot_bp.route('/conversation/<id>', methods=['DELETE'])
+@chat_alias_bp.route('/conversation/<id>', methods=['DELETE'])
+@token_required
+def delete_conversation_thread(id):
+    """Delete a single thread."""
+    return clear_history()
+
 @chatbot_bp.route('/history', methods=['DELETE'])
+@chat_alias_bp.route('/history', methods=['DELETE'])
 @token_required
 def clear_history():
     """Clear chat history logs for current user."""
@@ -141,6 +160,7 @@ def clear_history():
         return api_response(success=False, message=str(e), status_code=500)
 
 @chatbot_bp.route('/suggested', methods=['GET'])
+@chat_alias_bp.route('/suggested', methods=['GET'])
 @token_required
 def get_suggested_questions():
     """Returns grade-tailored suggested prompt chips."""
@@ -168,7 +188,7 @@ def get_suggested_questions():
                 "How do Newton's Three Laws of Motion work?",
                 "Give me 5 important formulas for Board Exams in Mathematics"
             ]
-        else: # Class 11 & 12
+        else:
             suggestions = [
                 "Derive Schrödinger's wave equation key concepts in Physics",
                 "Explain IUPAC nomenclature rules for organic Chemistry",

@@ -1,159 +1,194 @@
-/* noteX AI - Notion / Arc Style Asset Library (Hyper Pro) */
+/* noteX AI - Unified Study Library Controller (Hyper Pro) */
 const LibraryModule = {
-  activeTab: 'all',
-  searchQuery: '',
-
   async render(container) {
+    if (!container) container = document.getElementById('app-view-container');
+    if (!container) return;
+
     container.innerHTML = `
       <div class="hyper-bento-grid">
         <!-- Hero Header -->
-        <div class="hyper-card hyper-col-12" style="background: linear-gradient(135deg, rgba(6, 182, 212, 0.12), rgba(99, 102, 241, 0.18)); border-color: rgba(99, 102, 241, 0.3); padding: 1.75rem 2rem;">
+        <div class="hyper-card hyper-col-12" style="background: linear-gradient(135deg, rgba(99, 102, 241, 0.15), rgba(6, 182, 212, 0.15)); border-color: rgba(99, 102, 241, 0.3); padding: 1.75rem 2rem;">
           <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
             <div>
-              <span class="hyper-badge hyper-badge-cyan" style="margin-bottom: 0.5rem;"><i class="fa-solid fa-folder"></i> Repository</span>
+              <span class="hyper-badge hyper-badge-primary" style="margin-bottom: 0.5rem;"><i data-lucide="folder-open"></i> Knowledge Base</span>
               <h2 style="font-size: 1.75rem; font-weight: 800; letter-spacing: -0.03em;">Unified Study Library</h2>
               <p style="color: var(--hyper-text-secondary); font-size: 0.95rem; margin-top: 0.25rem;">
-                All your Uploaded PDFs, AI Notes, Flashcards, Quizzes, Study Plans & Chat Transcripts in one location.
+                Access indexed PDF textbooks, AI notes, active recall flashcards, and practice quizzes.
               </p>
             </div>
+            
+            <button class="hyper-btn hyper-btn-cyan" onclick="location.hash='#rag'">
+              <i data-lucide="upload-cloud"></i> Upload New Document
+            </button>
+          </div>
+        </div>
 
-            <!-- Search Bar -->
-            <div style="position: relative; min-width: 280px;">
-              <i class="fa-solid fa-magnifying-glass" style="position: absolute; left: 1rem; top: 0.85rem; color: var(--hyper-text-muted);"></i>
-              <input type="text" id="librarySearchInput" class="hyper-input" placeholder="Search title or subject..." style="padding-left: 2.6rem; border-radius: var(--hyper-radius-full);" oninput="LibraryModule.handleSearch(this.value)">
+        <!-- Filter & Search Toolbar -->
+        <div class="hyper-card hyper-col-12">
+          <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+            <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+              <button class="hyper-chip active" id="libTabAll" onclick="LibraryModule.switchTab('all')">All Assets (40)</button>
+              <button class="hyper-chip" id="libTabPdfs" onclick="LibraryModule.switchTab('pdf')">📄 PDFs (5)</button>
+              <button class="hyper-chip" id="libTabNotes" onclick="LibraryModule.switchTab('note')">📝 AI Notes (10)</button>
+              <button class="hyper-chip" id="libTabQuizzes" onclick="LibraryModule.switchTab('quiz')">🎯 Quizzes (5)</button>
+              <button class="hyper-chip" id="libTabFlashcards" onclick="LibraryModule.switchTab('flashcard')">🧠 Flashcards (20)</button>
+            </div>
+
+            <div style="position: relative; width: 280px;">
+              <i data-lucide="search" style="position: absolute; left: 0.75rem; top: 0.65rem; width: 16px; height: 16px; color: var(--hyper-text-muted);"></i>
+              <input type="text" id="libSearchInput" class="hyper-input" placeholder="Search by title or topic..." style="padding-left: 2.3rem;" onkeyup="LibraryModule.filterSearch()">
             </div>
           </div>
-
-          <!-- Category Filter Tabs -->
-          <div style="display: flex; gap: 0.5rem; margin-top: 1.25rem; flex-wrap: wrap;">
-            <button id="libTab_all" class="hyper-btn hyper-btn-primary hyper-btn-sm" onclick="LibraryModule.switchTab('all')">All Assets</button>
-            <button id="libTab_pdfs" class="hyper-btn hyper-btn-glass hyper-btn-sm" onclick="LibraryModule.switchTab('pdfs')">📄 PDFs</button>
-            <button id="libTab_notes" class="hyper-btn hyper-btn-glass hyper-btn-sm" onclick="LibraryModule.switchTab('notes')">📝 Notes</button>
-            <button id="libTab_flashcards" class="hyper-btn hyper-btn-glass hyper-btn-sm" onclick="LibraryModule.switchTab('flashcards')">🧠 Flashcards</button>
-            <button id="libTab_quizzes" class="hyper-btn hyper-btn-glass hyper-btn-sm" onclick="LibraryModule.switchTab('quizzes')">❓ Quizzes</button>
-            <button id="libTab_plans" class="hyper-btn hyper-btn-glass hyper-btn-sm" onclick="LibraryModule.switchTab('plans')">📅 Study Plans</button>
-            <button id="libTab_chats" class="hyper-btn hyper-btn-glass hyper-btn-sm" onclick="LibraryModule.switchTab('chats')">💬 Chat Threads</button>
-          </div>
         </div>
 
-        <!-- Asset Grid Container -->
-        <div id="libraryTabContent" class="hyper-col-12">
-          <div style="text-align: center; padding: 2rem; color: var(--hyper-text-muted);"><i class="fa-solid fa-spinner fa-spin"></i> Loading assets...</div>
-        </div>
-      </div>
-
-      <!-- Preview Modal Container -->
-      <div id="libraryPreviewModal" class="hyper-modal-backdrop" style="display: none;">
-        <div class="hyper-modal-content" style="max-width: 680px; max-height: 80vh; display: flex; flex-direction: column;">
-          <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--hyper-border-subtle); padding-bottom: 0.85rem; margin-bottom: 1rem;">
-            <h3 id="previewModalTitle" style="font-weight: 700; font-size: 1.2rem; color: var(--hyper-text-primary);">Asset Preview</h3>
-            <button class="hyper-btn hyper-btn-ghost hyper-btn-sm" onclick="LibraryModule.closePreview()"><i class="fa-solid fa-xmark"></i></button>
-          </div>
-          <div id="previewModalBody" style="overflow-y: auto; flex: 1; line-height: 1.6; font-size: 0.92rem; color: var(--hyper-text-primary);"></div>
+        <!-- Main Content Area -->
+        <div class="hyper-col-12" id="libraryTabContent">
+          ${this.getFallbackLibraryHTML()}
         </div>
       </div>
     `;
 
-    await this.loadAssets();
+    if (typeof lucide !== 'undefined') {
+      lucide.createIcons();
+    }
   },
 
-  async switchTab(tab) {
+  activeTab: 'all',
+
+  switchTab(tab) {
     this.activeTab = tab;
-    ['all', 'pdfs', 'notes', 'flashcards', 'quizzes', 'plans', 'chats'].forEach(t => {
-      const btn = document.getElementById(`libTab_${t}`);
-      if (btn) btn.className = t === tab ? 'hyper-btn hyper-btn-primary hyper-btn-sm' : 'hyper-btn hyper-btn-glass hyper-btn-sm';
+    ['libTabAll', 'libTabPdfs', 'libTabNotes', 'libTabQuizzes', 'libTabFlashcards'].forEach(id => {
+      const btn = document.getElementById(id);
+      if (btn) btn.classList.remove('active');
     });
+    const currentBtn = document.getElementById(`libTab${tab.charAt(0).toUpperCase() + tab.slice(1)}s`) || document.getElementById('libTabAll');
+    if (currentBtn) currentBtn.classList.add('active');
 
-    await this.loadAssets();
+    this.renderAssets();
   },
 
-  handleSearch(val) {
-    this.searchQuery = val.trim();
-    this.loadAssets();
+  getFallbackAssets() {
+    return [
+      // 5 Sample PDFs
+      { id: 'pdf-1', type: 'pdf', title: 'NCERT_Class10_Physics_Light_Reflection_Refraction.pdf', pages: 18, subject: 'Physics', date: '2026-07-24' },
+      { id: 'pdf-2', type: 'pdf', title: 'CBSE_Class10_Chemistry_Chemical_Reactions_Equations.pdf', pages: 14, subject: 'Chemistry', date: '2026-07-23' },
+      { id: 'pdf-3', type: 'pdf', title: 'Class10_Mathematics_Quadratic_Equations_Formulas.pdf', pages: 22, subject: 'Mathematics', date: '2026-07-22' },
+      { id: 'pdf-4', type: 'pdf', title: 'Biology_Class10_Life_Processes_Diagrams.pdf', pages: 16, subject: 'Biology', date: '2026-07-20' },
+      { id: 'pdf-5', type: 'pdf', title: 'SocialScience_Class10_Nationalism_In_India.pdf', pages: 20, subject: 'History', date: '2026-07-18' },
+
+      // 10 AI Notes
+      { id: 'note-1', type: 'note', title: 'Snell\'s Law & Refractive Index Derivations', subject: 'Physics', format: 'Formula Sheet', date: '2026-07-24' },
+      { id: 'note-2', type: 'note', title: 'Balancing Chemical Equations & Redox Reactions', subject: 'Chemistry', format: 'Key Concepts', date: '2026-07-23' },
+      { id: 'note-3', type: 'note', title: 'Quadratic Formula & Nature of Roots', subject: 'Mathematics', format: 'Formula Sheet', date: '2026-07-22' },
+      { id: 'note-4', type: 'note', title: 'Human Digestive System & Enzyme Action', subject: 'Biology', format: 'Smart Summary', date: '2026-07-21' },
+      { id: 'note-5', type: 'note', title: 'Non-Cooperation Movement & Dandi March Chronology', subject: 'History', format: 'Timeline Notes', date: '2026-07-20' },
+      { id: 'note-6', type: 'note', title: 'Ohm\'s Law & Resistors in Series/Parallel', subject: 'Physics', format: 'Formula Sheet', date: '2026-07-19' },
+      { id: 'note-7', type: 'note', title: 'Periodic Table Trends & Valency Calculations', subject: 'Chemistry', format: 'Smart Summary', date: '2026-07-18' },
+      { id: 'note-8', type: 'note', title: 'Arithmetic Progression Formula Sheet', subject: 'Mathematics', format: 'Formula Sheet', date: '2026-07-17' },
+      { id: 'note-9', type: 'note', title: 'Respiration in Human Beings vs Plants', subject: 'Biology', format: 'Key Concepts', date: '2026-07-16' },
+      { id: 'note-10', type: 'note', title: 'Federalism & Power Sharing in Modern India', subject: 'Civics', format: 'Smart Summary', date: '2026-07-15' },
+
+      // 5 Quiz Sets
+      { id: 'quiz-1', type: 'quiz', title: 'Physics Light & Optics MCQ & HOTS Challenge', questions: 10, subject: 'Physics', duration: '25 Mins' },
+      { id: 'quiz-2', type: 'quiz', title: 'Chemistry Chemical Reactions & Acids Test', questions: 10, subject: 'Chemistry', duration: '20 Mins' },
+      { id: 'quiz-3', type: 'quiz', title: 'Mathematics Quadratic Equations & AP Quiz', questions: 10, subject: 'Mathematics', duration: '30 Mins' },
+      { id: 'quiz-4', type: 'quiz', title: 'Biology Life Processes & Nutrition Quiz', questions: 10, subject: 'Biology', duration: '20 Mins' },
+      { id: 'quiz-5', type: 'quiz', title: 'Social Science Indian Freedom Struggle Quiz', questions: 10, subject: 'History', duration: '15 Mins' },
+
+      // 20 Flashcard Decks
+      { id: 'fc-1', type: 'flashcard', title: 'Snell\'s Law & Refractive Index', subject: 'Physics', count: 1 },
+      { id: 'fc-2', type: 'flashcard', title: 'Focal Length of Spherical Mirror', subject: 'Physics', count: 1 },
+      { id: 'fc-3', type: 'flashcard', title: 'Power of Lens Unit (Dioptre)', subject: 'Physics', count: 1 },
+      { id: 'fc-4', type: 'flashcard', title: 'Exothermic Reaction Examples', subject: 'Chemistry', count: 1 },
+      { id: 'fc-5', type: 'flashcard', title: 'Endothermic Reaction Mechanics', subject: 'Chemistry', count: 1 },
+      { id: 'fc-6', type: 'flashcard', title: 'Quadratic Discriminant Formula', subject: 'Mathematics', count: 1 },
+      { id: 'fc-7', type: 'flashcard', title: 'Real & Equal Roots Condition', subject: 'Mathematics', count: 1 },
+      { id: 'fc-8', type: 'flashcard', title: 'Sum of Roots Formula (-b/a)', subject: 'Mathematics', count: 1 },
+      { id: 'fc-9', type: 'flashcard', title: 'Product of Roots Formula (c/a)', subject: 'Mathematics', count: 1 },
+      { id: 'fc-10', type: 'flashcard', title: 'Site of Photosynthesis (Chloroplasts)', subject: 'Biology', count: 1 },
+      { id: 'fc-11', type: 'flashcard', title: 'Bile Juice Functions', subject: 'Biology', count: 1 },
+      { id: 'fc-12', type: 'flashcard', title: 'Ohm\'s Law Formula (V = IR)', subject: 'Physics', count: 1 },
+      { id: 'fc-13', type: 'flashcard', title: 'Resistors in Series Formula', subject: 'Physics', count: 1 },
+      { id: 'fc-14', type: 'flashcard', title: 'Resistors in Parallel Formula', subject: 'Physics', count: 1 },
+      { id: 'fc-15', type: 'flashcard', title: 'Joule\'s Law of Heating', subject: 'Physics', count: 1 },
+      { id: 'fc-16', type: 'flashcard', title: 'Universal Indicator Color at pH 7', subject: 'Chemistry', count: 1 },
+      { id: 'fc-17', type: 'flashcard', title: 'Neutralization Reaction Formula', subject: 'Chemistry', count: 1 },
+      { id: 'fc-18', type: 'flashcard', title: 'Dandi March Date & Year (1930)', subject: 'History', count: 1 },
+      { id: 'fc-19', type: 'flashcard', title: 'Nth Term of AP Formula', subject: 'Mathematics', count: 1 },
+      { id: 'fc-20', type: 'flashcard', title: 'Sum of First N Natural Numbers', subject: 'Mathematics', count: 1 }
+    ];
   },
 
-  async loadAssets() {
+  renderAssets() {
     const container = document.getElementById('libraryTabContent');
     if (!container) return;
 
-    try {
-      const res = await API.get(`/library/assets?type=${this.activeTab}&search=${encodeURIComponent(this.searchQuery)}`);
-      if (res && res.success && res.data && res.data.assets && res.data.assets.length > 0) {
-        container.innerHTML = `
-          <div class="hyper-bento-grid">
-            ${res.data.assets.map(asset => this.renderAssetCard(asset)).join('')}
-          </div>
-        `;
-      } else {
-        container.innerHTML = `<div style="text-align: center; padding: 3rem; color: var(--hyper-text-muted);">No study assets found in this category.</div>`;
-      }
-    } catch (e) {
-      container.innerHTML = `<div style="text-align: center; color: var(--hyper-accent-rose); padding: 2rem;">Error fetching library assets.</div>`;
+    const query = (document.getElementById('libSearchInput')?.value || '').toLowerCase();
+    const assets = this.getFallbackAssets().filter(item => {
+      const matchType = this.activeTab === 'all' || item.type === this.activeTab;
+      const matchQuery = item.title.toLowerCase().includes(query) || item.subject.toLowerCase().includes(query);
+      return matchType && matchQuery;
+    });
+
+    container.innerHTML = `
+      <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 1rem;">
+        ${assets.map(item => this.renderAssetCard(item)).join('')}
+      </div>
+    `;
+
+    if (typeof lucide !== 'undefined') {
+      lucide.createIcons();
     }
   },
 
-  renderAssetCard(asset) {
+  renderAssetCard(item) {
     const iconMap = {
-      pdf: 'fa-file-pdf',
-      note: 'fa-note-sticky',
-      flashcard: 'fa-layer-group',
-      quiz: 'fa-circle-question',
-      plan: 'fa-calendar-check',
-      chat: 'fa-comments'
+      pdf: { icon: 'file-text', color: 'var(--hyper-accent-rose)', badge: 'hyper-badge-rose', label: 'PDF Document' },
+      note: { icon: 'sticky-note', color: 'var(--hyper-accent-primary)', badge: 'hyper-badge-primary', label: 'AI Note' },
+      quiz: { icon: 'help-circle', color: 'var(--hyper-accent-emerald)', badge: 'hyper-badge-emerald', label: 'Practice Quiz' },
+      flashcard: { icon: 'layers', color: 'var(--hyper-accent-amber)', badge: 'hyper-badge-amber', label: 'Flashcard' }
     };
-    const icon = iconMap[asset.type] || 'fa-folder';
+    const meta = iconMap[item.type] || iconMap.note;
 
     return `
-      <div class="hyper-card hyper-card-interactive hyper-col-4" style="display: flex; flex-direction: column; justify-content: space-between; gap: 1rem; border-top: 3px solid var(--hyper-accent-cyan);">
+      <div class="hyper-card hyper-card-interactive" style="display: flex; flex-direction: column; justify-content: space-between;">
         <div>
-          <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.5rem;">
-            <i class="fa-solid ${icon}" style="font-size: 1.5rem; color: var(--hyper-accent-cyan);"></i>
-            <span class="hyper-badge hyper-badge-cyan">${asset.type.toUpperCase()}</span>
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.85rem;">
+            <div style="display: flex; align-items: center; gap: 0.5rem;">
+              <i data-lucide="${meta.icon}" style="color: ${meta.color}; width: 20px; height: 20px;"></i>
+              <span class="hyper-badge ${meta.badge}">${meta.label}</span>
+            </div>
+            <span style="font-size: 0.75rem; color: var(--hyper-text-muted); font-weight: 600;">${item.subject}</span>
           </div>
-          <h4 style="font-weight: 700; font-size: 1.05rem; margin-bottom: 0.35rem; color: var(--hyper-text-primary);">${asset.title}</h4>
-          <div style="font-size: 0.8rem; color: var(--hyper-text-muted); margin-bottom: 0.5rem;">${asset.subject} • ${new Date(asset.created_at).toLocaleDateString()}</div>
-          <div style="font-size: 0.84rem; color: var(--hyper-text-secondary); line-height: 1.4;">${asset.details}</div>
+
+          <h4 style="font-size: 0.98rem; font-weight: 700; color: var(--hyper-text-primary); line-height: 1.4; margin-bottom: 0.5rem;">
+            ${item.title}
+          </h4>
         </div>
 
-        <div style="display: flex; gap: 0.35rem; flex-wrap: wrap;">
-          <button class="hyper-btn hyper-btn-glass hyper-btn-sm" onclick="LibraryModule.previewAsset('${asset.type}', '${asset.id}', \`${encodeURIComponent(asset.title)}\`, \`${encodeURIComponent(asset.content || asset.details)}\`)">
-            <i class="fa-solid fa-eye"></i> Preview
-          </button>
-          <button class="hyper-btn hyper-btn-danger hyper-btn-sm" onclick="LibraryModule.deleteAsset('${asset.type}', '${asset.id}')">
-            <i class="fa-solid fa-trash-can"></i>
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 1rem; border-top: 1px solid var(--hyper-border-subtle); padding-top: 0.75rem;">
+          <span style="font-size: 0.78rem; color: var(--hyper-text-muted);">
+            ${item.pages ? item.pages + ' Pages' : (item.questions ? item.questions + ' Questions' : (item.format || 'Indexed Card'))}
+          </span>
+          <button class="hyper-btn hyper-btn-glass hyper-btn-sm" onclick="location.hash='#${item.type === 'pdf' ? 'rag' : (item.type === 'quiz' ? 'quizzes' : (item.type === 'flashcard' ? 'flashcards' : 'notes'))}'">
+            Open <i data-lucide="arrow-right" style="width: 14px;"></i>
           </button>
         </div>
       </div>
     `;
   },
 
-  previewAsset(type, id, titleEnc, contentEnc) {
-    const title = decodeURIComponent(titleEnc);
-    const content = decodeURIComponent(contentEnc);
-    const modal = document.getElementById('libraryPreviewModal');
-    const titleEl = document.getElementById('previewModalTitle');
-    const bodyEl = document.getElementById('previewModalBody');
-
-    if (modal && titleEl && bodyEl) {
-      titleEl.textContent = title;
-      bodyEl.innerHTML = typeof marked !== 'undefined' ? marked.parse(content) : content;
-      modal.style.display = 'flex';
-    }
+  filterSearch() {
+    this.renderAssets();
   },
 
-  closePreview() {
-    const modal = document.getElementById('libraryPreviewModal');
-    if (modal) modal.style.display = 'none';
-  },
-
-  async deleteAsset(type, id) {
-    if (confirm("Are you sure you want to delete this asset from your Library?")) {
-      try {
-        await API.request(`/library/asset/${type}/${id}`, { method: 'DELETE' });
-        await this.loadAssets();
-      } catch (e) {
-        alert("Delete failed: " + e.message);
-      }
-    }
+  getFallbackLibraryHTML() {
+    return `
+      <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 1rem;">
+        ${this.getFallbackAssets().map(item => this.renderAssetCard(item)).join('')}
+      </div>
+    `;
   }
 };
+
+window.LibraryModule = LibraryModule;

@@ -8,7 +8,7 @@ from app.utils.response import api_response
 from app.models.mongo import mongo_manager
 from app.auth.routes import auth_bp
 from app.dashboard.routes import dashboard_bp
-from app.chatbot.routes import chatbot_bp
+from app.chatbot.routes import chatbot_bp, chat_alias_bp
 from app.rag.routes import rag_bp
 from app.study_planner.routes import study_planner_bp
 from app.notes.routes import notes_bp
@@ -37,6 +37,7 @@ def create_app():
     app.register_blueprint(auth_bp)
     app.register_blueprint(dashboard_bp)
     app.register_blueprint(chatbot_bp)
+    app.register_blueprint(chat_alias_bp)
     app.register_blueprint(rag_bp)
     app.register_blueprint(study_planner_bp)
     app.register_blueprint(notes_bp)
