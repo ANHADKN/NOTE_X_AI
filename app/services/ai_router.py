@@ -1,6 +1,6 @@
 """noteX AI - Central AI Intent Router & Orchestration Engine with RAG Context Integration."""
 import re
-from app.services.openai_service import AIService
+from app.services.ai_service import AIService
 from app.notes.services import NoteService
 from app.notes.ai_notes import AINotesGenerator
 from app.quiz.services import QuizService

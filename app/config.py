@@ -27,7 +27,12 @@ class Config:
     # CORS Settings
     ALLOWED_ORIGINS = os.getenv('ALLOWED_ORIGINS', '*').split(',')
     
-    # AI & Vector DB Settings
+    # Groq AI Settings
+    GROQ_API_KEY = os.getenv('GROQ_API_KEY', '')
+    MODEL_NAME = os.getenv('MODEL_NAME', 'llama-3.3-70b-versatile')
+    AI_PROVIDER = os.getenv('AI_PROVIDER', 'groq')
+
+    # OpenAI & Vector DB Settings
     OPENAI_API_KEY = os.getenv('OPENAI_API_KEY', '')
     EMBEDDING_MODEL = os.getenv('EMBEDDING_MODEL', 'all-MiniLM-L6-v2')
     CHROMA_PERSIST_DIR = os.getenv('CHROMA_PERSIST_DIR', os.path.join(BASE_DIR, 'chroma_db'))
