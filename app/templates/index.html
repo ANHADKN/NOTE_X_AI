@@ -18,6 +18,9 @@
   <!-- Lucide Icons CDN -->
   <script src="https://unpkg.com/lucide@latest"></script>
 
+  <!-- Google Identity Services -->
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
+
   <!-- KaTeX LaTeX Math Engine -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
   <script src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
@@ -217,6 +220,32 @@
         <button type="submit" id="authSubmitBtn" class="hyper-btn hyper-btn-primary" style="width: 100%; padding: 0.75rem; font-size: 0.95rem; margin-bottom: 1rem;">
           Sign In
         </button>
+
+        <div id="authGoogleDiv" style="margin-bottom: 1rem;">
+          <div style="display: flex; align-items: center; margin: 1rem 0;">
+            <div style="flex-grow: 1; height: 1px; background: var(--hyper-border-subtle);"></div>
+            <div style="padding: 0 10px; color: var(--hyper-text-muted); font-size: 0.75rem; font-weight: 600; text-transform: uppercase;">Or continue with</div>
+            <div style="flex-grow: 1; height: 1px; background: var(--hyper-border-subtle);"></div>
+          </div>
+          
+          <div id="g_id_onload"
+               data-client_id="842426615560-6n1u0v1j1b6g5p3m9i8t2f4r7c0s9e1a.apps.googleusercontent.com"
+               data-context="signin"
+               data-ux_mode="popup"
+               data-callback="handleGoogleCredentialResponse"
+               data-auto_prompt="false">
+          </div>
+
+          <div class="g_id_signin"
+               data-type="standard"
+               data-shape="rectangular"
+               data-theme="outline"
+               data-text="continue_with"
+               data-size="large"
+               data-logo_alignment="left"
+               style="display: flex; justify-content: center;">
+          </div>
+        </div>
       </form>
 
       <div id="authModalFooter" style="text-align: center; font-size: 0.85rem; color: var(--hyper-text-secondary);">

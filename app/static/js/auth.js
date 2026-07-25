@@ -129,6 +129,26 @@ const Auth = {
     }
   },
 
+  async googleLogin(credential) {
+    try {
+      const res = await API.post('/auth/google-login', { credential }, { skipAuthRedirect: true });
+      if (res && res.success && res.data) {
+        this.setSession(res.data.user, res.data.access_token, res.data.refresh_token);
+        if (typeof UI !== 'undefined' && UI.showToast) {
+          UI.showToast(`Welcome, ${res.data.user.name || 'Student'}!`, 'success');
+        }
+        AuthModal.hide();
+        return res.data;
+      }
+      throw new Error(res.message || 'Google Login failed');
+    } catch (err) {
+      if (typeof UI !== 'undefined' && UI.showToast) {
+        UI.showToast(err.message || 'Google Login failed', 'error');
+      }
+      throw err;
+    }
+  },
+
   updateUI() {
     const user = (typeof APP_STATE !== 'undefined' && APP_STATE.user) || JSON.parse(localStorage.getItem('notex_user') || 'null');
     const profileSection = document.getElementById('sidebarAuthProfileSection');
@@ -136,10 +156,16 @@ const Auth = {
     if (profileSection) {
       if (user) {
         const firstLetter = (user.name || 'Student').charAt(0).toUpperCase();
+        
+        // Display profile photo if available, else show initials
+        const avatarHTML = user.profile_photo 
+          ? `<img src="${user.profile_photo}" alt="Profile" style="width: 32px; height: 32px; border-radius: 50%; object-fit: cover; flex-shrink: 0; border: 2px solid var(--hyper-accent-primary-light);">`
+          : `<div style="width: 32px; height: 32px; border-radius: 50%; background: linear-gradient(135deg, var(--hyper-accent-primary), var(--hyper-accent-cyan)); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.85rem; color: #fff; flex-shrink: 0;">${firstLetter}</div>`;
+
         profileSection.innerHTML = `
           <div style="display: flex; align-items: center; justify-content: space-between;">
             <div style="display: flex; align-items: center; gap: 0.6rem; overflow: hidden;">
-              <div style="width: 32px; height: 32px; border-radius: 50%; background: linear-gradient(135deg, var(--hyper-accent-primary), var(--hyper-accent-cyan)); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.85rem; color: #fff; flex-shrink: 0;">${firstLetter}</div>
+              ${avatarHTML}
               <div style="overflow: hidden;">
                 <div style="font-size: 0.82rem; font-weight: 700; color: var(--hyper-text-primary); text-overflow: ellipsis; white-space: nowrap; overflow: hidden;">${user.name || 'Student'}</div>
                 <div style="font-size: 0.72rem; color: var(--hyper-accent-cyan); font-weight: 500;">${user.student_class || 'Class 10'} • ${user.role || 'student'}</div>
@@ -305,3 +331,14 @@ const AuthModal = {
 document.addEventListener('DOMContentLoaded', () => {
   Auth.updateUI();
 });
+
+// Global callback for Google Identity Services SDK
+window.handleGoogleCredentialResponse = async (response) => {
+  if (response && response.credential) {
+    try {
+      await Auth.googleLogin(response.credential);
+    } catch (e) {
+      console.error("Google login failed", e);
+    }
+  }
+};

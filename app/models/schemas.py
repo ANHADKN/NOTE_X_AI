@@ -30,7 +30,7 @@ class BaseModel:
 class UserModel:
     """User Model schema for Class 1 - Class 12 students and admins."""
     @staticmethod
-    def create_user_doc(name, email, password_hash, student_class="Class 10", role="student", target_exam="Board Exam"):
+    def create_user_doc(name, email, password_hash, student_class="Class 10", role="student", target_exam="Board Exam", login_provider="local", google_id=None, profile_photo=None):
         return {
             "name": name,
             "email": email.lower().strip(),
@@ -42,6 +42,9 @@ class UserModel:
             "preferred_theme": "dark",
             "study_streak": 1,
             "total_points": 50,
+            "login_provider": login_provider,
+            "google_id": google_id,
+            "profile_photo": profile_photo,
             "created_at": datetime.datetime.utcnow(),
             "updated_at": datetime.datetime.utcnow()
         }
