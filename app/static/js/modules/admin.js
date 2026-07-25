@@ -1,4 +1,4 @@
-/* noteX AI - Admin Panel Module Controller */
+/* noteX AI - Admin Console View Controller (Hyper Pro) */
 const AdminModule = {
   adminToken: null,
 
@@ -9,66 +9,82 @@ const AdminModule = {
     }
 
     container.innerHTML = `
-      <div class="dashboard-wrapper animate-fade-in">
-        <div class="glass-card" style="padding: 1.5rem 2rem; margin-bottom: 1.5rem; background: linear-gradient(135deg, rgba(239, 68, 68, 0.15), rgba(168, 85, 247, 0.2));">
+      <div class="hyper-bento-grid">
+        <!-- Hero Header -->
+        <div class="hyper-card hyper-col-12" style="background: linear-gradient(135deg, rgba(239, 68, 68, 0.15), rgba(168, 85, 247, 0.2)); border-color: rgba(239, 68, 68, 0.3); padding: 1.75rem 2rem;">
           <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
             <div>
-              <h2 style="font-size: 1.6rem; font-weight: 700;"><i class="fa-solid fa-shield-halved" style="color: var(--accent-rose);"></i> noteX AI Admin Console</h2>
-              <p style="color: var(--text-secondary); font-size: 0.95rem;">Isolated Administrative Dashboard & User Management Portal.</p>
+              <span class="hyper-badge hyper-badge-rose" style="margin-bottom: 0.5rem;"><i class="fa-solid fa-user-shield"></i> Security Portal</span>
+              <h2 style="font-size: 1.75rem; font-weight: 800; letter-spacing: -0.03em;">noteX AI Admin Console</h2>
+              <p style="color: var(--hyper-text-secondary); font-size: 0.95rem; margin-top: 0.25rem;">
+                Isolated Administrative Dashboard & User Management Portal.
+              </p>
             </div>
-            <button class="btn-glass-secondary" style="color: var(--accent-rose);" onclick="AdminModule.logoutAdmin()">
+            <button class="hyper-btn hyper-btn-danger hyper-btn-sm" onclick="AdminModule.logoutAdmin()">
               <i class="fa-solid fa-right-from-bracket"></i> Admin Logout
             </button>
           </div>
         </div>
 
-        <!-- Admin System Overview Metrics -->
-        <div class="metrics-grid" style="margin-bottom: 1.5rem;">
-          <div class="glass-card metric-card">
-            <div class="metric-icon" style="color: var(--accent-cyan); background: rgba(6, 182, 212, 0.15);"><i class="fa-solid fa-users"></i></div>
-            <div>
-              <div class="metric-val" id="adminTotalUsersVal">--</div>
-              <div class="metric-label">Registered Platform Users</div>
+        <!-- Metric KPI Cards -->
+        <div class="hyper-card hyper-col-4">
+          <div style="display: flex; align-items: center; gap: 1.25rem;">
+            <div style="width: 48px; height: 48px; border-radius: var(--hyper-radius-sm); background: var(--hyper-accent-cyan-light); color: var(--hyper-accent-cyan); display: flex; align-items: center; justify-content: center; font-size: 1.4rem;">
+              <i class="fa-solid fa-users"></i>
             </div>
-          </div>
-
-          <div class="glass-card metric-card">
-            <div class="metric-icon" style="color: var(--accent-indigo); background: rgba(99, 102, 241, 0.15);"><i class="fa-solid fa-file-pdf"></i></div>
             <div>
-              <div class="metric-val" id="adminTotalDocsVal">--</div>
-              <div class="metric-label">Indexed PDF Documents</div>
-            </div>
-          </div>
-
-          <div class="glass-card metric-card">
-            <div class="metric-icon" style="color: var(--accent-emerald); background: rgba(16, 185, 129, 0.15);"><i class="fa-solid fa-server"></i></div>
-            <div>
-              <div class="metric-val" style="color: var(--accent-emerald);">Healthy</div>
-              <div class="metric-label">Flask Server & ChromaDB Status</div>
+              <div style="font-size: 1.6rem; font-weight: 800;" id="adminTotalUsersVal">--</div>
+              <div style="font-size: 0.82rem; color: var(--hyper-text-muted);">Registered Users</div>
             </div>
           </div>
         </div>
 
-        <!-- User Management Table -->
-        <div class="glass-card section-card" style="margin-bottom: 1.5rem;">
-          <div class="section-title">
-            <span><i class="fa-solid fa-users-gear" style="color: var(--accent-cyan); margin-right: 0.5rem;"></i> User Management</span>
+        <div class="hyper-card hyper-col-4">
+          <div style="display: flex; align-items: center; gap: 1.25rem;">
+            <div style="width: 48px; height: 48px; border-radius: var(--hyper-radius-sm); background: var(--hyper-accent-primary-light); color: var(--hyper-accent-primary); display: flex; align-items: center; justify-content: center; font-size: 1.4rem;">
+              <i class="fa-solid fa-file-pdf"></i>
+            </div>
+            <div>
+              <div style="font-size: 1.6rem; font-weight: 800;" id="adminTotalDocsVal">--</div>
+              <div style="font-size: 0.82rem; color: var(--hyper-text-muted);">Indexed PDFs</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="hyper-card hyper-col-4">
+          <div style="display: flex; align-items: center; gap: 1.25rem;">
+            <div style="width: 48px; height: 48px; border-radius: var(--hyper-radius-sm); background: var(--hyper-accent-emerald-light); color: var(--hyper-accent-emerald); display: flex; align-items: center; justify-content: center; font-size: 1.4rem;">
+              <i class="fa-solid fa-server"></i>
+            </div>
+            <div>
+              <div style="font-size: 1.6rem; font-weight: 800; color: var(--hyper-accent-emerald);">Healthy</div>
+              <div style="font-size: 0.82rem; color: var(--hyper-text-muted);">Flask Server & Database Engine</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- User Management Table Card -->
+        <div class="hyper-card hyper-col-12">
+          <div class="hyper-card-header">
+            <div class="hyper-card-title">
+              <i class="fa-solid fa-users-gear" style="color: var(--hyper-accent-cyan);"></i> User Management
+            </div>
           </div>
 
           <div style="overflow-x: auto;">
             <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 0.9rem;">
               <thead>
-                <tr style="border-bottom: 1px solid var(--border-color); color: var(--text-secondary);">
-                  <th style="padding: 0.75rem;">Name</th>
-                  <th style="padding: 0.75rem;">Email</th>
-                  <th style="padding: 0.75rem;">Class</th>
-                  <th style="padding: 0.75rem;">Role</th>
-                  <th style="padding: 0.75rem;">Status</th>
-                  <th style="padding: 0.75rem;">Action</th>
+                <tr style="border-bottom: 1px solid var(--hyper-border-subtle); color: var(--hyper-text-muted);">
+                  <th style="padding: 0.85rem;">Name</th>
+                  <th style="padding: 0.85rem;">Email</th>
+                  <th style="padding: 0.85rem;">Class</th>
+                  <th style="padding: 0.85rem;">Role</th>
+                  <th style="padding: 0.85rem;">Status</th>
+                  <th style="padding: 0.85rem;">Action</th>
                 </tr>
               </thead>
               <tbody id="adminUserTableBody">
-                <tr><td colspan="6" style="padding: 1.5rem; text-align: center; color: var(--text-secondary);">Loading user accounts...</td></tr>
+                <tr><td colspan="6" style="padding: 1.5rem; text-align: center; color: var(--hyper-text-muted);">Loading user accounts...</td></tr>
               </tbody>
             </table>
           </div>
@@ -81,25 +97,25 @@ const AdminModule = {
 
   renderAdminLogin(container) {
     container.innerHTML = `
-      <div class="glass-card section-card animate-fade-in" style="max-width: 440px; margin: 3rem auto; padding: 2rem; border-top: 4px solid var(--accent-rose);">
+      <div class="hyper-card" style="max-width: 440px; margin: 3rem auto; padding: 2rem; border-top: 4px solid var(--hyper-accent-rose);">
         <div style="text-align: center; margin-bottom: 1.5rem;">
-          <i class="fa-solid fa-user-shield" style="font-size: 3rem; color: var(--accent-rose); margin-bottom: 0.75rem;"></i>
-          <h2 style="font-size: 1.5rem; font-weight: 700;">Admin Console Login</h2>
-          <p style="color: var(--text-secondary); font-size: 0.85rem;">Enter Admin Credentials to access system controls.</p>
+          <i class="fa-solid fa-user-shield" style="font-size: 3rem; color: var(--hyper-accent-rose); margin-bottom: 0.75rem;"></i>
+          <h2 style="font-size: 1.5rem; font-weight: 800; color: var(--hyper-text-primary);">Admin Console Login</h2>
+          <p style="color: var(--hyper-text-muted); font-size: 0.85rem; margin-top: 0.25rem;">Enter Admin Credentials to access system controls.</p>
         </div>
 
         <div style="display: flex; flex-direction: column; gap: 1rem;">
           <div>
-            <label style="font-size: 0.85rem; font-weight: 600; color: var(--text-secondary); margin-bottom: 0.35rem; display: block;">Admin Email:</label>
-            <input type="email" id="adminEmailInput" class="glass-input" placeholder="admin@notex.ai">
+            <label style="font-size: 0.85rem; font-weight: 600; color: var(--hyper-text-secondary); margin-bottom: 0.35rem; display: block;">Admin Email:</label>
+            <input type="email" id="adminEmailInput" class="hyper-input" placeholder="admin@notex.ai">
           </div>
 
           <div>
-            <label style="font-size: 0.85rem; font-weight: 600; color: var(--text-secondary); margin-bottom: 0.35rem; display: block;">Password:</label>
-            <input type="password" id="adminPasswordInput" class="glass-input" placeholder="••••••••">
+            <label style="font-size: 0.85rem; font-weight: 600; color: var(--hyper-text-secondary); margin-bottom: 0.35rem; display: block;">Password:</label>
+            <input type="password" id="adminPasswordInput" class="hyper-input" placeholder="••••••••">
           </div>
 
-          <button class="btn-glass" style="background: linear-gradient(135deg, var(--accent-rose), var(--accent-indigo)); margin-top: 0.5rem;" onclick="AdminModule.handleAdminLogin()">
+          <button class="hyper-btn hyper-btn-danger" style="margin-top: 0.5rem;" onclick="AdminModule.handleAdminLogin()">
             Authenticate Admin
           </button>
 
@@ -114,12 +130,12 @@ const AdminModule = {
     const passInput = document.getElementById('adminPasswordInput');
     const statusDiv = document.getElementById('adminLoginStatus');
 
-    const email = (emailInput ? emailInput.value : '').trim();
+    const email = emailInput ? emailInput.value.trim() : '';
     const password = passInput ? passInput.value : '';
 
     if (!email || !password) {
       if (statusDiv) {
-        statusDiv.style.color = 'var(--accent-rose)';
+        statusDiv.style.color = 'var(--hyper-accent-rose)';
         statusDiv.textContent = 'Please enter admin email and password.';
       }
       return;
@@ -135,17 +151,17 @@ const AdminModule = {
 
       if (response.ok && res.success) {
         this.adminToken = res.data.access_token;
-        const container = document.getElementById('mainContentArea');
+        const container = document.getElementById('app-view-container');
         if (container) await this.render(container);
       } else {
         if (statusDiv) {
-          statusDiv.style.color = 'var(--accent-rose)';
+          statusDiv.style.color = 'var(--hyper-accent-rose)';
           statusDiv.textContent = res.message || 'Admin authentication failed.';
         }
       }
     } catch (e) {
       if (statusDiv) {
-        statusDiv.style.color = 'var(--accent-rose)';
+        statusDiv.style.color = 'var(--hyper-accent-rose)';
         statusDiv.textContent = `Error: ${e.message}`;
       }
     }
@@ -170,14 +186,14 @@ const AdminModule = {
         const tbody = document.getElementById('adminUserTableBody');
         if (tbody) {
           tbody.innerHTML = uData.data.users.map(u => `
-            <tr style="border-bottom: 1px solid var(--border-color);">
-              <td style="padding: 0.75rem; font-weight: 600;">${u.name}</td>
-              <td style="padding: 0.75rem; color: var(--text-secondary);">${u.email}</td>
-              <td style="padding: 0.75rem;">${u.student_class || 'Class 10'}</td>
-              <td style="padding: 0.75rem;"><span class="grade-badge-selector" style="padding: 0.15rem 0.5rem; font-size: 0.75rem;">${(u.role || 'user').toUpperCase()}</span></td>
-              <td style="padding: 0.75rem; color: var(--accent-emerald);">Active</td>
-              <td style="padding: 0.75rem;">
-                <button class="btn-glass-secondary" style="padding: 0.25rem 0.6rem; font-size: 0.75rem; color: var(--accent-amber);" onclick="AdminModule.toggleUser('${u.id}')">
+            <tr style="border-bottom: 1px solid var(--hyper-border-subtle);">
+              <td style="padding: 0.85rem; font-weight: 600; color: var(--hyper-text-primary);">${u.name}</td>
+              <td style="padding: 0.85rem; color: var(--hyper-text-muted);">${u.email}</td>
+              <td style="padding: 0.85rem; color: var(--hyper-text-secondary);">${u.student_class || 'Class 10'}</td>
+              <td style="padding: 0.85rem;"><span class="hyper-badge hyper-badge-primary">${(u.role || 'user').toUpperCase()}</span></td>
+              <td style="padding: 0.85rem; color: var(--hyper-accent-emerald);">Active</td>
+              <td style="padding: 0.85rem;">
+                <button class="hyper-btn hyper-btn-glass hyper-btn-sm" style="color: var(--hyper-accent-amber);" onclick="AdminModule.toggleUser('${u.id}')">
                   Toggle Status
                 </button>
               </td>

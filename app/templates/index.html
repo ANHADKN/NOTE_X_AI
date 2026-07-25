@@ -3,122 +3,174 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>noteX AI — Next-Gen AI Study Assistant</title>
+  <title>noteX AI — Intelligent AI Study Platform</title>
   <meta name="description" content="noteX AI is a modern AI-powered study platform featuring RAG chatbots, smart notes, quiz generators, and progress analytics.">
   
+  <!-- SVG Favicon with Chi Spark Emblem -->
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='25' fill='%236366f1'/><text x='50%' y='68%' font-size='60' font-weight='800' fill='white' text-anchor='middle'>𝝌</text></svg>">
+
   <!-- Modern Fonts & Icons -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500&family=Inter:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Inter:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <!-- Lucide Icons CDN -->
+  <script src="https://unpkg.com/lucide@latest"></script>
 
-  <!-- KaTeX LaTeX Math Engine CDN -->
+  <!-- KaTeX LaTeX Math Engine -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
   <script src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js"></script>
   
-  <!-- CSS Stylesheets -->
-  <link rel="stylesheet" href="/static/css/variables.css">
-  <link rel="stylesheet" href="/static/css/main.css">
-  <link rel="stylesheet" href="/static/css/glassmorphism.css">
-  <link rel="stylesheet" href="/static/css/components.css">
+  <!-- Hyper-Design System Stylesheets -->
+  <link rel="stylesheet" href="/static/css/hyper-tokens.css">
+  <link rel="stylesheet" href="/static/css/hyper-layout.css">
+  <link rel="stylesheet" href="/static/css/hyper-components.css">
 
-  <!-- Chart.js & Code Highlighting CDN -->
+  <!-- Chart.js & Highlight.js -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/atom-one-dark.min.css">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
 </head>
 <body>
-  <!-- Ambient Mesh Background -->
-  <div class="ambient-bg"></div>
+  <!-- Scientific & Formula Animated Background Canvas -->
+  <canvas id="scienceCanvas"></canvas>
+  <div class="hyper-ambient-bg"></div>
 
-  <div class="app-wrapper">
-    <!-- Sidebar Navigation -->
-    <aside class="sidebar">
-      <div class="brand">
-        <div class="brand-logo" title="noteX AI - Chi Spark Badge">𝝌</div>
-        <div class="brand-title">noteX AI</div>
+  <div class="hyper-app-wrapper">
+    <!-- Linear / Vercel Minimalist Sidebar -->
+    <aside class="hyper-sidebar" id="mainSidebar">
+      <div class="hyper-brand">
+        <div class="hyper-brand-logo">𝝌</div>
+        <div class="hyper-brand-title">noteX AI</div>
       </div>
       
-      <ul class="nav-list">
-        <li class="nav-item active" data-view="chat">
-          <a href="#chat"><i class="fa-solid fa-comments"></i> <span>AI Chat (Home)</span></a>
+      <ul class="hyper-nav-list">
+        <li class="hyper-nav-item" data-view="dashboard">
+          <a href="#dashboard"><i data-lucide="layout-dashboard"></i> <span>Dashboard</span></a>
         </li>
-        <li class="nav-item" data-view="dashboard">
-          <a href="#dashboard"><i class="fa-solid fa-house"></i> <span>Dashboard</span></a>
+        <li class="hyper-nav-item active" data-view="chat">
+          <a href="#chat"><i data-lucide="sparkles"></i> <span>AI Chat Assistant</span></a>
         </li>
-        <li class="nav-item" data-view="library">
-          <a href="#library"><i class="fa-solid fa-folder-open"></i> <span>My Library</span></a>
+        <li class="hyper-nav-item" data-view="library">
+          <a href="#library"><i data-lucide="folder-open"></i> <span>My Library</span></a>
         </li>
-        <li class="nav-item" data-view="rag">
-          <a href="#rag"><i class="fa-solid fa-file-pdf"></i> <span>PDF Assistant</span></a>
+        <li class="hyper-nav-item" data-view="rag">
+          <a href="#rag"><i data-lucide="file-text"></i> <span>PDF Assistant</span></a>
         </li>
-        <li class="nav-item" data-view="notes">
-          <a href="#notes"><i class="fa-solid fa-pen-to-square"></i> <span>AI Notes</span></a>
+        <li class="hyper-nav-item" data-view="notes">
+          <a href="#notes"><i data-lucide="sticky-note"></i> <span>AI Notes</span></a>
         </li>
-        <li class="nav-item" data-view="study-plan">
-          <a href="#study-plan"><i class="fa-solid fa-calendar-days"></i> <span>Study Planner</span></a>
+        <li class="hyper-nav-item" data-view="study-plan">
+          <a href="#study-plan"><i data-lucide="calendar"></i> <span>Study Planner</span></a>
         </li>
-        <li class="nav-item" data-view="flashcards">
-          <a href="#flashcards"><i class="fa-solid fa-layer-group"></i> <span>Flashcards</span></a>
+        <li class="hyper-nav-item" data-view="flashcards">
+          <a href="#flashcards"><i data-lucide="layers"></i> <span>Flashcards</span></a>
         </li>
-        <li class="nav-item" data-view="quizzes">
-          <a href="#quizzes"><i class="fa-solid fa-circle-question"></i> <span>AI Quiz</span></a>
+        <li class="hyper-nav-item" data-view="quizzes">
+          <a href="#quizzes"><i data-lucide="help-circle"></i> <span>AI Quiz</span></a>
         </li>
-        <li class="nav-item" data-view="analytics">
-          <a href="#analytics"><i class="fa-solid fa-chart-line"></i> <span>Analytics</span></a>
+        <li class="hyper-nav-item" data-view="analytics">
+          <a href="#analytics"><i data-lucide="bar-chart-3"></i> <span>Analytics</span></a>
         </li>
-        <li class="nav-item" data-view="admin">
-          <a href="#admin"><i class="fa-solid fa-user-shield"></i> <span>Admin Console</span></a>
+        <li class="hyper-nav-item" data-view="admin">
+          <a href="#admin"><i data-lucide="shield-check"></i> <span>Admin Console</span></a>
         </li>
       </ul>
+
+      <!-- Bottom User Profile Pill -->
+      <div style="display: flex; align-items: center; justify-content: space-between; padding: 0.75rem; border-top: 1px solid var(--hyper-border-subtle); background: var(--hyper-bg-surface); border-radius: var(--hyper-radius-sm);">
+        <div style="display: flex; align-items: center; gap: 0.6rem;">
+          <div style="width: 28px; height: 28px; border-radius: 50%; background: linear-gradient(135deg, var(--hyper-accent-primary), var(--hyper-accent-cyan)); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.75rem; color: #fff;">S</div>
+          <div style="font-size: 0.82rem; font-weight: 600; color: var(--hyper-text-primary);">Student</div>
+        </div>
+        <button id="logoutBtn" style="background: none; border: none; color: var(--hyper-text-muted); cursor: pointer;" title="Logout">
+          <i data-lucide="log-out" style="width: 16px; height: 16px;"></i>
+        </button>
+      </div>
     </aside>
 
     <!-- Main View Shell -->
-    <main class="main-content">
-      <!-- Navbar -->
-      <header class="top-navbar">
+    <main class="hyper-main-content">
+      <!-- Arc / Raycast Floating Glass Navigation Bar -->
+      <header class="hyper-float-nav">
         <div style="display: flex; align-items: center; gap: 1rem;">
-          <button id="classSelectorBtn" class="btn-glass-secondary" style="padding: 0.35rem 0.75rem; font-size: 0.82rem;">
-            🎓 Active Grade: <span id="currentGradeLabel" style="color: var(--accent-violet-light); font-weight: 700;">Class 10</span>
-          </button>
+          <!-- Raycast Command Trigger Bar -->
+          <div class="hyper-command-trigger" onclick="document.getElementById('commandPaletteModal').style.display = 'flex'">
+            <i data-lucide="search" style="width: 16px; height: 16px; color: var(--hyper-accent-cyan);"></i>
+            <span>Search or run command...</span>
+            <span class="hyper-kbd" style="margin-left: auto;">⌘ K</span>
+          </div>
         </div>
 
-        <div style="display: flex; align-items: center; gap: 0.75rem;">
-          <span class="user-greeting" style="font-size: 0.88rem; color: var(--text-secondary);">Welcome, Student</span>
-          <button id="logoutBtn" class="btn-glass-secondary" style="padding: 0.35rem 0.75rem; font-size: 0.82rem;">
-            <i class="fa-solid fa-right-from-bracket"></i> Logout
+        <div style="display: flex; align-items: center; gap: 0.85rem;">
+          <button id="classSelectorBtn" class="hyper-btn hyper-btn-glass hyper-btn-sm" style="border-radius: var(--hyper-radius-full);">
+            <i data-lucide="graduation-cap" style="width: 15px; height: 15px; color: var(--hyper-accent-cyan);"></i> Target: <span id="currentGradeLabel" style="color: var(--hyper-accent-primary); font-weight: 700;">Class 10</span>
           </button>
         </div>
       </header>
 
-      <!-- Dynamic View Container -->
-      <div id="app-view-container" class="view-container">
-        <!-- SPA Module Content Loaded via app.js -->
+      <!-- Dynamic View Viewport -->
+      <div id="app-view-container" class="hyper-view-viewport">
+        <!-- SPA View Module HTML Rendered Here -->
       </div>
     </main>
   </div>
 
-  <!-- Class Selector Modal -->
-  <div id="gradeModal" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 1000; justify-content: center; align-items: center; padding: 1rem;">
-    <div class="glass-card" style="width: 100%; max-width: 480px; padding: 1.5rem; position: relative;">
-      <h3 style="font-weight: 700; margin-bottom: 1rem;">Select Target Grade</h3>
-      <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.5rem; margin-bottom: 1.5rem;">
-        <button class="grade-opt-btn btn-glass-secondary" data-grade="Class 1">Class 1</button>
-        <button class="grade-opt-btn btn-glass-secondary" data-grade="Class 2">Class 2</button>
-        <button class="grade-opt-btn btn-glass-secondary" data-grade="Class 3">Class 3</button>
-        <button class="grade-opt-btn btn-glass-secondary" data-grade="Class 4">Class 4</button>
-        <button class="grade-opt-btn btn-glass-secondary" data-grade="Class 5">Class 5</button>
-        <button class="grade-opt-btn btn-glass-secondary" data-grade="Class 6">Class 6</button>
-        <button class="grade-opt-btn btn-glass-secondary" data-grade="Class 7">Class 7</button>
-        <button class="grade-opt-btn btn-glass-secondary" data-grade="Class 8">Class 8</button>
-        <button class="grade-opt-btn btn-glass-secondary" data-grade="Class 9">Class 9</button>
-        <button class="grade-opt-btn btn-glass-secondary" data-grade="Class 10">Class 10</button>
-        <button class="grade-opt-btn btn-glass-secondary" data-grade="Class 11">Class 11</button>
-        <button class="grade-opt-btn btn-glass-secondary" data-grade="Class 12">Class 12</button>
+  <!-- Raycast Style Command Palette Modal (`⌘K`) -->
+  <div id="commandPaletteModal" class="hyper-modal-backdrop" style="display: none;">
+    <div class="hyper-modal-content" style="max-width: 580px; padding: 1.25rem;">
+      <div style="position: relative; margin-bottom: 1rem;">
+        <i data-lucide="terminal" style="position: absolute; left: 1rem; top: 0.85rem; color: var(--hyper-accent-cyan); width: 18px; height: 18px;"></i>
+        <input type="text" id="commandPaletteInput" class="hyper-input" placeholder="Type a command or jump to feature..." style="padding-left: 2.75rem; border-radius: var(--hyper-radius-sm); font-size: 0.95rem;">
       </div>
-      <button id="closeGradeModal" class="btn-glass-secondary" style="width: 100%;">Close</button>
+      <div style="display: flex; flex-direction: column; gap: 0.35rem; max-height: 320px; overflow-y: auto;">
+        <div class="hyper-btn hyper-btn-ghost" style="justify-content: flex-start;" onclick="location.hash='#chat'; document.getElementById('commandPaletteModal').style.display='none';">
+          <i data-lucide="sparkles" style="color: var(--hyper-accent-cyan); width: 18px; margin-right: 0.5rem;"></i> Open AI Chat Assistant
+        </div>
+        <div class="hyper-btn hyper-btn-ghost" style="justify-content: flex-start;" onclick="location.hash='#rag'; document.getElementById('commandPaletteModal').style.display='none';">
+          <i data-lucide="file-text" style="color: var(--hyper-accent-rose); width: 18px; margin-right: 0.5rem;"></i> Upload PDF & RAG Search
+        </div>
+        <div class="hyper-btn hyper-btn-ghost" style="justify-content: flex-start;" onclick="location.hash='#notes'; document.getElementById('commandPaletteModal').style.display='none';">
+          <i data-lucide="sticky-note" style="color: var(--hyper-accent-primary); width: 18px; margin-right: 0.5rem;"></i> Generate AI Smart Notes
+        </div>
+        <div class="hyper-btn hyper-btn-ghost" style="justify-content: flex-start;" onclick="location.hash='#flashcards'; document.getElementById('commandPaletteModal').style.display='none';">
+          <i data-lucide="layers" style="color: var(--hyper-accent-amber); width: 18px; margin-right: 0.5rem;"></i> Practice Flashcards Session
+        </div>
+        <div class="hyper-btn hyper-btn-ghost" style="justify-content: flex-start;" onclick="location.hash='#quizzes'; document.getElementById('commandPaletteModal').style.display='none';">
+          <i data-lucide="help-circle" style="color: var(--hyper-accent-emerald); width: 18px; margin-right: 0.5rem;"></i> Start AI Quiz Challenge
+        </div>
+      </div>
+      <div style="display: flex; justify-content: flex-end; margin-top: 1rem; border-top: 1px solid var(--hyper-border-subtle); padding-top: 0.75rem;">
+        <button class="hyper-btn hyper-btn-glass hyper-btn-sm" onclick="document.getElementById('commandPaletteModal').style.display='none'">Close ESC</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Class Selector Modal -->
+  <div id="gradeModal" class="hyper-modal-backdrop" style="display: none;">
+    <div class="hyper-modal-content">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem;">
+        <h3 style="font-size: 1.15rem; font-weight: 700; color: var(--hyper-text-primary);">Select Target Grade</h3>
+        <span class="hyper-badge hyper-badge-cyan">Curriculum</span>
+      </div>
+      <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.6rem; margin-bottom: 1.5rem;">
+        <button class="grade-opt-btn hyper-btn hyper-btn-glass hyper-btn-sm" data-grade="Class 1">Class 1</button>
+        <button class="grade-opt-btn hyper-btn hyper-btn-glass hyper-btn-sm" data-grade="Class 2">Class 2</button>
+        <button class="grade-opt-btn hyper-btn hyper-btn-glass hyper-btn-sm" data-grade="Class 3">Class 3</button>
+        <button class="grade-opt-btn hyper-btn hyper-btn-glass hyper-btn-sm" data-grade="Class 4">Class 4</button>
+        <button class="grade-opt-btn hyper-btn hyper-btn-glass hyper-btn-sm" data-grade="Class 5">Class 5</button>
+        <button class="grade-opt-btn hyper-btn hyper-btn-glass hyper-btn-sm" data-grade="Class 6">Class 6</button>
+        <button class="grade-opt-btn hyper-btn hyper-btn-glass hyper-btn-sm" data-grade="Class 7">Class 7</button>
+        <button class="grade-opt-btn hyper-btn hyper-btn-glass hyper-btn-sm" data-grade="Class 8">Class 8</button>
+        <button class="grade-opt-btn hyper-btn hyper-btn-glass hyper-btn-sm" data-grade="Class 9">Class 9</button>
+        <button class="grade-opt-btn hyper-btn hyper-btn-glass hyper-btn-sm" data-grade="Class 10">Class 10</button>
+        <button class="grade-opt-btn hyper-btn hyper-btn-glass hyper-btn-sm" data-grade="Class 11">Class 11</button>
+        <button class="grade-opt-btn hyper-btn hyper-btn-glass hyper-btn-sm" data-grade="Class 12">Class 12</button>
+      </div>
+      <button id="closeGradeModal" class="hyper-btn hyper-btn-glass" style="width: 100%;">Close</button>
     </div>
   </div>
 
@@ -126,6 +178,7 @@
   <script src="/static/js/config.js"></script>
   <script src="/static/js/api.js"></script>
   <script src="/static/js/auth.js"></script>
+  <script src="/static/js/science-bg.js"></script>
   <script src="/static/js/modules/chatbot.js"></script>
   <script src="/static/js/modules/dashboard.js"></script>
   <script src="/static/js/modules/library.js"></script>
@@ -137,5 +190,6 @@
   <script src="/static/js/modules/analytics.js"></script>
   <script src="/static/js/modules/admin.js"></script>
   <script src="/static/js/app.js"></script>
+  <script src="/static/js/theme.js"></script>
 </body>
 </html>

@@ -1,15 +1,15 @@
 const UI = {
   showToast(message, type = 'info') {
-    let container = document.getElementById('toastContainer');
+    let container = document.getElementById('hyperToastContainer');
     if (!container) {
       container = document.createElement('div');
-      container.id = 'toastContainer';
-      container.className = 'toast-container';
+      container.id = 'hyperToastContainer';
+      container.className = 'hyper-toast-container';
       document.body.appendChild(container);
     }
 
     const toast = document.createElement('div');
-    toast.className = `toast toast-${type}`;
+    toast.className = `hyper-toast hyper-toast-${type}`;
     const iconMap = { success: 'fa-circle-check', error: 'fa-circle-exclamation', info: 'fa-circle-info' };
     toast.innerHTML = `<i class="fa-solid ${iconMap[type] || 'fa-bell'}"></i> <span>${message}</span>`;
     container.appendChild(toast);
@@ -28,21 +28,42 @@ document.addEventListener('DOMContentLoaded', () => {
   const currentGradeLabel = document.getElementById('currentGradeLabel');
   const gradeModal = document.getElementById('gradeModal');
   const closeGradeModal = document.getElementById('closeGradeModal');
-  const navItems = document.querySelectorAll('.nav-item');
+  const navItems = document.querySelectorAll('.hyper-nav-item');
+  const commandModal = document.getElementById('commandPaletteModal');
 
-  // Update Initial Class Label
-  if (currentGradeLabel) {
-    currentGradeLabel.textContent = APP_STATE.currentGrade;
+  // Initialize Lucide Icons
+  if (typeof lucide !== 'undefined') {
+    lucide.createIcons();
   }
 
+  // Update Initial Class Label
+  if (currentGradeLabel && typeof APP_STATE !== 'undefined') {
+    currentGradeLabel.textContent = APP_STATE.currentGrade || 'Class 10';
+  }
+
+  // Keyboard Command Palette Listener (`⌘K` / `Ctrl+K`)
+  document.addEventListener('keydown', (e) => {
+    if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
+      e.preventDefault();
+      if (commandModal) {
+        commandModal.style.display = commandModal.style.display === 'flex' ? 'none' : 'flex';
+        if (commandModal.style.display === 'flex') {
+          document.getElementById('commandPaletteInput')?.focus();
+        }
+      }
+    } else if (e.key === 'Escape' && commandModal) {
+      commandModal.style.display = 'none';
+    }
+  });
+
   // Grade Modal Controls
-  if (classSelectorBtn) {
+  if (classSelectorBtn && gradeModal) {
     classSelectorBtn.addEventListener('click', () => {
-      gradeModal.style.display = 'block';
+      gradeModal.style.display = 'flex';
     });
   }
 
-  if (closeGradeModal) {
+  if (closeGradeModal && gradeModal) {
     closeGradeModal.addEventListener('click', () => {
       gradeModal.style.display = 'none';
     });
@@ -51,14 +72,13 @@ document.addEventListener('DOMContentLoaded', () => {
   // Class Selection Handler
   document.querySelectorAll('.grade-opt-btn').forEach(btn => {
     btn.addEventListener('click', async (e) => {
-      const selectedGrade = e.target.getAttribute('data-class');
-      if (selectedGrade) {
+      const selectedGrade = e.target.getAttribute('data-grade') || e.target.getAttribute('data-class');
+      if (selectedGrade && typeof APP_STATE !== 'undefined') {
         APP_STATE.currentGrade = selectedGrade;
         localStorage.setItem('notex_grade', selectedGrade);
         if (currentGradeLabel) currentGradeLabel.textContent = selectedGrade;
-        gradeModal.style.display = 'none';
+        if (gradeModal) gradeModal.style.display = 'none';
 
-        // Update backend user grade if authenticated
         if (APP_STATE.token) {
           try {
             await API.post('/auth/update-class', { student_class: selectedGrade });
@@ -67,18 +87,18 @@ document.addEventListener('DOMContentLoaded', () => {
           }
         }
 
-        // Re-render active view
         router();
       }
     });
   });
 
-  // SPA Hash Router
+  // SPA Router
   async function router() {
     const hash = window.location.hash.replace('#', '') || 'dashboard';
-    APP_STATE.activeView = hash;
+    if (typeof APP_STATE !== 'undefined') {
+      APP_STATE.activeView = hash;
+    }
 
-    // Update active nav link
     navItems.forEach(item => {
       if (item.getAttribute('data-view') === hash) {
         item.classList.add('active');
@@ -87,42 +107,46 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     });
 
-    // Render corresponding view module
     switch (hash) {
       case 'chat':
       case 'chatbot':
-        await ChatbotModule.render(container);
+        if (window.ChatbotModule) await ChatbotModule.render(container);
         break;
       case 'dashboard':
-        await DashboardModule.render(container);
+        if (window.DashboardModule) await DashboardModule.render(container);
         break;
       case 'library':
-        await LibraryModule.render(container);
+        if (window.LibraryModule) await LibraryModule.render(container);
         break;
       case 'rag':
-        await RAGModule.render(container);
+        if (window.RAGModule) await RAGModule.render(container);
         break;
       case 'study-plan':
-        await StudyPlannerModule.render(container);
+        if (window.StudyPlannerModule) await StudyPlannerModule.render(container);
         break;
       case 'notes':
-        await NotesModule.render(container);
+        if (window.NotesModule) await NotesModule.render(container);
         break;
       case 'quizzes':
-        await QuizModule.render(container);
+        if (window.QuizModule) await QuizModule.render(container);
         break;
       case 'flashcards':
-        await FlashcardsModule.render(container);
+        if (window.FlashcardsModule) await FlashcardsModule.render(container);
         break;
       case 'analytics':
-        await AnalyticsModule.render(container);
+        if (window.AnalyticsModule) await AnalyticsModule.render(container);
         break;
       case 'admin':
-        await AdminModule.render(container);
+        if (window.AdminModule) await AdminModule.render(container);
         break;
       default:
-        await ChatbotModule.render(container);
+        if (window.DashboardModule) await DashboardModule.render(container);
         break;
+    }
+
+    // Refresh Lucide Icons after view render
+    if (typeof lucide !== 'undefined') {
+      lucide.createIcons();
     }
   }
 

@@ -1,0 +1,390 @@
+/* ==========================================
+   Hyper Component Library (Linear / Raycast / Perplexity AI / Stripe)
+   ========================================== */
+
+/* 1. Bento Box Cards */
+.hyper-card {
+  background-color: var(--hyper-bg-card);
+  border: 1px solid var(--hyper-border-subtle);
+  border-radius: var(--hyper-radius-lg);
+  padding: 1.5rem;
+  box-shadow: var(--hyper-shadow-subtle);
+  transition: all var(--hyper-transition-normal);
+  position: relative;
+  overflow: hidden;
+}
+
+.hyper-card-interactive {
+  cursor: pointer;
+}
+
+.hyper-card-interactive:hover {
+  border-color: var(--hyper-border-focus);
+  box-shadow: var(--hyper-shadow-glow-primary);
+  transform: translateY(-2px);
+}
+
+.hyper-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.25rem;
+}
+
+.hyper-card-title {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--hyper-text-primary);
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  letter-spacing: -0.02em;
+}
+
+/* 2. Raycast Keyboard Shortcut Key (`⌘K`) */
+.hyper-kbd {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--hyper-bg-elevated);
+  border: 1px solid var(--hyper-border-subtle);
+  border-radius: var(--hyper-radius-xs);
+  padding: 0.15rem 0.45rem;
+  font-family: var(--hyper-font-mono);
+  font-size: 0.72rem;
+  color: var(--hyper-text-muted);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
+}
+
+/* 3. Buttons & Controls */
+.hyper-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.6rem 1.2rem;
+  border-radius: var(--hyper-radius-sm);
+  font-family: var(--hyper-font-heading);
+  font-weight: 600;
+  font-size: 0.86rem;
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: all var(--hyper-transition-fast);
+  text-decoration: none;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.hyper-btn-sm {
+  padding: 0.35rem 0.75rem;
+  font-size: 0.8rem;
+  border-radius: var(--hyper-radius-xs);
+}
+
+.hyper-btn-primary {
+  background: linear-gradient(135deg, var(--hyper-accent-primary), var(--hyper-accent-primary-hover));
+  color: #ffffff;
+  box-shadow: 0 4px 14px rgba(99, 102, 241, 0.35);
+}
+
+.hyper-btn-primary:hover {
+  box-shadow: var(--hyper-shadow-glow-primary);
+  transform: translateY(-1px);
+}
+
+.hyper-btn-cyan {
+  background: linear-gradient(135deg, var(--hyper-accent-cyan), #0284c7);
+  color: #ffffff;
+  box-shadow: 0 4px 14px rgba(6, 182, 212, 0.35);
+}
+
+.hyper-btn-cyan:hover {
+  box-shadow: var(--hyper-shadow-glow-cyan);
+  transform: translateY(-1px);
+}
+
+.hyper-btn-glass {
+  background-color: var(--hyper-bg-elevated);
+  border-color: var(--hyper-border-subtle);
+  color: var(--hyper-text-primary);
+}
+
+.hyper-btn-glass:hover {
+  background-color: var(--hyper-bg-hover);
+  border-color: var(--hyper-text-secondary);
+}
+
+.hyper-btn-danger {
+  background: linear-gradient(135deg, var(--hyper-accent-rose), #e11d48);
+  color: #ffffff;
+}
+
+.hyper-btn-danger:hover {
+  box-shadow: 0 4px 14px rgba(244, 63, 94, 0.35);
+}
+
+.hyper-btn-ghost {
+  background: transparent;
+  color: var(--hyper-text-muted);
+}
+
+.hyper-btn-ghost:hover {
+  background-color: var(--hyper-bg-hover);
+  color: var(--hyper-text-primary);
+}
+
+/* 4. Form Inputs */
+.hyper-input, .hyper-textarea, .hyper-select {
+  width: 100%;
+  background-color: var(--hyper-bg-surface);
+  border: 1px solid var(--hyper-border-subtle);
+  border-radius: var(--hyper-radius-sm);
+  padding: 0.7rem 0.95rem;
+  color: var(--hyper-text-primary);
+  font-family: var(--hyper-font-body);
+  font-size: 0.88rem;
+  outline: none;
+  transition: all var(--hyper-transition-fast);
+}
+
+.hyper-input:focus, .hyper-textarea:focus, .hyper-select:focus {
+  border-color: var(--hyper-accent-primary);
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+}
+
+.hyper-input::placeholder, .hyper-textarea::placeholder {
+  color: var(--hyper-text-muted);
+}
+
+/* 5. Badges & Chips */
+.hyper-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.2rem 0.6rem;
+  border-radius: var(--hyper-radius-full);
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.hyper-badge-primary { background: var(--hyper-accent-primary-light); color: var(--hyper-accent-primary); border: 1px solid rgba(99,102,241,0.3); }
+.hyper-badge-cyan { background: var(--hyper-accent-cyan-light); color: var(--hyper-accent-cyan); border: 1px solid rgba(6,182,212,0.3); }
+.hyper-badge-emerald { background: var(--hyper-accent-emerald-light); color: var(--hyper-accent-emerald); border: 1px solid rgba(16,185,129,0.3); }
+.hyper-badge-amber { background: var(--hyper-accent-amber-light); color: var(--hyper-accent-amber); border: 1px solid rgba(245,158,11,0.3); }
+.hyper-badge-rose { background: var(--hyper-accent-rose-light); color: var(--hyper-accent-rose); border: 1px solid rgba(244,63,94,0.3); }
+
+.hyper-chip {
+  background-color: var(--hyper-bg-elevated);
+  border: 1px solid var(--hyper-border-subtle);
+  padding: 0.45rem 0.85rem;
+  border-radius: var(--hyper-radius-full);
+  font-size: 0.82rem;
+  color: var(--hyper-text-secondary);
+  cursor: pointer;
+  transition: all var(--hyper-transition-fast);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.hyper-chip:hover {
+  background-color: var(--hyper-bg-hover);
+  color: var(--hyper-text-primary);
+  border-color: var(--hyper-accent-cyan);
+  transform: translateY(-1px);
+}
+
+/* 6. Learning Progress Ring Component */
+.hyper-progress-ring-container {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+}
+
+.hyper-progress-ring {
+  transform: rotate(-90deg);
+}
+
+.hyper-progress-ring-bg {
+  stroke: var(--hyper-bg-elevated);
+}
+
+.hyper-progress-ring-fill {
+  stroke: var(--hyper-accent-cyan);
+  stroke-dasharray: 283;
+  stroke-dashoffset: 44;
+  transition: stroke-dashoffset 1s ease-in-out;
+}
+
+/* 7. Quick Action Tiles Matrix */
+.hyper-action-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.85rem;
+}
+
+.hyper-action-tile {
+  background: var(--hyper-bg-surface);
+  border: 1px solid var(--hyper-border-subtle);
+  border-radius: var(--hyper-radius-md);
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.65rem;
+  cursor: pointer;
+  transition: all var(--hyper-transition-fast);
+}
+
+.hyper-action-tile:hover {
+  background: var(--hyper-bg-hover);
+  border-color: var(--hyper-accent-primary);
+  transform: translateY(-2px);
+}
+
+.hyper-action-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: var(--hyper-radius-xs);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+}
+
+/* 8. Perplexity AI Hero Workspace */
+.hyper-chat-workspace {
+  display: flex;
+  height: calc(100vh - 110px);
+  background-color: var(--hyper-bg-card);
+  border: 1px solid var(--hyper-border-subtle);
+  border-radius: var(--hyper-radius-lg);
+  overflow: hidden;
+}
+
+.hyper-chat-sidebar {
+  width: 260px;
+  background-color: var(--hyper-bg-surface);
+  border-right: 1px solid var(--hyper-border-subtle);
+  display: flex;
+  flex-direction: column;
+  padding: 1rem;
+  gap: 1rem;
+  flex-shrink: 0;
+}
+
+.hyper-chat-feed {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  background-color: var(--hyper-bg-app);
+}
+
+.hyper-chat-messages {
+  flex: 1;
+  padding: 1.5rem;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.hyper-query-card {
+  background: var(--hyper-bg-card);
+  border: 1px solid var(--hyper-border-medium);
+  border-radius: var(--hyper-radius-xl);
+  padding: 1.25rem;
+  box-shadow: var(--hyper-shadow-glow-primary);
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.hyper-bubble-user {
+  align-self: flex-end;
+  background: linear-gradient(135deg, var(--hyper-accent-primary), var(--hyper-accent-primary-hover));
+  color: #ffffff;
+  padding: 0.85rem 1.25rem;
+  border-radius: var(--hyper-radius-md) var(--hyper-radius-md) 2px var(--hyper-radius-md);
+  max-width: 75%;
+  box-shadow: 0 4px 15px rgba(99, 102, 241, 0.2);
+}
+
+.hyper-bubble-ai {
+  align-self: flex-start;
+  background-color: var(--hyper-bg-card);
+  border: 1px solid var(--hyper-border-subtle);
+  color: var(--hyper-text-primary);
+  padding: 1rem 1.35rem;
+  border-radius: var(--hyper-radius-md) var(--hyper-radius-md) var(--hyper-radius-md) 2px;
+  max-width: 80%;
+  box-shadow: var(--hyper-shadow-subtle);
+}
+
+/* 9. Modals & Toasts */
+.hyper-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(3, 5, 8, 0.85);
+  backdrop-filter: var(--hyper-glass-blur);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+}
+
+.hyper-modal-content {
+  background-color: var(--hyper-bg-card);
+  border: 1px solid var(--hyper-border-medium);
+  border-radius: var(--hyper-radius-xl);
+  width: 100%;
+  max-width: 540px;
+  padding: 1.75rem;
+  box-shadow: var(--hyper-shadow-glow-primary);
+  animation: hyperPop 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes hyperPop {
+  0% { transform: scale(0.94); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+.hyper-toast-container {
+  position: fixed;
+  bottom: 1.5rem;
+  right: 1.5rem;
+  z-index: 2000;
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+  pointer-events: none;
+}
+
+.hyper-toast {
+  pointer-events: auto;
+  min-width: 280px;
+  padding: 0.85rem 1.2rem;
+  border-radius: var(--hyper-radius-sm);
+  background-color: var(--hyper-bg-card);
+  border: 1px solid var(--hyper-border-subtle);
+  color: var(--hyper-text-primary);
+  font-size: 0.88rem;
+  font-weight: 500;
+  box-shadow: var(--hyper-shadow-subtle);
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  animation: hyperSlide 0.3s ease;
+}
+
+@keyframes hyperSlide {
+  0% { transform: translateX(100%); opacity: 0; }
+  100% { transform: translateX(0); opacity: 1; }
+}
+
+.hyper-toast-success { border-left: 4px solid var(--hyper-accent-emerald); }
+.hyper-toast-error { border-left: 4px solid var(--hyper-accent-rose); }
+.hyper-toast-info { border-left: 4px solid var(--hyper-accent-cyan); }

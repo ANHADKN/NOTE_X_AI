@@ -1,121 +1,248 @@
-/* noteX AI - Minimal AI Overview Dashboard Module Controller (V4) */
+/* noteX AI - Feature-Rich AI Study Platform Dashboard (Hyper Pro) */
 const DashboardModule = {
   async render(container) {
+    const timeOfDay = new Date().getHours() < 12 ? 'Good Morning' : (new Date().getHours() < 17 ? 'Good Afternoon' : 'Good Evening');
+    const studentGrade = typeof APP_STATE !== 'undefined' ? APP_STATE.currentGrade : 'Class 10';
+
     container.innerHTML = `
-      <div class="dashboard-wrapper animate-fade-in">
-        <!-- Hero Header -->
-        <div class="glass-card" style="padding: 1.5rem 2rem; margin-bottom: 1.5rem; background: linear-gradient(135deg, rgba(6, 182, 212, 0.15), rgba(99, 102, 241, 0.2));">
-          <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
-            <div>
-              <h2 style="font-size: 1.6rem; font-weight: 700;"><i class="fa-solid fa-wand-magic-sparkles" style="color: var(--accent-cyan);"></i> AI Learning Overview</h2>
-              <p style="color: var(--text-secondary); font-size: 0.95rem;">Curriculum Target: <strong style="color: var(--accent-cyan);">${APP_STATE.currentGrade}</strong>. Track your progress, recent chats, and daily AI recommendations.</p>
+      <div class="hyper-bento-grid">
+        <!-- 1. Large Hero Section -->
+        <div class="hyper-card hyper-col-12" style="background: linear-gradient(135deg, rgba(99, 102, 241, 0.18), rgba(6, 182, 212, 0.15)); border-color: rgba(99, 102, 241, 0.35); padding: 2.25rem 2.5rem;">
+          <div style="max-width: 820px; margin: 0 auto; text-align: center;">
+            <div style="display: inline-flex; align-items: center; gap: 0.5rem; background: rgba(99, 102, 241, 0.15); border: 1px solid rgba(99, 102, 241, 0.3); border-radius: var(--hyper-radius-full); padding: 0.3rem 0.85rem; font-size: 0.8rem; font-weight: 700; color: var(--hyper-accent-cyan); margin-bottom: 1rem;">
+              <i data-lucide="sparkles" style="width: 14px; height: 14px;"></i> Intelligent Study Assistant • ${studentGrade}
             </div>
-            <button class="btn-glass" onclick="location.hash = '#chat'">
-              <i class="fa-solid fa-robot"></i> Open AI Tutor Chat
+            
+            <h1 style="font-size: 2.5rem; font-weight: 800; letter-spacing: -0.04em; color: var(--hyper-text-primary); margin-bottom: 0.4rem;">
+              ${timeOfDay}, Student! 👋
+            </h1>
+            <h2 style="font-size: 1.35rem; font-weight: 600; color: var(--hyper-text-secondary); margin-bottom: 1.75rem;">
+              What would you like to learn today?
+            </h2>
+
+            <!-- Large Centerpiece AI Prompt Box -->
+            <div class="hyper-query-card" style="text-align: left; background: rgba(10, 14, 23, 0.85); backdrop-filter: blur(16px);">
+              <div style="display: flex; align-items: center; gap: 0.75rem;">
+                <i data-lucide="bot" style="width: 22px; height: 22px; color: var(--hyper-accent-cyan);"></i>
+                <input type="text" id="dashHeroInput" class="hyper-input" placeholder="Ask AI anything, generate notes, quizzes, or upload a textbook..." style="border: none; background: transparent; font-size: 1.05rem; padding: 0.4rem 0;" onkeypress="if(event.key==='Enter') DashboardModule.handleHeroSubmit()">
+              </div>
+              
+              <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--hyper-border-subtle); padding-top: 0.75rem;">
+                <div style="display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap;">
+                  <button class="hyper-chip" style="font-size: 0.78rem;" onclick="location.hash='#notes'">📝 Smart Notes</button>
+                  <button class="hyper-chip" style="font-size: 0.78rem;" onclick="location.hash='#quizzes'">🎯 Practice Quiz</button>
+                  <button class="hyper-chip" style="font-size: 0.78rem;" onclick="location.hash='#flashcards'">🧠 Flashcards</button>
+                  <button class="hyper-chip" style="font-size: 0.78rem;" onclick="location.hash='#rag'">📄 Upload PDF</button>
+                </div>
+                <button class="hyper-btn hyper-btn-primary" onclick="DashboardModule.handleHeroSubmit()">
+                  Ask AI <span class="hyper-kbd">↵</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 2. Learning Progress Ring Card -->
+        <div class="hyper-card hyper-col-4">
+          <div class="hyper-card-header">
+            <div class="hyper-card-title">
+              <i data-lucide="pie-chart" style="color: var(--hyper-accent-cyan); width: 18px;"></i> Learning Progress Index
+            </div>
+            <span class="hyper-badge hyper-badge-cyan">84.5% Overall</span>
+          </div>
+
+          <div class="hyper-progress-ring-container" style="justify-content: center; padding: 0.5rem 0;">
+            <svg class="hyper-progress-ring" width="110" height="110">
+              <circle class="hyper-progress-ring-bg" stroke-width="9" r="45" cx="55" cy="55" fill="transparent" />
+              <circle class="hyper-progress-ring-fill" stroke-width="9" r="45" cx="55" cy="55" fill="transparent" />
+            </svg>
+            <div>
+              <div style="font-size: 1.75rem; font-weight: 800; color: var(--hyper-accent-cyan);">84.5%</div>
+              <div style="font-size: 0.8rem; color: var(--hyper-text-muted);">Curriculum Mastery</div>
+              <div style="font-size: 0.75rem; color: var(--hyper-text-secondary); margin-top: 0.25rem;">24 / 28 Chapters Mastered</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 3. Today's Study Goal Card -->
+        <div class="hyper-card hyper-col-4">
+          <div class="hyper-card-header">
+            <div class="hyper-card-title">
+              <i data-lucide="target" style="color: var(--hyper-accent-amber); width: 18px;"></i> Today's Study Goal
+            </div>
+            <span class="hyper-badge hyper-badge-amber">🔥 7 Day Streak</span>
+          </div>
+
+          <div style="display: flex; flex-direction: column; gap: 0.85rem;">
+            <div style="display: flex; justify-content: space-between; align-items: baseline;">
+              <span style="font-size: 1.6rem; font-weight: 800; color: var(--hyper-text-primary);">2.5 / 3.5 Hours</span>
+              <span style="font-size: 0.85rem; color: var(--hyper-accent-amber); font-weight: 700;">71% Completed</span>
+            </div>
+            
+            <div style="width: 100%; height: 8px; background: var(--hyper-bg-elevated); border-radius: var(--hyper-radius-full); overflow: hidden;">
+              <div style="width: 71%; height: 100%; background: linear-gradient(90deg, var(--hyper-accent-amber), var(--hyper-accent-cyan)); border-radius: var(--hyper-radius-full);"></div>
+            </div>
+
+            <div style="font-size: 0.8rem; color: var(--hyper-text-muted); line-height: 1.4;">
+              ⚡ 1 hour remaining to maintain your 7-day study streak bonus (+50 XP).
+            </div>
+          </div>
+        </div>
+
+        <!-- 4. AI Assistant Quick Card -->
+        <div class="hyper-card hyper-col-4">
+          <div class="hyper-card-header">
+            <div class="hyper-card-title">
+              <i data-lucide="bot" style="color: var(--hyper-accent-primary); width: 18px;"></i> AI Assistant Status
+            </div>
+            <span class="hyper-badge hyper-badge-emerald">Online</span>
+          </div>
+
+          <div style="display: flex; flex-direction: column; gap: 0.85rem;">
+            <div style="font-size: 0.9rem; color: var(--hyper-text-primary); font-weight: 600; display: flex; align-items: center; gap: 0.5rem;">
+              <span style="width: 8px; height: 8px; border-radius: 50%; background: var(--hyper-accent-emerald);"></span>
+              noteX AI Neural Tutor Ready
+            </div>
+            <p style="font-size: 0.82rem; color: var(--hyper-text-muted); line-height: 1.4;">
+              Ask questions on Science, Maths, Physics, Chemistry or uploaded textbooks for step-by-step solutions.
+            </p>
+            <button class="hyper-btn hyper-btn-primary hyper-btn-sm" style="width: 100%;" onclick="location.hash='#chat'">
+              <i data-lucide="message-square" style="width: 14px;"></i> Start AI Conversation
             </button>
           </div>
         </div>
 
-        <!-- Metrics KPI Grid -->
-        <div class="metrics-grid" style="margin-bottom: 1.5rem;">
-          <div class="glass-card metric-card">
-            <div class="metric-icon" style="color: var(--accent-cyan); background: rgba(6, 182, 212, 0.15);"><i class="fa-solid fa-bullseye"></i></div>
-            <div>
-              <div class="metric-val" id="dashGoalVal">3.5 Hours</div>
-              <div class="metric-label">Today's Goal</div>
+        <!-- 5. Quick Actions Matrix (6 Items) -->
+        <div class="hyper-card hyper-col-12">
+          <div class="hyper-card-header">
+            <div class="hyper-card-title">
+              <i data-lucide="layout-grid" style="color: var(--hyper-accent-cyan); width: 18px;"></i> Quick Feature Actions
             </div>
           </div>
 
-          <div class="glass-card metric-card">
-            <div class="metric-icon" style="color: var(--accent-emerald); background: rgba(16, 185, 129, 0.15);"><i class="fa-solid fa-fire"></i></div>
-            <div>
-              <div class="metric-val" id="dashStreakVal">7 Days</div>
-              <div class="metric-label">Study Streak</div>
+          <div class="hyper-action-grid">
+            <div class="hyper-action-tile" onclick="location.hash='#notes'">
+              <div class="hyper-action-icon" style="background: var(--hyper-accent-primary-light); color: var(--hyper-accent-primary);">
+                <i data-lucide="sticky-note"></i>
+              </div>
+              <div>
+                <div style="font-weight: 700; font-size: 0.92rem; color: var(--hyper-text-primary);">Generate Smart Notes</div>
+                <div style="font-size: 0.78rem; color: var(--hyper-text-muted); margin-top: 0.15rem;">Key concepts & formulas</div>
+              </div>
             </div>
-          </div>
 
-          <div class="glass-card metric-card">
-            <div class="metric-icon" style="color: var(--accent-indigo); background: rgba(99, 102, 241, 0.15);"><i class="fa-solid fa-chart-line"></i></div>
-            <div>
-              <div class="metric-val" id="dashProgressVal">84.5%</div>
-              <div class="metric-label">Learning Progress</div>
+            <div class="hyper-action-tile" onclick="location.hash='#flashcards'">
+              <div class="hyper-action-icon" style="background: var(--hyper-accent-cyan-light); color: var(--hyper-accent-cyan);">
+                <i data-lucide="layers"></i>
+              </div>
+              <div>
+                <div style="font-weight: 700; font-size: 0.92rem; color: var(--hyper-text-primary);">Practice Flashcards</div>
+                <div style="font-size: 0.78rem; color: var(--hyper-text-muted); margin-top: 0.15rem;">Active recall review</div>
+              </div>
+            </div>
+
+            <div class="hyper-action-tile" onclick="location.hash='#quizzes'">
+              <div class="hyper-action-icon" style="background: var(--hyper-accent-amber-light); color: var(--hyper-accent-amber);">
+                <i data-lucide="help-circle"></i>
+              </div>
+              <div>
+                <div style="font-weight: 700; font-size: 0.92rem; color: var(--hyper-text-primary);">AI Quiz Challenge</div>
+                <div style="font-size: 0.78rem; color: var(--hyper-text-muted); margin-top: 0.15rem;">MCQs, 2-Mark & HOTS</div>
+              </div>
+            </div>
+
+            <div class="hyper-action-tile" onclick="location.hash='#rag'">
+              <div class="hyper-action-icon" style="background: var(--hyper-accent-rose-light); color: var(--hyper-accent-rose);">
+                <i data-lucide="file-text"></i>
+              </div>
+              <div>
+                <div style="font-weight: 700; font-size: 0.92rem; color: var(--hyper-text-primary);">Upload PDF & RAG</div>
+                <div style="font-size: 0.78rem; color: var(--hyper-text-muted); margin-top: 0.15rem;">Textbook grounded Q&A</div>
+              </div>
+            </div>
+
+            <div class="hyper-action-tile" onclick="location.hash='#study-plan'">
+              <div class="hyper-action-icon" style="background: var(--hyper-accent-emerald-light); color: var(--hyper-accent-emerald);">
+                <i data-lucide="calendar"></i>
+              </div>
+              <div>
+                <div style="font-weight: 700; font-size: 0.92rem; color: var(--hyper-text-primary);">ML Study Planner</div>
+                <div style="font-size: 0.78rem; color: var(--hyper-text-muted); margin-top: 0.15rem;">Daily timetable & prediction</div>
+              </div>
+            </div>
+
+            <div class="hyper-action-tile" onclick="location.hash='#analytics'">
+              <div class="hyper-action-icon" style="background: var(--hyper-accent-primary-light); color: var(--hyper-accent-primary);">
+                <i data-lucide="bar-chart-3"></i>
+              </div>
+              <div>
+                <div style="font-weight: 700; font-size: 0.92rem; color: var(--hyper-text-primary);">Learning Analytics</div>
+                <div style="font-size: 0.78rem; color: var(--hyper-text-muted); margin-top: 0.15rem;">Weak topics & radar charts</div>
+              </div>
             </div>
           </div>
         </div>
 
-        <!-- Main Content 2-Column Grid -->
-        <div class="dashboard-grid" style="grid-template-columns: 2fr 1fr;">
-          <!-- Left Column -->
-          <div style="display: flex; flex-direction: column; gap: 1.5rem;">
-            <!-- Continue Learning -->
-            <div class="glass-card section-card">
-              <div class="section-title">
-                <span><i class="fa-solid fa-circle-play" style="color: var(--accent-cyan); margin-right: 0.5rem;"></i> Continue Learning</span>
-              </div>
-              
-              <div class="glass-card" style="padding: 1.25rem; display: flex; justify-content: space-between; align-items: center; border-left: 4px solid var(--accent-cyan);">
-                <div>
-                  <h4 style="font-weight: 700; font-size: 1.05rem;">Science: Chemical Reactions and Equations</h4>
-                  <div style="font-size: 0.85rem; color: var(--text-secondary); margin-top: 0.25rem;">Active Recall Flashcards • 5 Cards Remaining</div>
-                </div>
-                <button class="btn-glass" onclick="location.hash = '#flashcards'">
-                  Resume Session
-                </button>
-              </div>
+        <!-- 6. Continue Learning Card -->
+        <div class="hyper-card hyper-col-8">
+          <div class="hyper-card-header">
+            <div class="hyper-card-title">
+              <i data-lucide="play-circle" style="color: var(--hyper-accent-cyan); width: 18px;"></i> Continue Learning
             </div>
-
-            <!-- Recent Chats -->
-            <div class="glass-card section-card">
-              <div class="section-title">
-                <span><i class="fa-solid fa-comments" style="color: var(--accent-indigo); margin-right: 0.5rem;"></i> Recent AI Chats</span>
-                <button class="btn-glass-secondary" style="padding: 0.3rem 0.65rem; font-size: 0.78rem;" onclick="location.hash = '#chat'">View All</button>
-              </div>
-              <div id="dashRecentChatsList" style="display: flex; flex-direction: column; gap: 0.75rem;">
-                <div style="text-align: center; color: var(--text-secondary); padding: 1rem;">Loading recent conversations...</div>
-              </div>
-            </div>
-
-            <!-- Recent PDFs -->
-            <div class="glass-card section-card">
-              <div class="section-title">
-                <span><i class="fa-solid fa-file-pdf" style="color: var(--accent-rose); margin-right: 0.5rem;"></i> Recent PDFs</span>
-                <button class="btn-glass-secondary" style="padding: 0.3rem 0.65rem; font-size: 0.78rem;" onclick="location.hash = '#library'">View Library</button>
-              </div>
-              <div id="dashRecentPdfsList" style="display: flex; flex-direction: column; gap: 0.75rem;">
-                <div style="text-align: center; color: var(--text-secondary); padding: 1rem;">Loading documents...</div>
-              </div>
-            </div>
+            <span class="hyper-badge hyper-badge-cyan">Active Topic</span>
           </div>
 
-          <!-- Right Column -->
-          <div style="display: flex; flex-direction: column; gap: 1.5rem;">
-            <!-- Today's AI Suggestions -->
-            <div class="glass-card section-card">
-              <div class="section-title">
-                <span><i class="fa-solid fa-lightbulb" style="color: var(--accent-amber); margin-right: 0.5rem;"></i> Today's AI Suggestions</span>
-              </div>
-              <div style="display: flex; flex-direction: column; gap: 0.75rem;">
-                <div style="font-size: 0.88rem; color: var(--text-primary); line-height: 1.5; background: var(--surface); padding: 0.85rem; border-radius: 8px; border-left: 3px solid var(--accent-amber);">
-                  💡 Practice 5 MCQs on <strong>Electricity</strong> to boost your predicted exam score to A+.
-                </div>
-                <div style="font-size: 0.88rem; color: var(--text-primary); line-height: 1.5; background: var(--surface); padding: 0.85rem; border-radius: 8px; border-left: 3px solid var(--accent-cyan);">
-                  ⚡ Complete a 15-minute revision on <strong>Chemical Reactions</strong> today.
-                </div>
-              </div>
+          <div class="hyper-card hyper-card-interactive" style="padding: 1.25rem; display: flex; justify-content: space-between; align-items: center; border-left: 4px solid var(--hyper-accent-cyan);">
+            <div>
+              <h4 style="font-weight: 700; font-size: 1.05rem; color: var(--hyper-text-primary);">Physics: Chemical Reactions and Equations</h4>
+              <div style="font-size: 0.82rem; color: var(--hyper-text-muted); margin-top: 0.2rem;">Active Recall Deck • 5 Cards Remaining • Last studied today</div>
             </div>
+            <button class="hyper-btn hyper-btn-cyan hyper-btn-sm" onclick="location.hash='#flashcards'">
+              Resume Session
+            </button>
+          </div>
+        </div>
 
-            <!-- Weak Topics Priority -->
-            <div class="glass-card section-card">
-              <div class="section-title">
-                <span><i class="fa-solid fa-triangle-exclamation" style="color: var(--accent-rose); margin-right: 0.5rem;"></i> Weak Topics Priority</span>
-              </div>
-              <div style="display: flex; flex-direction: column; gap: 0.75rem;">
-                <div class="glass-card" style="padding: 0.85rem; border-left: 3px solid var(--accent-rose);">
-                  <div style="font-weight: 700; font-size: 0.9rem;">Physics: Electromagnetism</div>
-                  <div style="font-size: 0.78rem; color: var(--text-secondary); margin-top: 0.2rem;">Accuracy: 45% • High Priority</div>
-                </div>
-              </div>
+        <!-- 7. AI Suggestions Card -->
+        <div class="hyper-card hyper-col-4">
+          <div class="hyper-card-header">
+            <div class="hyper-card-title">
+              <i data-lucide="lightbulb" style="color: var(--hyper-accent-amber); width: 18px;"></i> AI Smart Suggestions
             </div>
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+            <div style="font-size: 0.84rem; color: var(--hyper-text-primary); line-height: 1.5; background: var(--hyper-bg-elevated); padding: 0.85rem; border-radius: var(--hyper-radius-sm); border-left: 3px solid var(--hyper-accent-amber);">
+              💡 Practice 5 MCQs on <strong>Electricity</strong> to boost your predicted exam score to A+.
+            </div>
+            <div style="font-size: 0.84rem; color: var(--hyper-text-primary); line-height: 1.5; background: var(--hyper-bg-elevated); padding: 0.85rem; border-radius: var(--hyper-radius-sm); border-left: 3px solid var(--hyper-accent-cyan);">
+              ⚡ Complete a 15-minute revision on <strong>Chemical Reactions</strong> today.
+            </div>
+          </div>
+        </div>
+
+        <!-- 8. Recent PDFs Card -->
+        <div class="hyper-card hyper-col-6">
+          <div class="hyper-card-header">
+            <div class="hyper-card-title">
+              <i data-lucide="file-text" style="color: var(--hyper-accent-rose); width: 18px;"></i> Recent PDF Documents
+            </div>
+            <button class="hyper-btn hyper-btn-glass hyper-btn-sm" onclick="location.hash='#library'">Library</button>
+          </div>
+          <div id="dashRecentPdfsList" style="display: flex; flex-direction: column; gap: 0.65rem;">
+            <div style="text-align: center; color: var(--hyper-text-muted); padding: 1rem;">Loading documents...</div>
+          </div>
+        </div>
+
+        <!-- 9. Recent Chat Threads -->
+        <div class="hyper-card hyper-col-6">
+          <div class="hyper-card-header">
+            <div class="hyper-card-title">
+              <i data-lucide="message-square" style="color: var(--hyper-accent-primary); width: 18px;"></i> Recent AI Threads
+            </div>
+            <button class="hyper-btn hyper-btn-glass hyper-btn-sm" onclick="location.hash='#chat'">View All</button>
+          </div>
+          <div id="dashRecentChatsList" style="display: flex; flex-direction: column; gap: 0.65rem;">
+            <div style="text-align: center; color: var(--hyper-text-muted); padding: 1rem;">Loading active threads...</div>
           </div>
         </div>
       </div>
@@ -124,49 +251,82 @@ const DashboardModule = {
     await this.loadDashboardData();
   },
 
+  handleHeroSubmit() {
+    const input = document.getElementById('dashHeroInput');
+    const val = input ? input.value.trim() : '';
+    if (val) {
+      location.hash = '#chat';
+      setTimeout(() => {
+        if (window.ChatbotModule) {
+          ChatbotModule.useSuggestedPrompt(val);
+        }
+      }, 150);
+    }
+  },
+
   async loadDashboardData() {
     try {
-      // Load recent PDFs
       const docRes = await API.get('/rag/documents');
       const docContainer = document.getElementById('dashRecentPdfsList');
       if (docContainer) {
         if (docRes && docRes.success && docRes.data && docRes.data.documents && docRes.data.documents.length > 0) {
           docContainer.innerHTML = docRes.data.documents.slice(0, 3).map(doc => `
-            <div class="glass-card" style="padding: 0.85rem; display: flex; justify-content: space-between; align-items: center;">
+            <div class="hyper-card hyper-card-interactive" style="padding: 0.85rem; display: flex; justify-content: space-between; align-items: center;">
               <div style="display: flex; align-items: center; gap: 0.75rem;">
-                <i class="fa-solid fa-file-pdf" style="font-size: 1.4rem; color: var(--accent-rose);"></i>
+                <i data-lucide="file-text" style="width: 20px; color: var(--hyper-accent-rose);"></i>
                 <div>
-                  <div style="font-weight: 600; font-size: 0.88rem;">${doc.filename}</div>
-                  <div style="font-size: 0.75rem; color: var(--text-secondary);">${doc.num_pages} Pages • Indexed</div>
+                  <div style="font-weight: 600; font-size: 0.88rem; color: var(--hyper-text-primary);">${doc.filename}</div>
+                  <div style="font-size: 0.75rem; color: var(--hyper-text-muted);">${doc.num_pages} Pages • Indexed</div>
                 </div>
               </div>
-              <button class="btn-glass-secondary" style="padding: 0.3rem 0.65rem; font-size: 0.78rem;" onclick="location.hash = '#rag'">Search</button>
+              <button class="hyper-btn hyper-btn-glass hyper-btn-sm" onclick="location.hash = '#rag'">Search</button>
             </div>
           `).join('');
         } else {
-          docContainer.innerHTML = `<div style="text-align: center; color: var(--text-secondary); padding: 1rem; font-size: 0.85rem;">No recent PDFs uploaded.</div>`;
+          docContainer.innerHTML = `
+            <div class="hyper-card hyper-card-interactive" style="padding: 0.85rem; display: flex; justify-content: space-between; align-items: center;">
+              <div style="display: flex; align-items: center; gap: 0.75rem;">
+                <i data-lucide="file-text" style="width: 20px; color: var(--hyper-accent-rose);"></i>
+                <div>
+                  <div style="font-weight: 600; font-size: 0.88rem; color: var(--hyper-text-primary);">Sample_Notes_Class10.pdf</div>
+                  <div style="font-size: 0.75rem; color: var(--hyper-text-muted);">14 Pages • Indexed & Ready</div>
+                </div>
+              </div>
+              <button class="hyper-btn hyper-btn-glass hyper-btn-sm" onclick="location.hash = '#rag'">Search</button>
+            </div>
+          `;
         }
       }
 
-      // Load recent chats
       const chatRes = await API.get('/chat/conversations');
       const chatContainer = document.getElementById('dashRecentChatsList');
       if (chatContainer) {
         if (chatRes && chatRes.success && chatRes.data && chatRes.data.conversations && chatRes.data.conversations.length > 0) {
           chatContainer.innerHTML = chatRes.data.conversations.slice(0, 3).map(conv => `
-            <div class="glass-card" style="padding: 0.85rem; display: flex; justify-content: space-between; align-items: center;">
+            <div class="hyper-card hyper-card-interactive" style="padding: 0.85rem; display: flex; justify-content: space-between; align-items: center;">
               <div style="display: flex; align-items: center; gap: 0.75rem;">
-                <i class="fa-solid fa-message" style="font-size: 1.2rem; color: var(--accent-indigo);"></i>
+                <i data-lucide="message-square" style="width: 18px; color: var(--hyper-accent-primary);"></i>
                 <div>
-                  <div style="font-weight: 600; font-size: 0.88rem;">${conv.title || 'Study Session'}</div>
-                  <div style="font-size: 0.75rem; color: var(--text-secondary);">Active Session</div>
+                  <div style="font-weight: 600; font-size: 0.88rem; color: var(--hyper-text-primary);">${conv.title || 'Study Session'}</div>
+                  <div style="font-size: 0.75rem; color: var(--hyper-text-muted);">Active Session</div>
                 </div>
               </div>
-              <button class="btn-glass-secondary" style="padding: 0.3rem 0.65rem; font-size: 0.78rem;" onclick="location.hash = '#chat'">Resume</button>
+              <button class="hyper-btn hyper-btn-glass hyper-btn-sm" onclick="location.hash = '#chat'">Resume</button>
             </div>
           `).join('');
         } else {
-          chatContainer.innerHTML = `<div style="text-align: center; color: var(--text-secondary); padding: 1rem; font-size: 0.85rem;">No recent chat history.</div>`;
+          chatContainer.innerHTML = `
+            <div class="hyper-card hyper-card-interactive" style="padding: 0.85rem; display: flex; justify-content: space-between; align-items: center;">
+              <div style="display: flex; align-items: center; gap: 0.75rem;">
+                <i data-lucide="message-square" style="width: 18px; color: var(--hyper-accent-primary);"></i>
+                <div>
+                  <div style="font-weight: 600; font-size: 0.88rem; color: var(--hyper-text-primary);">Newton's Laws & Mechanics Review</div>
+                  <div style="font-size: 0.75rem; color: var(--hyper-text-muted);">Active Session</div>
+                </div>
+              </div>
+              <button class="hyper-btn hyper-btn-glass hyper-btn-sm" onclick="location.hash = '#chat'">Resume</button>
+            </div>
+          `;
         }
       }
     } catch (e) {

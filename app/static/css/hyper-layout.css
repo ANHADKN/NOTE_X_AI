@@ -1,0 +1,230 @@
+/* ==========================================
+   Hyper Layout & Bento Grid System
+   ========================================== */
+
+*, *::before, *::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body {
+  height: 100%;
+  background-color: var(--hyper-bg-app);
+  color: var(--hyper-text-primary);
+  font-family: var(--hyper-font-body);
+  font-size: 14px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--hyper-font-heading);
+  color: var(--hyper-text-primary);
+  font-weight: 700;
+  letter-spacing: -0.03em;
+}
+
+code, pre {
+  font-family: var(--hyper-font-mono);
+}
+
+/* Ambient Raycast Aurora Background */
+.hyper-ambient-bg {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  background:
+    radial-gradient(circle at 15% 15%, rgba(99, 102, 241, 0.15) 0%, transparent 40%),
+    radial-gradient(circle at 85% 85%, rgba(6, 182, 212, 0.12) 0%, transparent 40%),
+    radial-gradient(circle at 50% 50%, rgba(168, 85, 247, 0.08) 0%, transparent 50%);
+  animation: hyperAurora 14s ease-in-out infinite alternate;
+}
+
+@keyframes hyperAurora {
+  0% { opacity: 0.7; transform: scale(1) rotate(0deg); }
+  100% { opacity: 1; transform: scale(1.05) rotate(2deg); }
+}
+
+/* Custom Scrollbars */
+::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--hyper-bg-app);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--hyper-bg-elevated);
+  border-radius: var(--hyper-radius-full);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--hyper-accent-primary);
+}
+
+/* App Wrapper Shell */
+.hyper-app-wrapper {
+  display: flex;
+  height: 100vh;
+  width: 100vw;
+  overflow: hidden;
+  position: relative;
+  z-index: 1;
+}
+
+/* Linear / Vercel Minimalist Sidebar */
+.hyper-sidebar {
+  width: 240px;
+  background-color: var(--hyper-bg-sidebar);
+  border-right: 1px solid var(--hyper-border-subtle);
+  display: flex;
+  flex-direction: column;
+  padding: 1.25rem 0.85rem;
+  gap: 1.25rem;
+  flex-shrink: 0;
+}
+
+.hyper-brand {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0 0.5rem;
+}
+
+.hyper-brand-logo {
+  width: 34px;
+  height: 34px;
+  background: linear-gradient(135deg, var(--hyper-accent-primary), var(--hyper-accent-cyan));
+  border-radius: var(--hyper-radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  font-size: 1.1rem;
+  color: #ffffff;
+  box-shadow: var(--hyper-shadow-glow-primary);
+}
+
+.hyper-brand-title {
+  font-size: 1.15rem;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  background: linear-gradient(90deg, #ffffff, var(--hyper-text-secondary));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.hyper-nav-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  overflow-y: auto;
+  flex: 1;
+}
+
+.hyper-nav-item a {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.65rem 0.85rem;
+  border-radius: var(--hyper-radius-sm);
+  color: var(--hyper-text-secondary);
+  text-decoration: none;
+  font-family: var(--hyper-font-heading);
+  font-size: 0.88rem;
+  font-weight: 500;
+  transition: all var(--hyper-transition-fast);
+}
+
+.hyper-nav-item a:hover {
+  background-color: var(--hyper-bg-hover);
+  color: var(--hyper-text-primary);
+}
+
+.hyper-nav-item.active a {
+  background-color: var(--hyper-bg-elevated);
+  color: #ffffff;
+  border-left: 2px solid var(--hyper-accent-cyan);
+  box-shadow: 0 2px 10px rgba(6, 182, 212, 0.15);
+}
+
+.hyper-nav-item.active a i {
+  color: var(--hyper-accent-cyan);
+}
+
+/* Main View Container */
+.hyper-main-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  overflow: hidden;
+  background-color: var(--hyper-bg-app);
+}
+
+/* Arc / Raycast Floating Glass Navigation Bar */
+.hyper-float-nav {
+  margin: 1rem 1.5rem 0.5rem 1.5rem;
+  padding: 0.5rem 1.25rem;
+  background: rgba(10, 14, 23, 0.75);
+  backdrop-filter: var(--hyper-glass-blur);
+  border: 1px solid var(--hyper-border-subtle);
+  border-radius: var(--hyper-radius-full);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  box-shadow: var(--hyper-shadow-subtle);
+  flex-shrink: 0;
+  z-index: 10;
+}
+
+.hyper-command-trigger {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  background: var(--hyper-bg-surface);
+  border: 1px solid var(--hyper-border-subtle);
+  border-radius: var(--hyper-radius-full);
+  padding: 0.4rem 1rem;
+  color: var(--hyper-text-muted);
+  font-size: 0.82rem;
+  cursor: pointer;
+  min-width: 280px;
+  transition: all var(--hyper-transition-fast);
+}
+
+.hyper-command-trigger:hover {
+  border-color: var(--hyper-accent-primary);
+  color: var(--hyper-text-primary);
+}
+
+.hyper-view-viewport {
+  flex: 1;
+  padding: 1.5rem 1.5rem;
+  overflow-y: auto;
+}
+
+/* Vercel 12-Column Bento Grid System */
+.hyper-bento-grid {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  gap: 1.25rem;
+}
+
+.hyper-col-12 { grid-column: span 12; }
+.hyper-col-8  { grid-column: span 8; }
+.hyper-col-6  { grid-column: span 6; }
+.hyper-col-4  { grid-column: span 4; }
+.hyper-col-3  { grid-column: span 3; }
+
+@media (max-width: 1024px) {
+  .hyper-col-8, .hyper-col-6, .hyper-col-4, .hyper-col-3 {
+    grid-column: span 12;
+  }
+}
