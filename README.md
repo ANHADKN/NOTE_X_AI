@@ -1,246 +1,225 @@
 <div align="center">
 
-# 🎓 noteX AI — Production AI-First Study Platform
+# 𝝌 noteX AI — Intelligent AI Study Platform
 
-[![GitHub Release](https://img.shields.io/github/v/release/ANHADKN/NOTE_X_AI?color=6366f1&style=for-the-badge&logo=github)](https://github.com/ANHADKN/NOTE_X_AI/releases)
-[![Build Status](https://img.shields.io/badge/CI%2FCD-passing-10b981?style=for-the-badge&logo=github-actions)](https://github.com/ANHADKN/NOTE_X_AI/actions)
-[![Python Version](https://img.shields.io/badge/Python-3.11+-3776AB?style=for-the-badge&logo=python)](https://www.python.org/)
-[![Flask Engine](https://img.shields.io/badge/Flask-3.0.0-000000?style=for-the-badge&logo=flask)](https://flask.palletsprojects.com/)
-[![MongoDB](https://img.shields.io/badge/MongoDB-6.0-47A248?style=for-the-badge&logo=mongodb)](https://www.mongodb.com/)
-[![ChromaDB](https://img.shields.io/badge/VectorDB-ChromaDB-FF4F00?style=for-the-badge)](https://www.trychroma.com/)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge)](LICENSE)
+[![Python](https://img.shields.io/badge/Python-3.11+-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://python.org)
+[![Flask](https://img.shields.io/badge/Flask-3.0.0-000000?style=for-the-badge&logo=flask&logoColor=white)](https://flask.palletsprojects.com/)
+[![MongoDB](https://img.shields.io/badge/MongoDB-6.0+-47A248?style=for-the-badge&logo=mongodb&logoColor=white)](https://mongodb.com)
+[![JavaScript](https://img.shields.io/badge/JavaScript-ES6+-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black)](https://developer.mozilla.org)
+[![License](https://img.shields.io/badge/License-MIT-blue.style=for-the-badge)](LICENSE)
 
-*An intelligent, conversational AI tutor designed for Class 1 to Class 12 students. Seamlessly unifies ChatGPT/Gemini-style AI conversations, RAG document search, smart note generation, adaptive quizzes, 3D flashcards, study planning, and machine learning performance analytics into a single glassmorphic web app.*
+<p align="center">
+  <b>A state-of-the-art, multi-dimensional AI Study Platform featuring Retrieval-Augmented Generation (RAG), active recall flashcards, AI quiz generators, ML score prediction, and real-time learning analytics.</b>
+</p>
 
-[Explore Features](#-features) • [System Architecture](#-system-architecture) • [Quick Start](#-quick-start) • [API Reference](#-api-overview) • [Deployment](#-production-deployment-docker)
+[Key Features](#key-features) • [Tech Stack](#tech-stack) • [System Architecture](#system-architecture) • [RAG Workflow](#rag-workflow) • [Installation](#installation-guide) • [Deployment](#deployment-guide)
 
 </div>
 
 ---
 
-## 📸 Screenshots & UI Showcase
+## 📌 Project Overview
 
-| 💬 ChatGPT AI Tutor Homepage | 📚 Unified "My Library" Asset Hub |
-|:----------------------------:|:----------------------------------:|
-| ![AI Chat Homepage](https://raw.githubusercontent.com/ANHADKN/NOTE_X_AI/main/docs/screenshots/chat_homepage.png) | ![My Library Hub](https://raw.githubusercontent.com/ANHADKN/NOTE_X_AI/main/docs/screenshots/library_hub.png) |
+**noteX AI** is a modern, full-stack AI-powered study platform designed to transform traditional learning into an interactive, data-driven experience. Built with a sleek **Obsidian Hyper-Design System**, noteX AI integrates natural language query routing, semantic textbook search (RAG), active recall flashcard stages, automated Board-exam quiz generation, and predictive study analytics.
 
-| 📊 ML Analytics & Mastery Engine | 🧠 3D Interactive Flashcards |
-|:--------------------------------:|:-----------------------------:|
-| ![Analytics Dashboard](https://raw.githubusercontent.com/ANHADKN/NOTE_X_AI/main/docs/screenshots/analytics_dashboard.png) | ![3D Flashcards](https://raw.githubusercontent.com/ANHADKN/NOTE_X_AI/main/docs/screenshots/flashcards_deck.png) |
+Whether analyzing complex physics formulas ($n_1 \sin \theta_1 = n_2 \sin \theta_2$), balancing chemistry redox equations, or solving quadratic polynomials ($x = \frac{-b \pm \sqrt{b^2 - 4ac}}{2a}$), noteX AI provides grounded, step-by-step guidance tailored to students from **Class 1 to Class 12**.
 
 ---
 
-## ✨ Core Features Matrix
+## ✨ Key Features
 
-- 🤖 **Central AI Intent Router (`ai_router.py`)**: Analyzes every prompt to detect intent (`GENERATE_NOTES`, `GENERATE_QUIZ`, `GENERATE_FLASHCARDS`, `GENERATE_STUDY_PLAN`, `VIEW_ANALYTICS`, `RAG_PDF_SEARCH`), enriches with RAG vector search, and outputs interactive action buttons.
-- 📄 **PDF Upload & RAG Vector Engine**: Semantic text extraction (`pypdf` / `pdfplumber`), embeddings via `SentenceTransformers`, and vector chunk querying in `ChromaDB` with page citations (`Page X`).
-- 📚 **Unified "My Library"**: Search, filter, preview, rename, and delete uploaded PDFs, AI Notes, Flashcard Decks, Quizzes, Study Plans, and Chat History from one hub.
-- 📝 **Smart Notes AI Generator**: Instant generation of 8 structured note formats (Smart Notes, Short Notes, Key Points, Revision Notes, Formula Sheets, Summaries, Exam Notes, Last-Minute Revision) with PDF printing/export.
-- ❓ **AI Quiz System & Leaderboards**: MCQs, 1-Mark, 2-Mark, 5-Mark, and HOTS questions with automated score evaluation, AI explanations, and global XP leaderboards.
-- 🧠 **3D Active Recall Flashcards**: Interactive 3D flip card runner using Leitner spaced repetition rating (`Easy +15 XP`, `Medium +10 XP`, `Hard +5 XP`).
-- 📅 **AI Study Planner**: 7-Day timetables and Board Exam revision roadmaps generated using ML weak topic prioritization.
-- 📈 **ML Performance Analytics**: Scikit-Learn and XGBoost algorithms calculating Subject Mastery Index (%), Memory Retention Rate (%), and ML Predicted Exam Score (`A+ 90%`).
-- 🛡️ **Isolated Admin Console**: Separate admin login (`/api/admin/login`), user management, system metrics, and audit log tracking.
+- **🧠 Intelligent AI Chatbot & Neural Tutor**: Context-aware educational chat powered by custom intent-routing engines, supporting LaTeX math math rendering and streaming typing responses.
+- **📄 Grounded PDF Assistant (RAG Engine)**: Drag-and-drop textbook indexing with vector embedding search and page-level attribution.
+- **📝 AI Smart Notes & Formula Cheat Sheets**: One-click generation of revision notes, key definitions, and formula cheat sheets across Physics, Chemistry, Mathematics, Biology, and Social Science.
+- **🎯 AI Quiz & Board Evaluation System**: Generate customizable practice quizzes (MCQs, 2-Mark short answers, and HOTS questions) with instant AI solution explanations.
+- **🧠 3D Active Recall Flashcards**: Spaced repetition flashcard stage with 3D flip card animations and self-assessment controls (`🔴 Hard`, `🟡 Medium`, `🟢 Easy`).
+- **📅 ML Study Planner & Timetable**: Adaptive exam revision scheduling with ML predicted Board exam score meters (92.4% Target) and daily task checklists.
+- **📊 Real-time Learning Analytics**: Subject mastery progress bars, weak topic detection, and Chart.js weekly study velocity tracking (26.5 hrs/week).
+- **🛡️ Security & Admin Console**: JWT authentication, role-based admin dashboard, user management, and system health metrics.
+- **🌌 Pitch Obsidian Hyper-Design Theme**: Modern SaaS interface featuring floating glass navigation, Raycast command palette (`⌘K`), floating formula background canvas, and zero empty placeholders.
 
 ---
 
-## 🏛️ System Architecture
+## 🖼️ Interface Screenshots
+
+<div align="center">
+
+| Module | Interface Preview |
+|---|---|
+| **Dashboard Bento Grid** | ![Dashboard Screenshot](docs/screenshots/dashboard.png) |
+| **AI Chat & Neural Tutor** | ![AI Chat Screenshot](docs/screenshots/chat.png) |
+| **PDF RAG Assistant** | ![RAG Assistant Screenshot](docs/screenshots/rag.png) |
+| **Active Recall Flashcards** | ![Flashcards Screenshot](docs/screenshots/flashcards.png) |
+| **Learning Analytics** | ![Analytics Screenshot](docs/screenshots/analytics.png) |
+
+</div>
+
+---
+
+## 🛠️ Tech Stack
+
+### **Frontend**
+- **Core**: HTML5, Vanilla JavaScript (ES6+ Modules), SPA Hash Router Engine
+- **Styling**: Vanilla CSS3 (Hyper-Design System with Design Tokens & Glassmorphism Blur)
+- **Typography & Icons**: Plus Jakarta Sans, Inter, JetBrains Mono, Lucide Icons, FontAwesome 6
+- **Mathematics & Graphics**: KaTeX 0.16.8 (LaTeX Math Engine), Chart.js (Data Visualization), Canvas Particle Engine
+
+### **Backend**
+- **Framework**: Python 3.11+ / Flask 3.0.0 Microframework
+- **Authentication**: PyJWT (JSON Web Tokens) with Werkzeug Password Hashing
+- **AI Engine**: OpenAI API / Custom RAG Vector Search & Intent Classifier
+- **Database**: MongoDB 6.0+ (PyMongo Engine) with graceful In-Memory Fallback mode
+
+---
+
+## 🏗️ System Architecture
 
 ```mermaid
 graph TD
-    Client["🌐 Glassmorphism Web SPA (HTML5 / ES6 JS / CSS3)"]
-    API["⚡ Flask REST API Engine (Python 3.11)"]
-    AIRouter["🧠 Central AI Intent Router (ai_router.py)"]
-    OpenAI["🤖 OpenAI GPT-4o API Engine"]
-    Chroma["🔍 ChromaDB Persistent Vector Index"]
-    Mongo[("🍃 MongoDB Database")]
+    User([Student / Client Browser]) -->|HTTPS / REST API| Frontend[SPA Frontend Engine]
+    
+    subgraph Frontend Architecture
+        Frontend --> Router[Hash Router #view]
+        Frontend --> FloatingNav[Arc Glass Header / ⌘K Command Palette]
+        Frontend --> ScienceCanvas[Science Formula Background Canvas]
+        Frontend --> DesignTokens[Obsidian Token System]
+    end
 
-    Client -->|HTTP / REST| API
-    API --> AIRouter
-    AIRouter -->|RAG Context Search| Chroma
-    AIRouter -->|LLM Inference| OpenAI
-    AIRouter -->|Persist Assets| Mongo
-    API -->|JWT Authorization| Mongo
+    Frontend -->|JWT Auth Header| Flask[Flask Backend Server]
+
+    subgraph Backend Services
+        Flask --> Auth[Auth Blueprint /api/auth]
+        Flask --> Chatbot[Chatbot Blueprint /api/chatbot]
+        Flask --> RAG[RAG Blueprint /api/rag]
+        Flask --> Notes[Notes Blueprint /api/notes]
+        Flask --> Planner[Planner Blueprint /api/study-plan]
+        Flask --> Quiz[Quiz Blueprint /api/quiz]
+        Flask --> Analytics[Analytics Blueprint /api/analytics]
+    end
+
+    Chatbot --> AIRouter[AI Intent Router & OpenAI Service]
+    RAG --> PDFProcessor[PyMuPDF / Vector Indexer]
+    Planner --> MLPredictor[ML Performance Predictor]
+    
+    Flask --> Database[(MongoDB / In-Memory Store)]
 ```
 
 ---
 
-## 🗄️ Database ER Diagram
+## 🔄 RAG Workflow (Retrieval-Augmented Generation)
 
 ```mermaid
-erDiagram
-    USERS ||--o{ CHAT_HISTORY : owns
-    USERS ||--o{ DOCUMENTS : uploads
-    USERS ||--o{ NOTES : generates
-    USERS ||--o{ QUIZZES : creates
-    USERS ||--o{ FLASHCARD_DECKS : owns
-    USERS ||--o1 STUDY_PLANS : receives
-    USERS ||--o1 ANALYTICS : tracks
+sequenceDiagram
+    autonumber
+    actor Student
+    participant UI as RAG Assistant UI
+    participant Server as Flask RAG API
+    participant Indexer as Vector Search Engine
+    participant LLM as OpenAI / RAG LLM
 
-    USERS {
-        string id PK
-        string email UK
-        string password_hash
-        string role
-        string student_class
-        int xp_points
-    }
+    Student->>UI: Upload PDF Textbook (e.g., Physics_Light.pdf)
+    UI->>Server: POST /api/rag/upload (Multipart PDF)
+    Server->>Indexer: Extract Text & Page Chunking (PyMuPDF)
+    Indexer-->>Server: 18 Pages Indexed & Embedded
+    Server-->>UI: Upload Success (Doc ID & Page Telemetry)
 
-    DOCUMENTS {
-        string id PK
-        string user_id FK
-        string filename
-        int num_pages
-        int num_chunks
-    }
-
-    NOTES {
-        string id PK
-        string user_id FK
-        string chapter
-        string note_type
-        string content
-    }
-
-    QUIZZES {
-        string id PK
-        string user_id FK
-        string title
-        array questions
-    }
-
-    FLASHCARD_DECKS {
-        string id PK
-        string user_id FK
-        string title
-        int card_count
-    }
-
-    STUDY_PLANS {
-        string id PK
-        string user_id FK
-        array daily_plan
-        array weekly_plan
-    }
-
-    ANALYTICS {
-        string id PK
-        string user_id FK
-        float mastery_score
-        float retention_rate
-        float predicted_score
-    }
+    Student->>UI: Ask Question ("What is Snell's Law?")
+    UI->>Server: POST /api/rag/query { query, doc_id }
+    Server->>Indexer: Semantic Similarity Search
+    Indexer-->>Server: Top Relevant Chunks (Page 4, Score: 0.94)
+    Server->>LLM: Prompt + Retracted Context Chunks
+    LLM-->>Server: Grounded Response with Page Citations
+    Server-->>UI: Return Answer + Page Citation Badges
 ```
 
 ---
 
-## 🛠️ Technology Stack
+## 🚀 Installation Guide
 
-| Category | Technology |
-|---|---|
-| **Frontend** | Vanilla CSS3 (Glassmorphism), JavaScript (ES6 SPA Router), Marked.js, Highlight.js, Chart.js, Web Speech API |
-| **Backend** | Python 3.11, Flask 3.0, Flask Blueprints, PyMongo, JWT Auth, Bcrypt |
-| **Database & Cache** | MongoDB 6.0 (with in-memory dictionary fallback mode) |
-| **AI & RAG** | OpenAI GPT-4o, ChromaDB Persistent Vector Store, SentenceTransformers |
-| **Machine Learning**| Scikit-Learn, XGBoost, NumPy, Pandas |
-| **DevOps & Containers**| Docker, Docker Compose, Gunicorn WSGI, Nginx Reverse Proxy |
+### Prerequisites
+- **Python**: `3.11` or higher
+- **Node.js**: (Optional, for web tools)
+- **MongoDB**: `6.0` or higher (Optional — runs automatically in fallback mode if MongoDB is not present)
 
----
-
-## ⚡ Quick Start (Local Setup)
-
-### 1. Clone Repository
+### 1. Clone the Repository
 ```bash
 git clone https://github.com/ANHADKN/NOTE_X_AI.git
 cd NOTE_X_AI
 ```
 
-### 2. Environment Setup
+### 2. Set Up Virtual Environment
 ```bash
-# Create Python Virtual Environment
+# Windows
 python -m venv .venv
+.\.venv\Scripts\activate
 
-# Activate Virtual Environment (Windows)
-.venv\Scripts\activate
-
-# Activate Virtual Environment (Linux / macOS)
+# macOS / Linux
+python3 -m venv .venv
 source .venv/bin/activate
+```
 
-# Install Dependencies
+### 3. Install Dependencies
+```bash
 pip install -r requirements.txt
 ```
 
-### 3. Configuration (.env)
-Create a `.env` file in the project root:
+### 4. Environment Configuration
+Create a `.env` file in the root directory:
 ```env
 FLASK_ENV=development
-SECRET_KEY=dev-secret-key-12345
-JWT_SECRET_KEY=jwt-secret-key-67890
+SECRET_KEY=notex_ai_super_secret_production_key_2026
+JWT_SECRET_KEY=notex_jwt_secret_key_2026
 MONGO_URI=mongodb://localhost:27017/notex_ai
 OPENAI_API_KEY=your_openai_api_key_here
-ALLOWED_ORIGINS=*
+PORT=5000
 ```
 
-### 4. Run Application
+### 5. Run the Application
 ```bash
 python app.py
 ```
-Open browser at [http://localhost:5000](http://localhost:5000).
+Open your browser and navigate to: **`http://127.0.0.1:5000/`**
 
 ---
 
-## 🐳 Production Deployment (Docker)
+## 🌐 Deployment Guide
 
-Launch the complete microservices stack using Docker Compose:
+### Deploying on Render / Heroku / Gunicorn
+1. Create a `Procfile`:
+   ```web: gunicorn "app:create_app()"`
+2. Set Environment Variables on host service (`OPENAI_API_KEY`, `JWT_SECRET_KEY`, `MONGO_URI`).
+3. Deploy directly via Git push or Docker container build.
 
+### Docker Deployment
 ```bash
-docker-compose up -d --build
-```
-Access the application on port `80` (handled by Nginx reverse proxying to Gunicorn WSGI workers).
+# Build Container
+docker build -t notex-ai:latest .
 
----
-
-## 🧪 Master Test Suite Verification
-
-Run the master integration test suite verifying all 14 module test runners:
-
-```bash
-python scratch/test_all_modules.py
+# Run Container
+docker run -p 5000:5000 --env-file .env notex-ai:latest
 ```
 
 ---
 
-## 📄 API Overview
+## 🗺️ Future Roadmap
 
-| Method | Endpoint | Description | Auth Required |
-|---|---|---|---|
-| `GET` | `/api/health` | System health check and blueprint registry | No |
-| `POST` | `/api/auth/register` | Register student account | No |
-| `POST` | `/api/auth/login` | Authenticate user & receive JWT token | No |
-| `POST` | `/api/chatbot/message` | Submit conversational tutor prompt (AI Router) | Yes |
-| `POST` | `/api/rag/upload` | Upload PDF textbook & index ChromaDB vectors | Yes |
-| `GET` | `/api/library/assets` | Retrieve user assets with search & filtering | Yes |
-| `POST` | `/api/notes/generate` | Generate AI Smart Note (8 formats) | Yes |
-| `POST` | `/api/quiz/generate` | Generate AI Quiz (MCQ / 1-5 Marks / HOTS) | Yes |
-| `POST` | `/api/flashcards/generate` | Generate 3D Active Recall Deck | Yes |
-| `GET` | `/api/study-plan/today` | Fetch daily timetable & revision tasks | Yes |
-| `GET` | `/api/analytics/overview` | Fetch ML Subject Mastery & Grade Prediction | Yes |
-| `POST` | `/api/admin/login` | Authenticate Administrator session | No |
+- [x] **Phase 1**: Pitch Obsidian Hyper-Design overhaul & Glassmorphism Navigation.
+- [x] **Phase 2**: Multi-module SPA Router with zero console errors.
+- [x] **Phase 3**: RAG Assistant, 3D Flashcard Deck, and ML Study Planner integration.
+- [ ] **Phase 4**: Real-time Collaborative Group Study Rooms (WebSockets / Socket.io).
+- [ ] **Phase 5**: Offline Voice AI Tutor (Whisper Speech-to-Text & Edge-TTS Speech Synthesis).
+- [ ] **Phase 6**: Cross-platform Mobile Companion Application (React Native / Flutter).
 
 ---
 
-## 🤝 Contributing
+## 📄 License
 
-Contributions are welcome! Please read our [CONTRIBUTING.md](CONTRIBUTING.md) and [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md) for details on code submission protocols.
-
----
-
-## 📜 License
-
-Distributed under the **MIT License**. See [LICENSE](LICENSE) for details.
+This project is licensed under the **MIT License** — see the [LICENSE](LICENSE) file for details.
 
 ---
 
-## 👤 Author
+## ✍️ Author
 
-Developed with ❤️ by **[ANHADKN](https://github.com/ANHADKN)** and the **noteX AI Core Team**.
+Developed with ❤️ by **ANHAD KN** & the noteX AI Engineering Team.
+- **GitHub**: [@ANHADKN](https://github.com/ANHADKN)
+- **Repository**: [ANHADKN/NOTE_X_AI](https://github.com/ANHADKN/NOTE_X_AI)
