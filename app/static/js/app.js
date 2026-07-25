@@ -40,6 +40,11 @@ document.addEventListener('DOMContentLoaded', () => {
     currentGradeLabel.textContent = APP_STATE.currentGrade || 'Class 10';
   }
 
+  // Update Auth Profile UI
+  if (typeof Auth !== 'undefined' && Auth.updateUI) {
+    Auth.updateUI();
+  }
+
   // Keyboard Command Palette Listener (`⌘K` / `Ctrl+K`)
   document.addEventListener('keydown', (e) => {
     if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
@@ -91,7 +96,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  // SPA Router
+  // Role-Based SPA Router with Security Guarding
   async function router() {
     const targetContainer = document.getElementById('app-view-container');
     if (!targetContainer) return;
@@ -109,44 +114,64 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     });
 
-    switch (hash) {
-      case 'chat':
-      case 'chatbot':
-        if (typeof ChatbotModule !== 'undefined') await ChatbotModule.render(targetContainer);
-        break;
-      case 'dashboard':
-        if (typeof DashboardModule !== 'undefined') await DashboardModule.render(targetContainer);
-        break;
-      case 'library':
-        if (typeof LibraryModule !== 'undefined') await LibraryModule.render(targetContainer);
-        break;
-      case 'rag':
-        if (typeof RAGModule !== 'undefined') await RAGModule.render(targetContainer);
-        break;
-      case 'study-plan':
-        if (typeof StudyPlannerModule !== 'undefined') await StudyPlannerModule.render(targetContainer);
-        break;
-      case 'notes':
-        if (typeof NotesModule !== 'undefined') await NotesModule.render(targetContainer);
-        break;
-      case 'quizzes':
-        if (typeof QuizModule !== 'undefined') await QuizModule.render(targetContainer);
-        break;
-      case 'flashcards':
-        if (typeof FlashcardsModule !== 'undefined') await FlashcardsModule.render(targetContainer);
-        break;
-      case 'analytics':
-        if (typeof AnalyticsModule !== 'undefined') await AnalyticsModule.render(targetContainer);
-        break;
-      case 'settings':
-        if (typeof SettingsModule !== 'undefined') await SettingsModule.render(targetContainer);
-        break;
-      case 'admin':
-        if (typeof AdminModule !== 'undefined') await AdminModule.render(targetContainer);
-        break;
-      default:
-        if (typeof DashboardModule !== 'undefined') await DashboardModule.render(targetContainer);
-        break;
+    try {
+      switch (hash) {
+        case 'chat':
+        case 'chatbot':
+          if (typeof ChatbotModule !== 'undefined') await ChatbotModule.render(targetContainer);
+          break;
+        case 'dashboard':
+          if (typeof DashboardModule !== 'undefined') await DashboardModule.render(targetContainer);
+          break;
+        case 'library':
+          if (typeof LibraryModule !== 'undefined') await LibraryModule.render(targetContainer);
+          break;
+        case 'rag':
+          if (typeof RAGModule !== 'undefined') await RAGModule.render(targetContainer);
+          break;
+        case 'study-plan':
+          if (typeof StudyPlannerModule !== 'undefined') await StudyPlannerModule.render(targetContainer);
+          break;
+        case 'notes':
+          if (typeof NotesModule !== 'undefined') await NotesModule.render(targetContainer);
+          break;
+        case 'quizzes':
+          if (typeof QuizModule !== 'undefined') await QuizModule.render(targetContainer);
+          break;
+        case 'flashcards':
+          if (typeof FlashcardsModule !== 'undefined') await FlashcardsModule.render(targetContainer);
+          break;
+        case 'analytics':
+          if (typeof AnalyticsModule !== 'undefined') await AnalyticsModule.render(targetContainer);
+          break;
+        case 'settings':
+          if (typeof SettingsModule !== 'undefined') await SettingsModule.render(targetContainer);
+          break;
+        case 'admin':
+          // Security Guard: Admin route only accessible if logged-in user has role === 'admin'
+          const currentUser = APP_STATE.user || JSON.parse(localStorage.getItem('notex_user') || 'null');
+          if (currentUser && currentUser.role === 'admin') {
+            if (typeof AdminModule !== 'undefined') await AdminModule.render(targetContainer);
+          } else {
+            UI.showToast("Admin access restricted. Admin login required.", "error");
+            window.location.hash = '#dashboard';
+            if (typeof DashboardModule !== 'undefined') await DashboardModule.render(targetContainer);
+          }
+          break;
+        default:
+          if (typeof DashboardModule !== 'undefined') await DashboardModule.render(targetContainer);
+          break;
+      }
+    } catch (routeErr) {
+      console.error(`[Router Error] Failed to render view '${hash}':`, routeErr);
+      targetContainer.innerHTML = `
+        <div style="text-align: center; padding: 4rem 1rem; color: var(--hyper-text-secondary);">
+          <i class="fa-solid fa-triangle-exclamation" style="font-size: 2.5rem; color: var(--hyper-accent-rose); margin-bottom: 1rem;"></i>
+          <h2 style="color: var(--hyper-text-primary); margin-bottom: 0.5rem;">Unable to load page</h2>
+          <p style="margin-bottom: 1.5rem;">${routeErr.message || 'An error occurred while loading this view.'}</p>
+          <button class="hyper-btn hyper-btn-primary" onclick="location.hash='#dashboard'">Return to Dashboard</button>
+        </div>
+      `;
     }
 
     // Refresh Lucide Icons after view render

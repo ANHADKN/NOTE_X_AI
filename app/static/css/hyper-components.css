@@ -2,6 +2,23 @@
    Hyper Component Library (Linear / Raycast / Perplexity AI / Stripe)
    ========================================== */
 
+/* Typing Cursor Animation */
+.hyper-typing-cursor {
+  display: inline-block;
+  width: 8px;
+  height: 16px;
+  background-color: var(--hyper-accent-cyan);
+  margin-left: 4px;
+  vertical-align: middle;
+  border-radius: 1px;
+  animation: hyperBlink 0.8s infinite;
+}
+
+@keyframes hyperBlink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.1; }
+}
+
 /* 1. Bento Box Cards */
 .hyper-card {
   background-color: var(--hyper-bg-card);
@@ -254,7 +271,7 @@
   font-size: 1.1rem;
 }
 
-/* 8. Perplexity AI Hero Workspace */
+/* 8. Perplexity AI & ChatGPT Production Workspace */
 .hyper-chat-workspace {
   display: flex;
   height: calc(100vh - 110px);
@@ -262,6 +279,7 @@
   border: 1px solid var(--hyper-border-subtle);
   border-radius: var(--hyper-radius-lg);
   overflow: hidden;
+  position: relative;
 }
 
 .hyper-chat-sidebar {
@@ -280,47 +298,198 @@
   display: flex;
   flex-direction: column;
   background-color: var(--hyper-bg-app);
+  position: relative;
 }
 
 .hyper-chat-messages {
   flex: 1;
-  padding: 1.5rem;
+  padding: 2rem 1.5rem;
   overflow-y: auto;
   display: flex;
   flex-direction: column;
-  gap: 1.25rem;
+  gap: 1.5rem;
+  align-items: center;
 }
 
-.hyper-query-card {
-  background: var(--hyper-bg-card);
-  border: 1px solid var(--hyper-border-medium);
-  border-radius: var(--hyper-radius-xl);
-  padding: 1.25rem;
-  box-shadow: var(--hyper-shadow-glow-primary);
+.hyper-user-message-row {
   display: flex;
-  flex-direction: column;
+  justify-content: flex-end;
+  max-width: 850px;
+  width: 100%;
+}
+
+.hyper-ai-message-row {
+  display: flex;
   gap: 1rem;
+  max-width: 850px;
+  width: 100%;
+  align-self: center;
+}
+
+.hyper-ai-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, var(--hyper-accent-primary), var(--hyper-accent-cyan));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  font-size: 1.05rem;
+  color: #ffffff;
+  flex-shrink: 0;
+  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
 }
 
 .hyper-bubble-user {
-  align-self: flex-end;
   background: linear-gradient(135deg, var(--hyper-accent-primary), var(--hyper-accent-primary-hover));
   color: #ffffff;
-  padding: 0.85rem 1.25rem;
-  border-radius: var(--hyper-radius-md) var(--hyper-radius-md) 2px var(--hyper-radius-md);
-  max-width: 75%;
+  padding: 0.85rem 1.35rem;
+  border-radius: var(--hyper-radius-lg) var(--hyper-radius-lg) 2px var(--hyper-radius-lg);
+  max-width: 80%;
+  font-size: 0.95rem;
+  line-height: 1.55;
   box-shadow: 0 4px 15px rgba(99, 102, 241, 0.2);
 }
 
 .hyper-bubble-ai {
-  align-self: flex-start;
-  background-color: var(--hyper-bg-card);
+  background-color: var(--hyper-bg-surface);
   border: 1px solid var(--hyper-border-subtle);
   color: var(--hyper-text-primary);
-  padding: 1rem 1.35rem;
-  border-radius: var(--hyper-radius-md) var(--hyper-radius-md) var(--hyper-radius-md) 2px;
-  max-width: 80%;
+  padding: 1.25rem 1.5rem;
+  border-radius: var(--hyper-radius-lg);
+  max-width: 850px;
+  width: 100%;
+  font-size: 0.96rem;
+  line-height: 1.65;
   box-shadow: var(--hyper-shadow-subtle);
+}
+
+/* Markdown & LaTeX Styling */
+.hyper-bubble-ai h1, .hyper-bubble-ai h2, .hyper-bubble-ai h3, .hyper-bubble-ai h4 {
+  color: var(--hyper-text-primary);
+  font-weight: 700;
+  margin-top: 1rem;
+  margin-bottom: 0.5rem;
+}
+.hyper-bubble-ai h3 { font-size: 1.15rem; }
+.hyper-bubble-ai p { margin-bottom: 0.75rem; }
+.hyper-bubble-ai ul, .hyper-bubble-ai ol { margin-left: 1.25rem; margin-bottom: 0.75rem; }
+.hyper-bubble-ai li { margin-bottom: 0.35rem; }
+.hyper-bubble-ai code {
+  background: var(--hyper-bg-elevated);
+  color: var(--hyper-accent-cyan);
+  padding: 0.15rem 0.4rem;
+  border-radius: 4px;
+  font-family: var(--hyper-font-mono);
+  font-size: 0.88rem;
+}
+.hyper-bubble-ai pre code {
+  display: block;
+  padding: 1rem;
+  overflow-x: auto;
+  border-radius: var(--hyper-radius-sm);
+  background: #1e1e2e !important;
+}
+.katex-display { margin: 1rem 0; overflow-x: auto; overflow-y: hidden; }
+
+/* ChatGPT / Gemini Multiline Input Box */
+.hyper-chat-input-card {
+  background: var(--hyper-bg-surface);
+  border: 1px solid var(--hyper-border-medium);
+  border-radius: var(--hyper-radius-xl);
+  padding: 0.85rem 1.15rem;
+  box-shadow: var(--hyper-shadow-glow-primary);
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  max-width: 850px;
+  width: 100%;
+  margin: 0 auto;
+  transition: border-color 0.2s ease;
+}
+
+.hyper-chat-input-card:focus-within {
+  border-color: var(--hyper-accent-primary);
+}
+
+.hyper-chat-textarea {
+  width: 100%;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: var(--hyper-text-primary);
+  font-family: var(--hyper-font-body);
+  font-size: 0.98rem;
+  line-height: 1.5;
+  resize: none;
+  min-height: 24px;
+  max-height: 160px;
+  overflow-y: auto;
+}
+
+/* Loading Shimmer Animation */
+.hyper-loading-shimmer {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0.5rem 0;
+}
+.hyper-loading-shimmer span {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: var(--hyper-accent-cyan);
+  animation: shimmerPulse 1.2s infinite ease-in-out;
+}
+.hyper-loading-shimmer span:nth-child(2) { animation-delay: 0.2s; }
+.hyper-loading-shimmer span:nth-child(3) { animation-delay: 0.4s; }
+
+@keyframes shimmerPulse {
+  0%, 80%, 100% { transform: scale(0.6); opacity: 0.4; }
+  40% { transform: scale(1.1); opacity: 1; }
+}
+
+/* Drag and Drop Zone Overlay */
+.hyper-drag-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.92);
+  backdrop-filter: blur(8px);
+  border: 2px dashed var(--hyper-accent-cyan);
+  border-radius: var(--hyper-radius-lg);
+  z-index: 500;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  color: var(--hyper-accent-cyan);
+  pointer-events: none;
+}
+
+/* Follow-up Suggestion Chips */
+.hyper-followup-chips {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin-top: 0.75rem;
+}
+.hyper-followup-chip {
+  background: var(--hyper-bg-elevated);
+  border: 1px solid var(--hyper-border-subtle);
+  border-radius: var(--hyper-radius-full);
+  padding: 0.35rem 0.85rem;
+  font-size: 0.78rem;
+  color: var(--hyper-text-secondary);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.hyper-followup-chip:hover {
+  background: var(--hyper-bg-hover);
+  border-color: var(--hyper-accent-cyan);
+  color: var(--hyper-accent-cyan);
+  transform: translateY(-1px);
 }
 
 /* 9. Modals & Toasts */

@@ -250,9 +250,20 @@ class AIService:
         return cls.generate_chat_response(user_prompt=prompt, student_class=student_class, subject=subject)
 
     @classmethod
-    def stream_chat_response(cls, user_prompt: str, student_class: str = "Class 10", subject: str = "General"):
+    def stream_chat_response(cls, user_prompt: str, student_class: str = "Class 10", subject: str = "General", history: list = None):
         """Streams SSE chunked response text for real-time live typing on frontend."""
         messages = [{"role": "system", "content": cls._build_system_prompt(student_class, subject)}]
+
+        if history:
+            for h in history[-6:]:
+                if isinstance(h, dict):
+                    u_msg = h.get('user_message') or h.get('prompt')
+                    a_msg = h.get('ai_response') or h.get('response')
+                    if u_msg:
+                        messages.append({"role": "user", "content": u_msg})
+                    if a_msg:
+                        messages.append({"role": "assistant", "content": a_msg})
+
         messages.append({"role": "user", "content": user_prompt})
 
         provider, model_name = AIProviderFactory.get_provider()

@@ -61,9 +61,11 @@ class QuizService:
     def submit_quiz(cls, user_id: str, quiz_id: str, student_answers: dict, time_taken: int) -> dict:
         quiz = cls.get_quiz_by_id(quiz_id)
         if not quiz:
-            raise ValueError("Quiz not found.")
+            # Fallback if quiz is not in MongoDB: construct dummy container
+            quiz = {"id": quiz_id, "title": "Interactive Quiz Challenge", "questions": []}
 
-        evaluation = QuizEvaluator.evaluate_submission(quiz.get('questions', []), student_answers, time_taken)
+        questions = quiz.get('questions', [])
+        evaluation = QuizEvaluator.evaluate_submission(questions, student_answers, time_taken)
 
         result_doc = QuizResultModel.create_result_doc(
             user_id=user_id,
@@ -89,6 +91,18 @@ class QuizService:
             result_id = f"res_{len(IN_MEMORY_RESULTS) + 1}"
             result_doc['id'] = result_id
             IN_MEMORY_RESULTS[result_id] = result_doc
+
+        # Automatically update student Analytics & Log Activity
+        try:
+            from app.analytics.services import AnalyticsService
+            AnalyticsService.log_activity(
+                user_id=user_id,
+                action="COMPLETED_QUIZ",
+                details=f"Scored {evaluation['score']}/{evaluation['total']} ({evaluation['accuracy']}%) on '{quiz.get('title')}'"
+            )
+            AnalyticsService.get_user_analytics(user_id)
+        except Exception as log_err:
+            logger.warning(f"Analytics logging warning on quiz submit: {str(log_err)}")
 
         return BaseModel.serialize_doc(result_doc)
 

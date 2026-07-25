@@ -1,23 +1,33 @@
-/* noteX AI - Perplexity AI & Raycast Style Conversational Hero (Hyper Pro) */
+/* noteX AI - Production ChatGPT & Gemini Style Conversational Experience */
 const ChatbotModule = {
   currentConversationId: null,
   isGenerating: false,
   abortController: null,
   speechRecognition: null,
   lastUserPrompt: "",
+  conversationsCache: [],
 
   async render(container) {
+    const currentClass = (typeof APP_STATE !== 'undefined' && APP_STATE.currentGrade) || localStorage.getItem('notex_grade') || 'Class 10';
+
     container.innerHTML = `
-      <div class="hyper-chat-workspace">
+      <div class="hyper-chat-workspace" id="chatWorkspaceContainer">
+        <!-- Drag and Drop PDF Overlay -->
+        <div id="dragDropOverlay" class="hyper-drag-overlay" style="display: none;">
+          <i class="fa-solid fa-file-pdf" style="font-size: 3.5rem; color: var(--hyper-accent-cyan);"></i>
+          <h2 style="font-size: 1.5rem; font-weight: 800; color: #ffffff;">Drop PDF to Attach to AI Session</h2>
+          <p style="color: var(--hyper-text-secondary); font-size: 0.9rem;">Release file to index chunks with ChromaDB RAG Vector Store</p>
+        </div>
+
         <!-- Sidebar Conversations Drawer -->
         <div class="hyper-chat-sidebar" id="chatSidebar">
-          <button class="hyper-btn hyper-btn-primary" style="width: 100%;" onclick="ChatbotModule.startNewChat()">
+          <button class="hyper-btn hyper-btn-primary" style="width: 100%; border-radius: var(--hyper-radius-sm);" onclick="ChatbotModule.startNewChat()">
             <i class="fa-solid fa-plus"></i> New AI Thread
           </button>
 
           <div style="position: relative; margin-top: 0.5rem;">
             <i class="fa-solid fa-magnifying-glass" style="position: absolute; left: 0.75rem; top: 0.75rem; color: var(--hyper-text-muted); font-size: 0.8rem;"></i>
-            <input type="text" id="searchChatsInput" class="hyper-input" placeholder="Filter threads..." style="padding-left: 2.2rem; font-size: 0.8rem; border-radius: var(--hyper-radius-sm);" oninput="ChatbotModule.filterConversations()">
+            <input type="text" id="searchChatsInput" class="hyper-input" placeholder="Search threads..." style="padding-left: 2.2rem; font-size: 0.8rem; border-radius: var(--hyper-radius-sm);" oninput="ChatbotModule.filterConversations()">
           </div>
 
           <div style="font-size: 0.72rem; font-weight: 700; color: var(--hyper-text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin: 0.5rem 0 0.2rem 0;">Recent Study Threads</div>
@@ -31,31 +41,33 @@ const ChatbotModule = {
           <!-- Top Feed Navbar -->
           <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.75rem 1.5rem; border-bottom: 1px solid var(--hyper-border-subtle); background: var(--hyper-bg-surface);">
             <div style="display: flex; align-items: center; gap: 0.75rem;">
-              <span class="hyper-badge hyper-badge-cyan"><i class="fa-solid fa-microchip"></i> noteX Engine v4</span>
-              <span style="font-size: 0.85rem; color: var(--hyper-text-muted);">Curriculum: <strong>${typeof APP_STATE !== 'undefined' ? APP_STATE.currentGrade : 'Class 10'}</strong></span>
+              <span class="hyper-badge hyper-badge-cyan"><i class="fa-solid fa-bolt"></i> Groq Llama-3.3 Engine</span>
+              <span style="font-size: 0.85rem; color: var(--hyper-text-muted);">Curriculum: <strong id="chatCurriculumGrade" style="color: var(--hyper-accent-primary);">${currentClass}</strong></span>
             </div>
-            <button class="hyper-btn hyper-btn-glass hyper-btn-sm" onclick="ChatbotModule.exportChat()">
-              <i class="fa-solid fa-download"></i> Export Thread
-            </button>
+            <div style="display: flex; gap: 0.5rem;">
+              <button class="hyper-btn hyper-btn-glass hyper-btn-sm" onclick="ChatbotModule.exportFullThreadMarkdown()" title="Export Thread as Markdown">
+                <i class="fa-solid fa-download"></i> Export Thread
+              </button>
+            </div>
           </div>
 
-          <!-- Chat Messages Container -->
+          <!-- Chat Messages Container (Max 850px Centered Content) -->
           <div id="chatMessagesBox" class="hyper-chat-messages">
-            <!-- Perplexity AI Hero Experience -->
-            <div id="chatWelcomeHero" style="text-align: center; padding: 3rem 1rem; max-width: 720px; margin: 0 auto;">
+            <!-- Perplexity / Gemini Style Hero Experience -->
+            <div id="chatWelcomeHero" style="text-align: center; padding: 3rem 1rem; max-width: 780px; width: 100%; margin: 0 auto;">
               <div style="font-size: 3.5rem; margin-bottom: 0.75rem; color: var(--hyper-accent-cyan);">
                 <i class="fa-solid fa-wand-magic-sparkles"></i>
               </div>
               <h1 style="font-size: 2.4rem; font-weight: 800; margin-bottom: 0.4rem; color: var(--hyper-text-primary); letter-spacing: -0.03em;">Where curiosity meets mastery</h1>
-              <p style="color: var(--hyper-text-secondary); font-size: 1rem; margin-bottom: 2rem;">Ask anything, solve complex science problems, generate smart notes & quizzes instantly.</p>
+              <p style="color: var(--hyper-text-secondary); font-size: 1rem; margin-bottom: 2rem;">Ask anything, solve complex science problems, generate smart notes & quizzes instantly with real-time streaming.</p>
 
-              <!-- Perplexity Query Box -->
-              <div class="hyper-query-card">
-                <input type="text" id="chatHeroInput" class="hyper-input" placeholder="Ask AI tutor anything or generate notes..." style="border: none; background: transparent; font-size: 1.05rem; padding: 0.5rem 0;" onkeypress="if(event.key==='Enter') ChatbotModule.sendHeroMessage()">
-                <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--hyper-border-subtle); padding-top: 0.75rem;">
+              <!-- ChatGPT Input Box in Hero -->
+              <div class="hyper-chat-input-card">
+                <textarea id="chatHeroTextarea" class="hyper-chat-textarea" placeholder="Ask AI tutor anything or drag & drop a PDF..." rows="2" onkeydown="ChatbotModule.handleKeyDown(event, true)"></textarea>
+                <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--hyper-border-subtle); padding-top: 0.5rem;">
                   <div style="display: flex; gap: 0.5rem; align-items: center;">
-                    <span class="hyper-badge hyper-badge-primary"><i class="fa-solid fa-bolt"></i> Fast RAG Model</span>
                     <button class="hyper-btn hyper-btn-ghost hyper-btn-sm" onclick="location.hash='#rag'"><i class="fa-solid fa-paperclip"></i> Attach PDF</button>
+                    <span class="hyper-badge hyper-badge-primary"><i class="fa-solid fa-bolt"></i> Live Stream</span>
                   </div>
                   <button class="hyper-btn hyper-btn-primary" onclick="ChatbotModule.sendHeroMessage()">
                     Ask AI <span class="hyper-kbd">↵</span>
@@ -65,56 +77,148 @@ const ChatbotModule = {
 
               <!-- Suggested Prompt Chips -->
               <div style="display: flex; gap: 0.6rem; flex-wrap: wrap; justify-content: center; margin-top: 2rem;">
-                <div class="hyper-chip" onclick="ChatbotModule.useSuggestedPrompt('Explain Newton\'s Laws of Motion with real world examples')">
+                <div class="hyper-chip" onclick="ChatbotModule.useSuggestedPrompt('Explain Newton\'s Three Laws of Motion with real world examples')">
                   ⚡ Explain Newton's Laws
                 </div>
-                <div class="hyper-chip" onclick="ChatbotModule.useSuggestedPrompt('Generate a 5-question MCQ quiz for Science')">
-                  🎯 Generate Quiz
+                <div class="hyper-chip" onclick="ChatbotModule.useSuggestedPrompt('Generate Smart Notes on Chemical Reactions')">
+                  🎯 Generate Smart Notes
                 </div>
-                <div class="hyper-chip" onclick="ChatbotModule.useSuggestedPrompt('Summarize my uploaded Science PDF chapter')">
-                  📄 Summarize PDF
+                <div class="hyper-chip" onclick="ChatbotModule.useSuggestedPrompt('Generate 5 MCQs for Science Class 10')">
+                  ❓ Generate 5 MCQs
                 </div>
-                <div class="hyper-chip" onclick="ChatbotModule.useSuggestedPrompt('Create flashcards for Chemical Reactions')">
+                <div class="hyper-chip" onclick="ChatbotModule.useSuggestedPrompt('Create active recall flashcards for Physics Optics')">
                   🧠 Create Flashcards
                 </div>
               </div>
             </div>
           </div>
 
-          <!-- Bottom Chat Input Bar (Shown during active thread) -->
-          <div id="chatInputBar" style="padding: 1rem 1.5rem; background: var(--hyper-bg-surface); border-top: 1px solid var(--hyper-border-subtle); display: none; gap: 0.75rem; align-items: center;">
-            <button class="hyper-btn hyper-btn-glass" style="padding: 0.65rem; border-radius: var(--hyper-radius-full); width: 42px; height: 42px;" title="Upload PDF" onclick="location.hash='#rag'">
-              <i class="fa-solid fa-paperclip" style="color: var(--hyper-accent-cyan);"></i>
-            </button>
+          <!-- Bottom ChatGPT / Gemini Style Input Card (Max 850px Width) -->
+          <div id="chatInputBar" style="padding: 1rem 1.5rem; background: var(--hyper-bg-surface); border-top: 1px solid var(--hyper-border-subtle); display: none; justify-content: center;">
+            <div class="hyper-chat-input-card">
+              <textarea id="chatInputTextarea" class="hyper-chat-textarea" placeholder="Ask follow-up question or rephrase... (Shift + Enter for newline)" rows="1" oninput="ChatbotModule.autoResizeTextarea(this)" onkeydown="ChatbotModule.handleKeyDown(event, false)"></textarea>
+              
+              <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--hyper-border-subtle); padding-top: 0.5rem;">
+                <div style="display: flex; gap: 0.4rem; align-items: center;">
+                  <button class="hyper-btn hyper-btn-ghost hyper-btn-sm" title="Attach PDF file" onclick="location.hash='#rag'">
+                    <i class="fa-solid fa-paperclip" style="color: var(--hyper-accent-cyan);"></i> PDF
+                  </button>
+                  <button class="hyper-btn hyper-btn-ghost hyper-btn-sm" title="Voice Input" onclick="ChatbotModule.toggleVoiceInput()">
+                    <i class="fa-solid fa-microphone" id="voiceInputIcon" style="color: var(--hyper-text-muted);"></i> Voice
+                  </button>
+                </div>
 
-            <input type="text" id="chatInputText" class="hyper-input" placeholder="Ask follow-up question..." style="flex: 1; border-radius: var(--hyper-radius-full); padding: 0.75rem 1.25rem;">
-
-            <button id="sendChatBtn" class="hyper-btn hyper-btn-primary" style="padding: 0.75rem 1.35rem; border-radius: var(--hyper-radius-full);" onclick="ChatbotModule.sendMessage()">
-              <i class="fa-solid fa-paper-plane" id="sendBtnIcon"></i>
-            </button>
+                <div id="chatActionControls" style="display: flex; align-items: center; gap: 0.5rem;">
+                  <button id="sendChatBtn" class="hyper-btn hyper-btn-primary" style="border-radius: var(--hyper-radius-full);" onclick="ChatbotModule.sendMessage()">
+                    <i class="fa-solid fa-paper-plane"></i> Send
+                  </button>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
     `;
 
-    this.attachEvents();
+    this.attachDragAndDropEvents();
     await this.loadConversationHistory();
   },
 
-  attachEvents() {
-    const input = document.getElementById('chatInputText');
-    if (input) {
-      input.addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') this.sendMessage();
-      });
+  autoResizeTextarea(el) {
+    el.style.height = 'auto';
+    el.style.height = Math.min(el.scrollHeight, 160) + 'px';
+  },
+
+  handleKeyDown(e, isHero) {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      if (isHero) this.sendHeroMessage();
+      else this.sendMessage();
     }
   },
 
+  attachDragAndDropEvents() {
+    const workspace = document.getElementById('chatWorkspaceContainer');
+    const overlay = document.getElementById('dragDropOverlay');
+    if (!workspace || !overlay) return;
+
+    window.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      if (e.dataTransfer.types.includes('Files')) {
+        overlay.style.display = 'flex';
+      }
+    });
+
+    overlay.addEventListener('dragleave', (e) => {
+      e.preventDefault();
+      overlay.style.display = 'none';
+    });
+
+    overlay.addEventListener('drop', async (e) => {
+      e.preventDefault();
+      overlay.style.display = 'none';
+
+      const files = e.dataTransfer.files;
+      if (files && files.length > 0) {
+        const file = files[0];
+        if (file.type === 'application/pdf' || file.name.endsWith('.pdf')) {
+          if (typeof UI !== 'undefined' && UI.showToast) {
+            UI.showToast(`Uploading '${file.name}' to PDF Assistant RAG...`, 'info');
+          }
+          window.location.hash = '#rag';
+        } else {
+          if (typeof UI !== 'undefined' && UI.showToast) {
+            UI.showToast('Please upload a valid PDF document.', 'error');
+          }
+        }
+      }
+    });
+  },
+
+  toggleVoiceInput() {
+    const icon = document.getElementById('voiceInputIcon');
+    if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+      if (typeof UI !== 'undefined' && UI.showToast) UI.showToast('Speech recognition not supported in this browser.', 'error');
+      return;
+    }
+
+    if (this.speechRecognition) {
+      this.speechRecognition.stop();
+      this.speechRecognition = null;
+      if (icon) icon.style.color = 'var(--hyper-text-muted)';
+      return;
+    }
+
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    this.speechRecognition = new SpeechRecognition();
+    this.speechRecognition.continuous = false;
+    this.speechRecognition.interimResults = false;
+    this.speechRecognition.lang = 'en-US';
+
+    if (icon) icon.style.color = 'var(--hyper-accent-rose)';
+
+    this.speechRecognition.onresult = (event) => {
+      const transcript = event.results[0][0].transcript;
+      const input = document.getElementById('chatInputTextarea') || document.getElementById('chatHeroTextarea');
+      if (input) {
+        input.value += (input.value ? ' ' : '') + transcript;
+      }
+      if (icon) icon.style.color = 'var(--hyper-text-muted)';
+      this.speechRecognition = null;
+    };
+
+    this.speechRecognition.onerror = () => {
+      if (icon) icon.style.color = 'var(--hyper-text-muted)';
+      this.speechRecognition = null;
+    };
+
+    this.speechRecognition.start();
+  },
+
   sendHeroMessage() {
-    const heroInput = document.getElementById('chatHeroInput');
+    const heroInput = document.getElementById('chatHeroTextarea');
     const val = heroInput ? heroInput.value.trim() : '';
     if (!val) return;
-    
     this.useSuggestedPrompt(val);
   },
 
@@ -122,16 +226,11 @@ const ChatbotModule = {
     document.getElementById('chatWelcomeHero')?.remove();
     document.getElementById('chatInputBar').style.display = 'flex';
     
-    const input = document.getElementById('chatInputText');
+    const input = document.getElementById('chatInputTextarea');
     if (input) {
       input.value = promptText;
       this.sendMessage();
     }
-  },
-
-  toggleSidebarMobile() {
-    const sidebar = document.getElementById('chatSidebar');
-    if (sidebar) sidebar.classList.toggle('active');
   },
 
   async loadConversationHistory() {
@@ -176,110 +275,274 @@ const ChatbotModule = {
   },
 
   startNewChat() {
+    if (this.isGenerating) this.stopGeneration();
     this.currentConversationId = null;
     this.render(document.getElementById('app-view-container'));
   },
 
   async sendMessage() {
-    const input = document.getElementById('chatInputText');
+    const input = document.getElementById('chatInputTextarea');
     const userText = input ? input.value.trim() : '';
     if (!userText || this.isGenerating) return;
 
     this.lastUserPrompt = userText;
-    if (input) input.value = '';
+    if (input) {
+      input.value = '';
+      input.style.height = 'auto';
+    }
     const messagesBox = document.getElementById('chatMessagesBox');
 
-    // Render User Bubble
+    // 1. Render User Message Row (Max 850px)
+    const userRow = document.createElement('div');
+    userRow.className = 'hyper-user-message-row';
+    
     const userBubble = document.createElement('div');
     userBubble.className = 'hyper-bubble-user';
     userBubble.textContent = userText;
-    messagesBox.appendChild(userBubble);
+    userRow.appendChild(userBubble);
+    messagesBox.appendChild(userRow);
 
-    // Render AI Bubble Container
+    // 2. Render AI Message Row with Avatar Emblem & Shimmer Loading (Max 850px)
+    const aiRow = document.createElement('div');
+    aiRow.className = 'hyper-ai-message-row';
+
+    const aiAvatar = document.createElement('div');
+    aiAvatar.className = 'hyper-ai-avatar';
+    aiAvatar.textContent = '𝝌';
+
     const aiBubbleContainer = document.createElement('div');
-    aiBubbleContainer.style.marginBottom = '1rem';
+    aiBubbleContainer.style.flex = '1';
     
     const aiBubble = document.createElement('div');
     aiBubble.className = 'hyper-bubble-ai';
-    aiBubble.innerHTML = `<i class="fa-solid fa-spinner fa-spin" style="color: var(--hyper-accent-cyan);"></i> Thinking...`;
+    aiBubble.innerHTML = `<div class="hyper-loading-shimmer"><span></span><span></span><span></span></div> Thinking... <span class="hyper-typing-cursor"></span>`;
+    
     aiBubbleContainer.appendChild(aiBubble);
-    messagesBox.appendChild(aiBubbleContainer);
+    aiRow.appendChild(aiAvatar);
+    aiRow.appendChild(aiBubbleContainer);
+    messagesBox.appendChild(aiRow);
 
     messagesBox.scrollTop = messagesBox.scrollHeight;
     this.isGenerating = true;
 
+    this.updateControlsState(true);
+    this.abortController = new AbortController();
+
+    let fullMarkdownText = "";
+    let actionData = null;
+
     try {
-      const res = await API.post('/chatbot/message', {
-        prompt: userText,
-        conversation_id: this.currentConversationId
+      const token = localStorage.getItem('notex_token') || sessionStorage.getItem('notex_token');
+
+      // Attempt SSE Real-Time Stream
+      const response = await fetch('/api/chatbot/stream', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': token ? `Bearer ${token}` : ''
+        },
+        body: JSON.stringify({
+          prompt: userText,
+          conversation_id: this.currentConversationId,
+          session_id: this.currentConversationId
+        }),
+        signal: this.abortController.signal
       });
 
-      if (res && res.success && res.data) {
-        this.currentConversationId = res.data.conversation_id;
-        const responseContent = res.data.response || '';
-
-        await this.typeWriterEffect(aiBubble, responseContent);
-
-        let actionBtnHTML = '';
-        if (res.data.action_url && res.data.action_title) {
-          actionBtnHTML = `<div style="margin-top: 0.75rem;"><button class="hyper-btn hyper-btn-primary hyper-btn-sm" onclick="location.hash = '${res.data.action_url}'">${res.data.action_title}</button></div>`;
+      if (!response.ok) {
+        if (response.status === 401) {
+          if (typeof Auth !== 'undefined' && Auth.handleUnauthorized) {
+            Auth.handleUnauthorized();
+          }
         }
+        throw new Error(`Server returned HTTP ${response.status}`);
+      }
 
-        const toolbarHTML = `
-          <div style="display: flex; gap: 0.5rem; margin-top: 0.5rem; align-items: center;">
-            <button class="hyper-btn hyper-btn-glass hyper-btn-sm" onclick="ChatbotModule.copyToClipboard(this)">
-              <i class="fa-solid fa-copy"></i> Copy
-            </button>
-            <button class="hyper-btn hyper-btn-glass hyper-btn-sm" onclick="ChatbotModule.regenerateLastResponse()">
-              <i class="fa-solid fa-rotate-right"></i> Regenerate
-            </button>
-          </div>
-        `;
+      const reader = response.body.getReader();
+      const decoder = new TextDecoder('utf-8');
+      let buffer = '';
 
-        aiBubbleContainer.innerHTML = `
-          <div class="hyper-bubble-ai">${this.formatMarkdown(responseContent)}${actionBtnHTML}</div>
-          ${toolbarHTML}
-        `;
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
 
-        if (typeof hljs !== 'undefined') hljs.highlightAll();
-        await this.loadConversationHistory();
-      } else {
-        aiBubble.textContent = "I could not process this request. Please try again.";
+        buffer += decoder.decode(value, { stream: true });
+        const lines = buffer.split('\n');
+        buffer = lines.pop();
+
+        for (const line of lines) {
+          const trimmed = line.trim();
+          if (!trimmed || !trimmed.startsWith('data:')) continue;
+          
+          const rawData = trimmed.replace(/^data:\s*/, '');
+          if (rawData === '[DONE]') break;
+
+          try {
+            const parsed = JSON.parse(rawData);
+
+            const newChunk = parsed.chunk || parsed.token || parsed.text || parsed.response || parsed.full_text || "";
+            if (newChunk) {
+              fullMarkdownText += newChunk;
+              
+              aiBubble.innerHTML = this.formatMarkdown(fullMarkdownText) + `<span class="hyper-typing-cursor"></span>`;
+              if (typeof hljs !== 'undefined') hljs.highlightAll();
+              messagesBox.scrollTop = messagesBox.scrollHeight;
+            }
+
+            if (parsed.session_id) {
+              this.currentConversationId = parsed.session_id;
+            }
+
+            if (parsed.action_url && parsed.action_title) {
+              actionData = { url: parsed.action_url, title: parsed.action_title };
+            }
+          } catch (jsonErr) {}
+        }
       }
     } catch (e) {
-      aiBubble.textContent = `Chat Error: ${e.message}`;
+      if (e.name === 'AbortError') {
+        fullMarkdownText += "\n\n*[Generation stopped by user]*";
+      } else {
+        console.warn("[Chatbot Stream Warning] Stream failed, executing POST fallback:", e.message);
+      }
+    }
+
+    // Fallback POST if empty
+    if (!fullMarkdownText.trim()) {
+      try {
+        const postRes = await API.post('/chatbot/message', {
+          prompt: userText,
+          conversation_id: this.currentConversationId,
+          session_id: this.currentConversationId
+        });
+
+        if (postRes && postRes.success && postRes.data) {
+          fullMarkdownText = postRes.data.response || postRes.data.ai_response || postRes.data.text || "";
+          if (postRes.data.conversation_id) this.currentConversationId = postRes.data.conversation_id;
+          if (postRes.data.action_url && postRes.data.action_title) {
+            actionData = { url: postRes.data.action_url, title: postRes.data.action_title };
+          }
+        }
+      } catch (postErr) {
+        console.error("[Chatbot POST Error]:", postErr);
+      }
     }
 
     this.isGenerating = false;
+    this.updateControlsState(false);
+
+    if (!fullMarkdownText.trim()) {
+      fullMarkdownText = "### 📚 noteX AI Tutor\n\nI could not generate a response at this time. Please check your query or try again.";
+    }
+
+    // Finalize AI Bubble with Action Button, Follow-up Chips & Multi-Format Export Toolbar
+    let actionBtnHTML = '';
+    if (actionData && actionData.url && actionData.title) {
+      actionBtnHTML = `<div style="margin-top: 0.75rem;"><button class="hyper-btn hyper-btn-primary hyper-btn-sm" onclick="location.hash = '${actionData.url}'">${actionData.title}</button></div>`;
+    }
+
+    const followUpChipsHTML = `
+      <div class="hyper-followup-chips">
+        <div class="hyper-followup-chip" onclick="ChatbotModule.useSuggestedPrompt('Explain this concept with a real world analogy')">💡 Real world analogy</div>
+        <div class="hyper-followup-chip" onclick="ChatbotModule.useSuggestedPrompt('Give me 3 practice board exam questions on this')">🎯 3 Practice questions</div>
+        <div class="hyper-followup-chip" onclick="ChatbotModule.useSuggestedPrompt('Summarize key takeaways in 3 bullet points')">📝 Key takeaways</div>
+      </div>
+    `;
+
+    const toolbarHTML = `
+      <div style="display: flex; gap: 0.5rem; margin-top: 0.65rem; align-items: center; flex-wrap: wrap;">
+        <button class="hyper-btn hyper-btn-glass hyper-btn-sm" onclick="ChatbotModule.copyToClipboard(this)">
+          <i class="fa-solid fa-copy"></i> Copy
+        </button>
+        <button class="hyper-btn hyper-btn-glass hyper-btn-sm" onclick="ChatbotModule.regenerateLastResponse()">
+          <i class="fa-solid fa-rotate-right"></i> Regenerate
+        </button>
+        <div style="margin-left: auto; display: flex; gap: 0.35rem;">
+          <button class="hyper-btn hyper-btn-ghost hyper-btn-sm" onclick="ChatbotModule.exportMessageMarkdown(\`${this.escapeQuotes(fullMarkdownText)}\`)" title="Export as Markdown">
+            <i class="fa-solid fa-file-code"></i> .MD
+          </button>
+          <button class="hyper-btn hyper-btn-ghost hyper-btn-sm" onclick="ChatbotModule.exportMessageDOCX(\`${this.escapeQuotes(fullMarkdownText)}\`)" title="Export as Word DOCX">
+            <i class="fa-solid fa-file-word"></i> .DOCX
+          </button>
+          <button class="hyper-btn hyper-btn-ghost hyper-btn-sm" onclick="ChatbotModule.exportMessagePDF(\`${this.escapeQuotes(fullMarkdownText)}\`)" title="Export as PDF Document">
+            <i class="fa-solid fa-file-pdf"></i> .PDF
+          </button>
+        </div>
+      </div>
+    `;
+
+    aiBubbleContainer.innerHTML = `
+      <div class="hyper-bubble-ai">${this.formatMarkdown(fullMarkdownText)}${actionBtnHTML}</div>
+      ${followUpChipsHTML}
+      ${toolbarHTML}
+    `;
+
+    this.renderKaTeXMath(aiBubbleContainer);
+    if (typeof hljs !== 'undefined') hljs.highlightAll();
     messagesBox.scrollTop = messagesBox.scrollHeight;
+
+    await this.loadConversationHistory();
   },
 
-  async typeWriterEffect(element, text) {
-    element.innerHTML = '';
-    const words = text.split(' ');
-    let current = '';
+  escapeQuotes(str) {
+    return (str || '').replace(/`/g, '\\`').replace(/\$/g, '\\$');
+  },
 
-    for (let i = 0; i < words.length; i++) {
-      current += (i === 0 ? '' : ' ') + words[i];
-      element.innerHTML = this.formatMarkdown(current);
-      if (i % 4 === 0) {
-        const box = document.getElementById('chatMessagesBox');
-        if (box) box.scrollTop = box.scrollHeight;
-        await new Promise(r => setTimeout(r, 20));
+  renderKaTeXMath(container) {
+    if (typeof renderMathInElement !== 'undefined' && container) {
+      try {
+        renderMathInElement(container, {
+          delimiters: [
+            {left: '$$', right: '$$', display: true},
+            {left: '$', right: '$', display: false},
+            {left: '\\(', right: '\\)', display: false},
+            {left: '\\[', right: '\\]', display: true}
+          ],
+          throwOnError: false
+        });
+      } catch (err) {
+        console.warn('KaTeX render warning:', err);
       }
+    }
+  },
+
+  stopGeneration() {
+    if (this.abortController) {
+      this.abortController.abort();
+      this.isGenerating = false;
+      this.updateControlsState(false);
+    }
+  },
+
+  updateControlsState(generating) {
+    const controls = document.getElementById('chatActionControls');
+    if (!controls) return;
+
+    if (generating) {
+      controls.innerHTML = `
+        <button id="stopChatBtn" class="hyper-btn hyper-btn-rose" style="border-radius: var(--hyper-radius-full);" onclick="ChatbotModule.stopGeneration()">
+          <i class="fa-solid fa-square"></i> Stop
+        </button>
+      `;
+    } else {
+      controls.innerHTML = `
+        <button id="sendChatBtn" class="hyper-btn hyper-btn-primary" style="border-radius: var(--hyper-radius-full);" onclick="ChatbotModule.sendMessage()">
+          <i class="fa-solid fa-paper-plane"></i> Send
+        </button>
+      `;
     }
   },
 
   regenerateLastResponse() {
     if (this.lastUserPrompt) {
-      const input = document.getElementById('chatInputText');
+      const input = document.getElementById('chatInputTextarea');
       if (input) input.value = this.lastUserPrompt;
       this.sendMessage();
     }
   },
 
   copyToClipboard(btn) {
-    const bubble = btn.closest('div').previousElementSibling;
+    const bubble = btn.closest('div').parentElement.querySelector('.hyper-bubble-ai');
     if (bubble) {
       navigator.clipboard.writeText(bubble.innerText).then(() => {
         btn.innerHTML = `<i class="fa-solid fa-check"></i> Copied`;
@@ -288,18 +551,67 @@ const ChatbotModule = {
     }
   },
 
-  exportChat() {
+  // Export Utilities (.MD, .DOCX, .PDF)
+  exportMessageMarkdown(text) {
+    const blob = new Blob([text], { type: 'text/markdown;charset=utf-8' });
+    this.downloadBlob(blob, `noteX_AI_Note_${Date.now()}.md`);
+  },
+
+  exportMessageDOCX(text) {
+    const htmlContent = `
+      <html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
+      <head><title>noteX AI Note</title><style>body{font-family:Arial,sans-serif;line-height:1.6;}</style></head>
+      <body><h2>noteX AI Study Session Note</h2><div>${this.formatMarkdown(text)}</div></body>
+      </html>
+    `;
+    const blob = new Blob(['\ufeff' + htmlContent], { type: 'application/msword' });
+    this.downloadBlob(blob, `noteX_AI_Note_${Date.now()}.docx`);
+  },
+
+  exportMessagePDF(text) {
+    const printWin = window.open('', '_blank');
+    if (!printWin) return;
+    printWin.document.write(`
+      <html>
+        <head>
+          <title>noteX AI Note Export</title>
+          <style>
+            body { font-family: 'Inter', sans-serif; padding: 2rem; color: #111; line-height: 1.6; }
+            h1, h2, h3 { color: #4f46e5; }
+            code { background: #f3f4f6; padding: 2px 5px; border-radius: 4px; }
+            pre { background: #1e1e2e; color: #fff; padding: 1rem; border-radius: 6px; }
+          </style>
+        </head>
+        <body>
+          <h1>noteX AI Study Platform — Note Export</h1>
+          <hr/>
+          <div>${this.formatMarkdown(text)}</div>
+          <script>window.onload = function() { window.print(); window.close(); };</script>
+        </body>
+      </html>
+    `);
+    printWin.document.close();
+  },
+
+  exportFullThreadMarkdown() {
     const box = document.getElementById('chatMessagesBox');
     if (!box) return;
-    const blob = new Blob([box.innerText], { type: 'text/plain' });
+    const blob = new Blob([box.innerText], { type: 'text/markdown;charset=utf-8' });
+    this.downloadBlob(blob, `noteX_AI_Full_Thread_${Date.now()}.md`);
+  },
+
+  downloadBlob(blob, filename) {
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `noteX_AI_Thread_${Date.now()}.txt`;
+    a.download = filename;
     a.click();
+    URL.revokeObjectURL(url);
   },
 
   async loadConversation(convId) {
+    if (this.isGenerating) this.stopGeneration();
+
     this.currentConversationId = convId;
     document.getElementById('chatWelcomeHero')?.remove();
     document.getElementById('chatInputBar').style.display = 'flex';
@@ -314,12 +626,47 @@ const ChatbotModule = {
       if (res && res.success && res.data.conversation) {
         const msgs = res.data.conversation.messages || [];
         messagesBox.innerHTML = '';
-        msgs.forEach(m => {
-          const bubble = document.createElement('div');
-          bubble.className = m.sender === 'user' ? 'hyper-bubble-user' : 'hyper-bubble-ai';
-          bubble.innerHTML = m.sender === 'user' ? m.text : this.formatMarkdown(m.text);
-          messagesBox.appendChild(bubble);
+        msgs.forEach((m) => {
+          if (m.sender === 'user') {
+            const userRow = document.createElement('div');
+            userRow.className = 'hyper-user-message-row';
+
+            const userBubble = document.createElement('div');
+            userBubble.className = 'hyper-bubble-user';
+            userBubble.textContent = m.text;
+
+            userRow.appendChild(userBubble);
+            messagesBox.appendChild(userRow);
+          } else {
+            const aiRow = document.createElement('div');
+            aiRow.className = 'hyper-ai-message-row';
+
+            const aiAvatar = document.createElement('div');
+            aiAvatar.className = 'hyper-ai-avatar';
+            aiAvatar.textContent = '𝝌';
+
+            const aiBubbleContainer = document.createElement('div');
+            aiBubbleContainer.style.flex = '1';
+
+            const toolbarHTML = `
+              <div style="display: flex; gap: 0.5rem; margin-top: 0.55rem; align-items: center;">
+                <button class="hyper-btn hyper-btn-glass hyper-btn-sm" onclick="ChatbotModule.copyToClipboard(this)">
+                  <i class="fa-solid fa-copy"></i> Copy
+                </button>
+              </div>
+            `;
+            aiBubbleContainer.innerHTML = `
+              <div class="hyper-bubble-ai">${this.formatMarkdown(m.text || "No content")}</div>
+              ${toolbarHTML}
+            `;
+            this.renderKaTeXMath(aiBubbleContainer);
+
+            aiRow.appendChild(aiAvatar);
+            aiRow.appendChild(aiBubbleContainer);
+            messagesBox.appendChild(aiRow);
+          }
         });
+
         if (typeof hljs !== 'undefined') hljs.highlightAll();
         messagesBox.scrollTop = messagesBox.scrollHeight;
         await this.loadConversationHistory();
@@ -340,7 +687,15 @@ const ChatbotModule = {
   },
 
   formatMarkdown(text) {
-    if (typeof marked !== 'undefined') return marked.parse(text);
-    return text.replace(/\n/g, '<br>');
+    if (!text) return '';
+    if (typeof marked !== 'undefined') {
+      try {
+        return marked.parse(text);
+      } catch (err) {}
+    }
+    return text
+      .replace(/### (.*)/g, '<h3>$1</h3>')
+      .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+      .replace(/\n/g, '<br>');
   }
 };

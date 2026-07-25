@@ -47,7 +47,8 @@
         <div class="hyper-brand-title">noteX AI</div>
       </div>
       
-      <ul class="hyper-nav-list">
+      <!-- Student Study Platform Navigation (No Admin Links) -->
+      <ul class="hyper-nav-list" id="studentNavList">
         <li class="hyper-nav-item active" data-view="dashboard">
           <a href="#dashboard"><i data-lucide="layout-dashboard"></i> <span>Dashboard</span></a>
         </li>
@@ -78,20 +79,11 @@
         <li class="hyper-nav-item" data-view="settings">
           <a href="#settings"><i data-lucide="settings"></i> <span>Settings</span></a>
         </li>
-        <li class="hyper-nav-item" data-view="admin">
-          <a href="#admin"><i data-lucide="shield-check"></i> <span>Admin Console</span></a>
-        </li>
       </ul>
 
-      <!-- Bottom User Profile Pill -->
-      <div style="display: flex; align-items: center; justify-content: space-between; padding: 0.75rem; border-top: 1px solid var(--hyper-border-subtle); background: var(--hyper-bg-surface); border-radius: var(--hyper-radius-sm);">
-        <div style="display: flex; align-items: center; gap: 0.6rem;">
-          <div style="width: 28px; height: 28px; border-radius: 50%; background: linear-gradient(135deg, var(--hyper-accent-primary), var(--hyper-accent-cyan)); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.75rem; color: #fff;">S</div>
-          <div style="font-size: 0.82rem; font-weight: 600; color: var(--hyper-text-primary);">Student</div>
-        </div>
-        <button id="logoutBtn" style="background: none; border: none; color: var(--hyper-text-muted); cursor: pointer;" title="Logout">
-          <i data-lucide="log-out" style="width: 16px; height: 16px;"></i>
-        </button>
+      <!-- Role-Based Bottom Profile / Authentication Section -->
+      <div id="sidebarAuthProfileSection" style="padding: 0.75rem; border-top: 1px solid var(--hyper-border-subtle); background: var(--hyper-bg-surface); border-radius: var(--hyper-radius-sm);">
+        <!-- Rendered dynamically by Auth.updateUI() -->
       </div>
     </aside>
 
@@ -180,6 +172,47 @@
         <button class="grade-opt-btn hyper-btn hyper-btn-glass hyper-btn-sm" data-grade="Class 12">Class 12</button>
       </div>
       <button id="closeGradeModal" class="hyper-btn hyper-btn-glass" style="width: 100%;">Close</button>
+    </div>
+  </div>
+
+  <!-- Auth Modal (Login / Register) -->
+  <div id="authModal" class="hyper-modal-backdrop" style="display: none;">
+    <div class="hyper-modal-content" style="max-width: 420px; padding: 1.75rem;">
+      <div style="text-align: center; margin-bottom: 1.5rem;">
+        <div style="font-size: 2.5rem; color: var(--hyper-accent-primary); margin-bottom: 0.5rem;">𝝌</div>
+        <h2 id="authModalTitle" style="font-size: 1.4rem; font-weight: 800; color: var(--hyper-text-primary);">Student Account Login</h2>
+        <p id="authModalSubtitle" style="color: var(--hyper-text-secondary); font-size: 0.88rem;">Sign in to save your AI notes, quizzes & progress.</p>
+      </div>
+
+      <form id="authForm" onsubmit="event.preventDefault(); AuthModal.submit();">
+        <div id="authNameGroup" style="margin-bottom: 1rem; display: none;">
+          <label style="font-size: 0.8rem; font-weight: 600; color: var(--hyper-text-secondary); display: block; margin-bottom: 0.35rem;">Full Name</label>
+          <input type="text" id="authNameInput" class="hyper-input" placeholder="e.g. Alex Sharma">
+        </div>
+
+        <div style="margin-bottom: 1rem;">
+          <label style="font-size: 0.8rem; font-weight: 600; color: var(--hyper-text-secondary); display: block; margin-bottom: 0.35rem;">Email Address</label>
+          <input type="email" id="authEmailInput" class="hyper-input" placeholder="student@example.com" required>
+        </div>
+
+        <div style="margin-bottom: 1.5rem;">
+          <label style="font-size: 0.8rem; font-weight: 600; color: var(--hyper-text-secondary); display: block; margin-bottom: 0.35rem;">Password</label>
+          <input type="password" id="authPasswordInput" class="hyper-input" placeholder="••••••••" required>
+        </div>
+
+        <button type="submit" id="authSubmitBtn" class="hyper-btn hyper-btn-primary" style="width: 100%; padding: 0.75rem; font-size: 0.95rem; margin-bottom: 1rem;">
+          Sign In
+        </button>
+      </form>
+
+      <div style="text-align: center; font-size: 0.85rem; color: var(--hyper-text-secondary);">
+        <span id="authTogglePrompt">Don't have an account?</span>
+        <a href="javascript:void(0)" id="authToggleLink" style="color: var(--hyper-accent-cyan); font-weight: 600; text-decoration: none; margin-left: 0.25rem;" onclick="AuthModal.toggleMode()">Register Now</a>
+      </div>
+
+      <div style="text-align: center; margin-top: 1rem;">
+        <button class="hyper-btn hyper-btn-ghost hyper-btn-sm" onclick="AuthModal.hide()">Close</button>
+      </div>
     </div>
   </div>
 

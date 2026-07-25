@@ -39,6 +39,7 @@ class MongoManager:
                 self.db.users.create_index("email", unique=True)
                 self.db.otps.create_index([("email", pymongo.ASCENDING), ("created_at", pymongo.DESCENDING)])
                 self.db.chat_history.create_index([("user_id", pymongo.ASCENDING), ("created_at", pymongo.DESCENDING)])
+                self.db.conversations.create_index([("user_id", pymongo.ASCENDING), ("session_id", pymongo.ASCENDING), ("timestamp", pymongo.DESCENDING)])
                 self.db.notes.create_index([("user_id", pymongo.ASCENDING), ("student_class", pymongo.ASCENDING)])
                 self.db.documents.create_index([("user_id", pymongo.ASCENDING), ("created_at", pymongo.DESCENDING)])
                 self.db.quizzes.create_index([("user_id", pymongo.ASCENDING), ("subject", pymongo.ASCENDING)])

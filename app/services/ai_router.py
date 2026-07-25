@@ -1,4 +1,4 @@
-"""noteX AI - Upgraded Central AI Intent Router & Modular Orchestration Engine."""
+"""noteX AI - Upgraded Central AI Intent Router & Conversation Memory Integration."""
 import re
 from app.services.ai_service import AIService
 from app.notes.services import NoteService
@@ -10,12 +10,12 @@ from app.services.rag_service import RAGService
 from app.utils.logger import logger
 
 class AIRouter:
-    """Upgraded Central AI Router automatically detecting user intent and routing to platform modules."""
+    """Upgraded Central AI Router automatically detecting user intent, incorporating conversation history, and routing to platform modules."""
 
     @classmethod
-    def analyze_and_route(cls, user_id: str, prompt: str, student_class: str = "Class 10") -> dict:
+    def analyze_and_route(cls, user_id: str, prompt: str, student_class: str = "Class 10", history: list = None, session_id: str = None) -> dict:
         prompt_lower = prompt.lower().strip()
-        logger.info(f"[AIRouter] Processing intent routing for user {user_id}: '{prompt}'")
+        logger.info(f"[AIRouter] Processing intent routing for user {user_id} (Session: {session_id}): '{prompt}'")
 
         # Query RAG Vector Store for context enrichment
         rag_context = ""
@@ -114,14 +114,15 @@ class AIRouter:
         # 5. Detect SUMMARIZE_PDF / RAG Intent
         if any(w in prompt_lower for w in ['pdf', 'document', 'file', 'from book', 'textbook', 'summarize pdf', 'extract from pdf']):
             if rag_context:
-                ai_reply = AIService.generate_study_response(
-                    prompt=f"Context from PDF:\n{rag_context}\n\nQuestion:\n{prompt}",
+                ai_reply = AIService.generate_chat_response(
+                    user_prompt=f"Context from PDF:\n{rag_context}\n\nQuestion:\n{prompt}",
                     subject="PDF Reference",
-                    student_class=student_class
+                    student_class=student_class,
+                    history=history
                 )
                 response_text = f"{ai_reply}\n\n**PDF Citations:**\n" + "\n".join([f"- Page {c.get('page')}: `{c.get('source')}`" for c in citations])
             else:
-                response_text = AIService.generate_study_response(prompt=prompt, subject="PDF RAG", student_class=student_class)
+                response_text = AIService.generate_chat_response(user_prompt=prompt, subject="PDF RAG", student_class=student_class, history=history)
 
             return {
                 "response": response_text,
@@ -133,10 +134,11 @@ class AIRouter:
 
         # 6. Detect TRANSLATE Intent
         if any(w in prompt_lower for w in ['translate', 'translation', 'in hindi', 'in malayalam', 'in spanish', 'convert to english', 'translate to']):
-            response_text = AIService.generate_study_response(
-                prompt=f"Please translate and explain the following into simple terms:\n\n{prompt}",
+            response_text = AIService.generate_chat_response(
+                user_prompt=f"Please translate and explain the following into simple terms:\n\n{prompt}",
                 subject="Language Translation",
-                student_class=student_class
+                student_class=student_class,
+                history=history
             )
             return {
                 "response": response_text,
@@ -148,7 +150,7 @@ class AIRouter:
 
         # 7. Detect MATHEMATICS Intent
         if any(w in prompt_lower for w in ['math', 'mathematics', 'algebra', 'geometry', 'calculus', 'trigonometry', 'quadratic', 'pythagoras', 'ap series', 'equation', 'matrix', 'derivative', 'integration']):
-            response_text = AIService.generate_study_response(prompt=prompt, subject="Mathematics", student_class=student_class)
+            response_text = AIService.generate_chat_response(user_prompt=prompt, subject="Mathematics", student_class=student_class, history=history)
             return {
                 "response": response_text,
                 "intent": "MATHEMATICS",
@@ -157,31 +159,9 @@ class AIRouter:
                 "action_title": "📐 Mathematics Tutor"
             }
 
-        # 8. Detect PHYSICS Intent
-        if any(w in prompt_lower for w in ['physics', 'optics', 'light', 'snell', 'electricity', 'ohm', 'voltage', 'resistor', 'force', 'motion', 'newton', 'thermodynamics', 'gravity']):
-            response_text = AIService.generate_study_response(prompt=prompt, subject="Physics", student_class=student_class)
-            return {
-                "response": response_text,
-                "intent": "PHYSICS",
-                "action": "OPEN_CHAT",
-                "action_url": "#chat",
-                "action_title": "⚡ Physics Tutor"
-            }
-
-        # 9. Detect CHEMISTRY Intent
-        if any(w in prompt_lower for w in ['chemistry', 'chemical', 'redox', 'acid', 'base', 'ph', 'periodic table', 'valency', 'molecule', 'atom', 'organic chemistry', 'reaction']):
-            response_text = AIService.generate_study_response(prompt=prompt, subject="Chemistry", student_class=student_class)
-            return {
-                "response": response_text,
-                "intent": "CHEMISTRY",
-                "action": "OPEN_CHAT",
-                "action_url": "#chat",
-                "action_title": "🧪 Chemistry Tutor"
-            }
-
-        # 10. Detect BIOLOGY Intent
-        if any(w in prompt_lower for w in ['biology', 'photosynthesis', 'cell', 'organ', 'digestive', 'respiration', 'heart', 'dna', 'genetics', 'enzyme', 'plant', 'chlorophyll']):
-            response_text = AIService.generate_study_response(prompt=prompt, subject="Biology", student_class=student_class)
+        # 8. Detect BIOLOGY Intent
+        if any(w in prompt_lower for w in ['biology', 'photosynthesis', 'chloroplast', 'botany', 'zoology', 'cell', 'organ', 'digestive', 'respiration', 'heart', 'dna', 'genetics', 'enzyme', 'plant']):
+            response_text = AIService.generate_chat_response(user_prompt=prompt, subject="Biology", student_class=student_class, history=history)
             return {
                 "response": response_text,
                 "intent": "BIOLOGY",
@@ -190,9 +170,31 @@ class AIRouter:
                 "action_title": "🧬 Biology Tutor"
             }
 
+        # 9. Detect PHYSICS Intent
+        if any(w in prompt_lower for w in ['physics', 'optics', 'refraction', 'light', 'snell', 'electricity', 'ohm', 'voltage', 'resistor', 'force', 'motion', 'newton', 'thermodynamics', 'gravity']):
+            response_text = AIService.generate_chat_response(user_prompt=prompt, subject="Physics", student_class=student_class, history=history)
+            return {
+                "response": response_text,
+                "intent": "PHYSICS",
+                "action": "OPEN_CHAT",
+                "action_url": "#chat",
+                "action_title": "⚡ Physics Tutor"
+            }
+
+        # 10. Detect CHEMISTRY Intent
+        if any(w in prompt_lower for w in ['chemistry', 'chemical reaction', 'redox', 'acid', 'base', 'ph', 'periodic table', 'valency', 'molecule', 'atom', 'organic chemistry']):
+            response_text = AIService.generate_chat_response(user_prompt=prompt, subject="Chemistry", student_class=student_class, history=history)
+            return {
+                "response": response_text,
+                "intent": "CHEMISTRY",
+                "action": "OPEN_CHAT",
+                "action_url": "#chat",
+                "action_title": "🧪 Chemistry Tutor"
+            }
+
         # 11. Detect PROGRAMMING Intent
         if any(w in prompt_lower for w in ['programming', 'code', 'python', 'javascript', 'html', 'css', 'algorithm', 'function', 'loop', 'array', 'sql', 'database', 'bug', 'debug']):
-            response_text = AIService.generate_study_response(prompt=prompt, subject="Programming & Computer Science", student_class=student_class)
+            response_text = AIService.generate_chat_response(user_prompt=prompt, subject="Programming & Computer Science", student_class=student_class, history=history)
             return {
                 "response": response_text,
                 "intent": "PROGRAMMING",
@@ -203,7 +205,7 @@ class AIRouter:
 
         # 12. Detect EXPLAIN_CONCEPT Intent
         if any(w in prompt_lower for w in ['explain', 'what is', 'how does', 'describe', 'definition of', 'concept of', 'tell me about']):
-            response_text = AIService.generate_study_response(prompt=prompt, subject="Concept Explanation", student_class=student_class)
+            response_text = AIService.generate_chat_response(user_prompt=prompt, subject="Concept Explanation", student_class=student_class, history=history)
             return {
                 "response": response_text,
                 "intent": "EXPLAIN_CONCEPT",
@@ -213,7 +215,7 @@ class AIRouter:
             }
 
         # 13. Default Fallback Intent
-        response_text = AIService.generate_study_response(prompt=prompt, subject="General Study", student_class=student_class)
+        response_text = AIService.generate_chat_response(user_prompt=prompt, subject="General Study", student_class=student_class, history=history)
         return {
             "response": response_text,
             "intent": "GENERAL_TUTOR_CHAT",

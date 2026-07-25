@@ -1,52 +1,54 @@
-/* ==========================================
-   Hyper-Design System Tokens (Linear / Raycast / Perplexity AI / Arc)
-   ========================================== */
+/* ==========================================================================
+   noteX AI — Premium Global Design Tokens (Apple / Linear / Raycast / Arc / Vercel)
+   ========================================================================== */
 
 :root {
-  /* Ultra-Deep Pitch Black Palette */
-  --hyper-bg-app: #030508;
-  --hyper-bg-sidebar: #06090f;
-  --hyper-bg-surface: #0a0e17;
-  --hyper-bg-elevated: #101625;
-  --hyper-bg-card: #0d121f;
-  --hyper-bg-hover: #161e31;
-  --hyper-bg-active: #1e2842;
+  /* Pitch Obsidian Color Palette */
+  --hyper-bg-app: #030712;
+  --hyper-bg-sidebar: #090d16;
+  --hyper-bg-surface: #0f172a;
+  --hyper-bg-elevated: #1e293b;
+  --hyper-bg-card: #0b1329;
+  --hyper-bg-hover: #1e293b;
+  --hyper-bg-active: #334155;
 
-  /* Accent Colors */
+  /* Neon Cyan & Indigo Primary Accents */
   --hyper-accent-primary: #6366f1;
   --hyper-accent-primary-hover: #4f46e5;
-  --hyper-accent-primary-light: rgba(99, 102, 241, 0.15);
+  --hyper-accent-primary-light: rgba(99, 102, 241, 0.16);
   
   --hyper-accent-cyan: #06b6d4;
-  --hyper-accent-cyan-light: rgba(6, 182, 212, 0.15);
-  
-  --hyper-accent-emerald: #10b981;
-  --hyper-accent-emerald-light: rgba(16, 185, 129, 0.15);
-  
-  --hyper-accent-rose: #f43f5e;
-  --hyper-accent-rose-light: rgba(244, 63, 94, 0.15);
-  
-  --hyper-accent-amber: #f59e0b;
-  --hyper-accent-amber-light: rgba(245, 158, 11, 0.15);
+  --hyper-accent-cyan-hover: #0891b2;
+  --hyper-accent-cyan-light: rgba(6, 182, 212, 0.16);
 
-  /* Typography Colors */
+  --hyper-accent-emerald: #10b981;
+  --hyper-accent-emerald-light: rgba(16, 185, 129, 0.16);
+
+  --hyper-accent-rose: #f43f5e;
+  --hyper-accent-rose-light: rgba(244, 63, 94, 0.16);
+
+  --hyper-accent-amber: #f59e0b;
+  --hyper-accent-amber-light: rgba(245, 158, 11, 0.16);
+
+  /* Typography Color Scale */
   --hyper-text-primary: #f8fafc;
   --hyper-text-secondary: #94a3b8;
   --hyper-text-muted: #64748b;
   --hyper-text-dim: #475569;
 
-  /* Borders & Glassmorphism Filters */
+  /* Apple & Vercel Glassmorphism & Borders */
   --hyper-border-subtle: rgba(255, 255, 255, 0.08);
-  --hyper-border-medium: rgba(255, 255, 255, 0.14);
-  --hyper-border-focus: rgba(99, 102, 241, 0.6);
-  --hyper-glass-blur: blur(20px) saturate(180%);
+  --hyper-border-medium: rgba(255, 255, 255, 0.15);
+  --hyper-border-focus: rgba(99, 102, 241, 0.65);
+  --hyper-glass-blur: blur(24px) saturate(190%);
+  --hyper-glass-bg: rgba(15, 23, 42, 0.75);
 
-  /* Typography Fonts */
-  --hyper-font-heading: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
-  --hyper-font-body: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-  --hyper-font-mono: 'JetBrains Mono', 'Fira Code', monospace;
+  /* Font Families: Plus Jakarta Sans + Inter + JetBrains Mono */
+  --hyper-font-heading: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --hyper-font-body: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --hyper-font-mono: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', monospace;
 
-  /* Radii Scale */
+  /* Consistent Radii Scale */
   --hyper-radius-xs: 6px;
   --hyper-radius-sm: 10px;
   --hyper-radius-md: 14px;
@@ -54,12 +56,13 @@
   --hyper-radius-xl: 28px;
   --hyper-radius-full: 9999px;
 
-  /* Shadows & Glow Effects */
-  --hyper-shadow-subtle: 0 4px 20px rgba(0, 0, 0, 0.5);
-  --hyper-shadow-glow-primary: 0 0 35px rgba(99, 102, 241, 0.25);
-  --hyper-shadow-glow-cyan: 0 0 35px rgba(6, 182, 212, 0.25);
+  /* Soft Ambient Shadows & Neon Glows */
+  --hyper-shadow-subtle: 0 8px 32px rgba(0, 0, 0, 0.45);
+  --hyper-shadow-glow-primary: 0 0 30px rgba(99, 102, 241, 0.28);
+  --hyper-shadow-glow-cyan: 0 0 30px rgba(6, 182, 212, 0.28);
+  --hyper-shadow-glow-emerald: 0 0 30px rgba(16, 185, 129, 0.28);
 
-  /* Transitions */
+  /* Linear Smooth Transitions */
   --hyper-transition-fast: 0.15s cubic-bezier(0.4, 0, 0.2, 1);
   --hyper-transition-normal: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
   --hyper-transition-bounce: 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);

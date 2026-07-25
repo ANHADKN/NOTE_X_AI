@@ -1,6 +1,6 @@
-/* ==========================================
-   Hyper Layout & Bento Grid System
-   ========================================== */
+/* ==========================================================================
+   noteX AI — Hyper Layout & Bento Grid System (Linear / Raycast / Arc / Vercel)
+   ========================================================================== */
 
 *, *::before, *::after {
   margin: 0;
@@ -14,7 +14,7 @@ html, body {
   color: var(--hyper-text-primary);
   font-family: var(--hyper-font-body);
   font-size: 14px;
-  line-height: 1.5;
+  line-height: 1.6;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -37,21 +37,21 @@ code, pre {
   pointer-events: none;
   z-index: 0;
   background:
-    radial-gradient(circle at 15% 15%, rgba(99, 102, 241, 0.15) 0%, transparent 40%),
-    radial-gradient(circle at 85% 85%, rgba(6, 182, 212, 0.12) 0%, transparent 40%),
+    radial-gradient(circle at 15% 15%, rgba(99, 102, 241, 0.16) 0%, transparent 40%),
+    radial-gradient(circle at 85% 85%, rgba(6, 182, 212, 0.14) 0%, transparent 40%),
     radial-gradient(circle at 50% 50%, rgba(168, 85, 247, 0.08) 0%, transparent 50%);
   animation: hyperAurora 14s ease-in-out infinite alternate;
 }
 
 @keyframes hyperAurora {
-  0% { opacity: 0.7; transform: scale(1) rotate(0deg); }
+  0% { opacity: 0.75; transform: scale(1) rotate(0deg); }
   100% { opacity: 1; transform: scale(1.05) rotate(2deg); }
 }
 
 /* Custom Scrollbars */
 ::-webkit-scrollbar {
-  width: 5px;
-  height: 5px;
+  width: 6px;
+  height: 6px;
 }
 
 ::-webkit-scrollbar-track {
@@ -61,10 +61,11 @@ code, pre {
 ::-webkit-scrollbar-thumb {
   background: var(--hyper-bg-elevated);
   border-radius: var(--hyper-radius-full);
+  border: 1px solid var(--hyper-border-subtle);
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--hyper-accent-primary);
+  background: var(--hyper-accent-cyan);
 }
 
 /* App Wrapper Shell */
@@ -150,8 +151,8 @@ code, pre {
 .hyper-nav-item.active a {
   background-color: var(--hyper-bg-elevated);
   color: #ffffff;
-  border-left: 2px solid var(--hyper-accent-cyan);
-  box-shadow: 0 2px 10px rgba(6, 182, 212, 0.15);
+  border-left: 3px solid var(--hyper-accent-cyan);
+  box-shadow: 0 2px 12px rgba(6, 182, 212, 0.18);
 }
 
 .hyper-nav-item.active a i {
@@ -171,8 +172,8 @@ code, pre {
 /* Arc / Raycast Floating Glass Navigation Bar */
 .hyper-float-nav {
   margin: 1rem 1.5rem 0.5rem 1.5rem;
-  padding: 0.5rem 1.25rem;
-  background: rgba(10, 14, 23, 0.75);
+  padding: 0.55rem 1.25rem;
+  background: var(--hyper-glass-bg);
   backdrop-filter: var(--hyper-glass-blur);
   border: 1px solid var(--hyper-border-subtle);
   border-radius: var(--hyper-radius-full);
