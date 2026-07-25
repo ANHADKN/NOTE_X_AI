@@ -140,101 +140,172 @@ def login():
         return api_response(success=False, message=f"Login failed: {str(e)}", status_code=500)
 
 import requests
+import json
+from urllib.parse import urlencode
+from flask import redirect, render_template_string
+from app.config import Config
 
-@auth_bp.route('/google-login', methods=['POST'])
-def google_login():
-    """Authenticate user with Google OAuth ID Token."""
+@auth_bp.route('/google/login', methods=['GET'])
+def google_login_redirect():
+    """Redirect user to Google OAuth 2.0 Consent Screen."""
+    if not Config.GOOGLE_CLIENT_ID:
+        return api_response(success=False, message="Google OAuth is not configured on the server (Missing Client ID).", status_code=500)
+    
+    auth_url = "https://accounts.google.com/o/oauth2/v2/auth"
+    params = {
+        "client_id": Config.GOOGLE_CLIENT_ID,
+        "redirect_uri": Config.GOOGLE_REDIRECT_URI,
+        "response_type": "code",
+        "scope": "openid email profile",
+        "access_type": "offline",
+        "prompt": "consent"
+    }
+    url = f"{auth_url}?{urlencode(params)}"
+    return redirect(url)
+
+@auth_bp.route('/google/callback', methods=['GET'])
+def google_callback():
+    """Handle Google OAuth 2.0 Callback."""
+    code = request.args.get('code')
+    error = request.args.get('error')
+
+    if error:
+        logger.error(f"Google OAuth Error Callback: {error}")
+        return render_template_string("<h1>Google Login Failed</h1><p>Error: {{ error }}</p><a href='/'>Go Back</a>", error=error), 400
+
+    if not code:
+        return render_template_string("<h1>Google Login Failed</h1><p>No authorization code received.</p><a href='/'>Go Back</a>"), 400
+
+    # Exchange code for access token
+    token_url = "https://oauth2.googleapis.com/token"
+    token_data = {
+        "client_id": Config.GOOGLE_CLIENT_ID,
+        "client_secret": Config.GOOGLE_CLIENT_SECRET,
+        "code": code,
+        "grant_type": "authorization_code",
+        "redirect_uri": Config.GOOGLE_REDIRECT_URI
+    }
+    
     try:
-        data = request.get_json() or {}
-        id_token = data.get('credential')
+        token_res = requests.post(token_url, data=token_data)
+        token_res.raise_for_status()
+    except requests.exceptions.RequestException as e:
+        logger.error(f"Failed to exchange OAuth code: {str(e)}")
+        error_msg = token_res.json().get('error', str(e)) if hasattr(token_res, 'json') else str(e)
+        return render_template_string("<h1>OAuth Token Exchange Failed</h1><p>Error: {{ error }}</p><a href='/'>Go Back</a>", error=error_msg), 400
 
-        if not id_token:
-            return api_response(success=False, message="Google ID token is required.", status_code=400)
+    tokens = token_res.json()
+    access_token = tokens.get('access_token')
 
-        # Verify token with Google's tokeninfo endpoint
-        google_response = requests.get(f"https://oauth2.googleapis.com/tokeninfo?id_token={id_token}")
-        if google_response.status_code != 200:
-            return api_response(success=False, message="Invalid Google token.", status_code=401)
+    # Fetch User Profile
+    userinfo_url = "https://www.googleapis.com/oauth2/v2/userinfo"
+    headers = {"Authorization": f"Bearer {access_token}"}
+    try:
+        user_res = requests.get(userinfo_url, headers=headers)
+        user_res.raise_for_status()
+    except requests.exceptions.RequestException as e:
+        logger.error(f"Failed to fetch user profile: {str(e)}")
+        return render_template_string("<h1>Profile Fetch Failed</h1><p>Error: {{ error }}</p><a href='/'>Go Back</a>", error=str(e)), 400
 
-        token_info = google_response.json()
-        email = token_info.get('email', '').lower().strip()
-        name = token_info.get('name', 'Student')
-        google_id = token_info.get('sub')
-        profile_photo = token_info.get('picture')
+    user_info = user_res.json()
+    email = user_info.get('email', '').lower().strip()
+    name = user_info.get('name', 'Student')
+    google_id = user_info.get('id')
+    profile_photo = user_info.get('picture')
 
-        if not email or not google_id:
-            return api_response(success=False, message="Incomplete profile information from Google.", status_code=400)
+    if not email or not google_id:
+        return render_template_string("<h1>Google Login Failed</h1><p>Incomplete profile information received from Google.</p><a href='/'>Go Back</a>"), 400
 
-        db = mongo_manager.get_db()
-        user = None
+    db = mongo_manager.get_db()
+    user = None
 
-        if db is not None:
-            # Check by email first (to link accounts if they already registered via email)
-            user = db.users.find_one({"email": email})
-            
-            if not user:
-                # First-time user via Google
-                hashed_pwd = hash_password(generate_otp()) # Random password for google users
-                user_doc = UserModel.create_user_doc(
-                    name=name, email=email, password_hash=hashed_pwd,
-                    student_class="Class 10", role="student", target_exam="Board Exam",
-                    login_provider="google", google_id=google_id, profile_photo=profile_photo
-                )
-                user_doc["is_verified"] = True # Google verified emails
-                res = db.users.insert_one(user_doc)
-                user = db.users.find_one({"_id": res.inserted_id})
-                logger.info(f"New Google user registered: {email}")
-            else:
-                # Update existing user with google_id and photo if missing
-                updates = {}
-                if not user.get('google_id'):
-                    updates['google_id'] = google_id
-                    updates['login_provider'] = "google"
-                if not user.get('profile_photo') and profile_photo:
-                    updates['profile_photo'] = profile_photo
-                
-                if updates:
-                    db.users.update_one({"_id": user['_id']}, {"$set": updates})
-                    user.update(updates)
-                logger.info(f"Google user logged in: {email}")
+    if db is not None:
+        user = db.users.find_one({"email": email})
+        
+        if not user:
+            # First-time user via Google
+            hashed_pwd = hash_password(generate_otp()) # Random password for google users
+            user_doc = UserModel.create_user_doc(
+                name=name, email=email, password_hash=hashed_pwd,
+                student_class="Class 10", role="student", target_exam="Board Exam",
+                login_provider="google", google_id=google_id, profile_photo=profile_photo
+            )
+            user_doc["is_verified"] = True
+            res = db.users.insert_one(user_doc)
+            user = db.users.find_one({"_id": res.inserted_id})
+            logger.info(f"New Google user registered: {email}")
         else:
-            # In memory fallback
-            if email in IN_MEMORY_USERS:
-                user = IN_MEMORY_USERS[email]
-            else:
-                hashed_pwd = hash_password(generate_otp())
-                user_id = f"mem_{len(IN_MEMORY_USERS) + 1}"
-                user = {
-                    "_id": user_id, "name": name, "email": email, "password_hash": hashed_pwd,
-                    "student_class": "Class 10", "role": "student", "target_exam": "Board Exam",
-                    "is_verified": True, "study_streak": 1, "total_points": 50,
-                    "login_provider": "google", "google_id": google_id, "profile_photo": profile_photo,
-                    "created_at": datetime.datetime.utcnow().isoformat()
-                }
-                IN_MEMORY_USERS[email] = user
+            # Update existing user with google_id and photo if missing
+            updates = {}
+            if not user.get('google_id'):
+                updates['google_id'] = google_id
+                updates['login_provider'] = "google"
+            if not user.get('profile_photo') and profile_photo:
+                updates['profile_photo'] = profile_photo
+            
+            if updates:
+                db.users.update_one({"_id": user['_id']}, {"$set": updates})
+                user.update(updates)
+            logger.info(f"Google user logged in: {email}")
+    else:
+        # In memory fallback
+        if email in IN_MEMORY_USERS:
+            user = IN_MEMORY_USERS[email]
+        else:
+            hashed_pwd = hash_password(generate_otp())
+            user_id = f"mem_{len(IN_MEMORY_USERS) + 1}"
+            user = {
+                "_id": user_id, "name": name, "email": email, "password_hash": hashed_pwd,
+                "student_class": "Class 10", "role": "student", "target_exam": "Board Exam",
+                "is_verified": True, "study_streak": 1, "total_points": 50,
+                "login_provider": "google", "google_id": google_id, "profile_photo": profile_photo,
+                "created_at": datetime.datetime.utcnow().isoformat()
+            }
+            IN_MEMORY_USERS[email] = user
 
-        user_id = str(user.get('_id'))
-        role = user.get('role', 'student')
-        student_class = user.get('student_class', 'Class 10')
+    user_id = str(user.get('_id'))
+    role = user.get('role', 'student')
+    student_class = user.get('student_class', 'Class 10')
 
-        access_token, refresh_token = generate_tokens(user_id, email, role, student_class)
-        serialized = BaseModel.serialize_doc(user)
-        if serialized and 'password_hash' in serialized:
-            del serialized['password_hash']
+    jwt_access_token, jwt_refresh_token = generate_tokens(user_id, email, role, student_class)
+    serialized = BaseModel.serialize_doc(user)
+    if serialized and 'password_hash' in serialized:
+        del serialized['password_hash']
 
-        return api_response(
-            success=True,
-            message="Google Login successful!",
-            data={
-                "user": serialized,
-                "access_token": access_token,
-                "refresh_token": refresh_token
-            },
-            status_code=200
-        )
-    except Exception as e:
-        logger.error(f"Google Login Error: {str(e)}")
-        return api_response(success=False, message=f"Google Login failed: {str(e)}", status_code=500)
+    # Transition HTML page to inject JWTs into localStorage and redirect
+    html_template = """
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <title>Authenticating...</title>
+        <style>
+            body { font-family: sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; background: #F8FAFC; margin: 0; }
+            .loader { border: 4px solid #E2E8F0; border-top: 4px solid #0EA5E9; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; }
+            @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        </style>
+    </head>
+    <body>
+        <div class="loader"></div>
+        <script>
+            try {
+                localStorage.setItem('notex_access_token', '{{ access_token }}');
+                localStorage.setItem('notex_refresh_token', '{{ refresh_token }}');
+                localStorage.setItem('notex_user', JSON.stringify({{ user | tojson | safe }}));
+                window.location.href = '/#dashboard';
+            } catch (e) {
+                document.body.innerHTML = '<h2>Error saving session data. Please enable cookies/localStorage.</h2><a href="/">Return Home</a>';
+            }
+        </script>
+    </body>
+    </html>
+    """
+    
+    return render_template_string(
+        html_template, 
+        access_token=jwt_access_token, 
+        refresh_token=jwt_refresh_token, 
+        user=serialized
+    )
 
 @auth_bp.route('/verify-otp', methods=['POST'])
 def verify_otp():

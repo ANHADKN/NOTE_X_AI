@@ -43,6 +43,11 @@ class Config:
     LOGS_FOLDER = os.path.join(BASE_DIR, 'logs')
     ML_MODELS_FOLDER = os.path.join(BASE_DIR, 'ml_models')
     
+    # Google OAuth 2.0 Settings
+    GOOGLE_CLIENT_ID = os.getenv('GOOGLE_CLIENT_ID', '')
+    GOOGLE_CLIENT_SECRET = os.getenv('GOOGLE_CLIENT_SECRET', '')
+    GOOGLE_REDIRECT_URI = os.getenv('GOOGLE_REDIRECT_URI', 'http://localhost:5000/api/auth/google/callback')
+    
     @staticmethod
     def init_app(app):
         """Ensure necessary production directories exist."""
