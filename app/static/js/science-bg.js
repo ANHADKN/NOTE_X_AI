@@ -1,5 +1,5 @@
 /* ==========================================
-   noteX AI - Scientific & Mathematical Animated Background Engine
+   noteX AI - Scientific & Mathematical Animated Background Engine (Light Theme)
    ========================================== */
 (function() {
   document.addEventListener('DOMContentLoaded', () => {
@@ -11,7 +11,7 @@
       canvas.style.inset = '0';
       canvas.style.pointerEvents = 'none';
       canvas.style.zIndex = '0';
-      canvas.style.opacity = '0.22';
+      canvas.style.opacity = '0.35';
       document.body.prepend(canvas);
     }
 
@@ -44,7 +44,7 @@
         this.vy = (Math.random() - 0.5) * 0.35;
         this.text = symbols[Math.floor(Math.random() * symbols.length)];
         this.size = Math.random() * 4 + 11;
-        this.alpha = Math.random() * 0.35 + 0.15;
+        this.alpha = Math.random() * 0.25 + 0.12;
         this.rotation = Math.random() * Math.PI * 2;
         this.vRot = (Math.random() - 0.5) * 0.005;
       }
@@ -64,8 +64,8 @@
         ctx.save();
         ctx.translate(this.x, this.y);
         ctx.rotate(this.rotation);
-        ctx.font = `500 ${this.size}px 'JetBrains Mono', monospace`;
-        ctx.fillStyle = `rgba(6, 182, 212, ${this.alpha})`;
+        ctx.font = `600 ${this.size}px 'JetBrains Mono', monospace`;
+        ctx.fillStyle = `rgba(14, 165, 233, ${this.alpha})`;
         ctx.fillText(this.text, 0, 0);
         ctx.restore();
       }
@@ -92,7 +92,7 @@
             ctx.beginPath();
             ctx.moveTo(particles[i].x, particles[i].y);
             ctx.lineTo(particles[j].x, particles[j].y);
-            ctx.strokeStyle = `rgba(99, 102, 241, ${0.12 * (1 - dist / 140)})`;
+            ctx.strokeStyle = `rgba(14, 165, 233, ${0.12 * (1 - dist / 140)})`;
             ctx.lineWidth = 0.8;
             ctx.stroke();
           }

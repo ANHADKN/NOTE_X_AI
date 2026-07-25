@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="dark">
+<html lang="en" data-theme="light">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,7 +7,7 @@
   <meta name="description" content="noteX AI is a modern AI-powered study platform featuring RAG chatbots, smart notes, quiz generators, and progress analytics.">
   
   <!-- SVG Favicon with Chi Spark Emblem -->
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='25' fill='%236366f1'/><text x='50%' y='68%' font-size='60' font-weight='800' fill='white' text-anchor='middle'>𝝌</text></svg>">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='25' fill='%230EA5E9'/><text x='50%' y='68%' font-size='60' font-weight='800' fill='white' text-anchor='middle'>𝝌</text></svg>">
 
   <!-- Modern Fonts & Icons -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -31,7 +31,7 @@
   <!-- Chart.js & Highlight.js -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/atom-one-dark.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/atom-one-light.min.css">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
 </head>
 <body>
@@ -40,14 +40,14 @@
   <div class="hyper-ambient-bg"></div>
 
   <div class="hyper-app-wrapper">
-    <!-- Linear / Vercel Minimalist Sidebar -->
+    <!-- Bright Minimalist Sidebar -->
     <aside class="hyper-sidebar" id="mainSidebar">
       <div class="hyper-brand">
         <div class="hyper-brand-logo">𝝌</div>
         <div class="hyper-brand-title">noteX AI</div>
       </div>
       
-      <!-- Student Study Platform Navigation (No Admin Links) -->
+      <!-- Student Study Platform Navigation -->
       <ul class="hyper-nav-list" id="studentNavList">
         <li class="hyper-nav-item active" data-view="dashboard">
           <a href="#dashboard"><i data-lucide="layout-dashboard"></i> <span>Dashboard</span></a>
@@ -89,12 +89,12 @@
 
     <!-- Main View Shell -->
     <main class="hyper-main-content">
-      <!-- Arc / Raycast Floating Glass Navigation Bar -->
+      <!-- Floating Glass Navigation Bar -->
       <header class="hyper-float-nav">
         <div style="display: flex; align-items: center; gap: 1rem;">
           <!-- Raycast Command Trigger Bar -->
           <div class="hyper-command-trigger" onclick="document.getElementById('commandPaletteModal').style.display = 'flex'">
-            <i data-lucide="search" style="width: 16px; height: 16px; color: var(--hyper-accent-cyan);"></i>
+            <i data-lucide="search" style="width: 16px; height: 16px; color: var(--hyper-accent-primary);"></i>
             <span>Search or run command...</span>
             <span class="hyper-kbd" style="margin-left: auto;">⌘ K</span>
           </div>
@@ -102,7 +102,7 @@
 
         <div style="display: flex; align-items: center; gap: 0.85rem;">
           <button id="classSelectorBtn" class="hyper-btn hyper-btn-glass hyper-btn-sm" style="border-radius: var(--hyper-radius-full);">
-            <i data-lucide="graduation-cap" style="width: 15px; height: 15px; color: var(--hyper-accent-cyan);"></i> Target: <span id="currentGradeLabel" style="color: var(--hyper-accent-primary); font-weight: 700;">Class 10</span>
+            <i data-lucide="graduation-cap" style="width: 15px; height: 15px; color: var(--hyper-accent-primary);"></i> Target: <span id="currentGradeLabel" style="color: var(--hyper-accent-primary); font-weight: 700;">Class 10</span>
           </button>
         </div>
       </header>
@@ -118,7 +118,7 @@
   <div id="commandPaletteModal" class="hyper-modal-backdrop" style="display: none;">
     <div class="hyper-modal-content" style="max-width: 580px; padding: 1.25rem;">
       <div style="position: relative; margin-bottom: 1rem;">
-        <i data-lucide="terminal" style="position: absolute; left: 1rem; top: 0.85rem; color: var(--hyper-accent-cyan); width: 18px; height: 18px;"></i>
+        <i data-lucide="terminal" style="position: absolute; left: 1rem; top: 0.85rem; color: var(--hyper-accent-primary); width: 18px; height: 18px;"></i>
         <input type="text" id="commandPaletteInput" class="hyper-input" placeholder="Type a command or jump to feature..." style="padding-left: 2.75rem; border-radius: var(--hyper-radius-sm); font-size: 0.95rem;">
       </div>
       <div style="display: flex; flex-direction: column; gap: 0.35rem; max-height: 320px; overflow-y: auto;">
@@ -132,7 +132,7 @@
           <i data-lucide="file-text" style="color: var(--hyper-accent-rose); width: 18px; margin-right: 0.5rem;"></i> Upload PDF & RAG Search
         </div>
         <div class="hyper-btn hyper-btn-ghost" style="justify-content: flex-start;" onclick="location.hash='#notes'; document.getElementById('commandPaletteModal').style.display='none';">
-          <i data-lucide="sticky-note" style="color: var(--hyper-accent-primary); width: 18px; margin-right: 0.5rem;"></i> Generate AI Smart Notes
+          <i data-lucide="sticky-note" style="color: var(--hyper-accent-lavender); width: 18px; margin-right: 0.5rem;"></i> Generate AI Smart Notes
         </div>
         <div class="hyper-btn hyper-btn-ghost" style="justify-content: flex-start;" onclick="location.hash='#flashcards'; document.getElementById('commandPaletteModal').style.display='none';">
           <i data-lucide="layers" style="color: var(--hyper-accent-amber); width: 18px; margin-right: 0.5rem;"></i> Practice Flashcards Session
@@ -207,7 +207,7 @@
 
       <div style="text-align: center; font-size: 0.85rem; color: var(--hyper-text-secondary);">
         <span id="authTogglePrompt">Don't have an account?</span>
-        <a href="javascript:void(0)" id="authToggleLink" style="color: var(--hyper-accent-cyan); font-weight: 600; text-decoration: none; margin-left: 0.25rem;" onclick="AuthModal.toggleMode()">Register Now</a>
+        <a href="javascript:void(0)" id="authToggleLink" style="color: var(--hyper-accent-primary); font-weight: 600; text-decoration: none; margin-left: 0.25rem;" onclick="AuthModal.toggleMode()">Register Now</a>
       </div>
 
       <div style="text-align: center; margin-top: 1rem;">

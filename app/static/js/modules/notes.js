@@ -10,7 +10,7 @@ const NotesModule = {
     container.innerHTML = `
       <div class="hyper-bento-grid">
         <!-- Hero Header -->
-        <div class="hyper-card hyper-col-12" style="background: linear-gradient(135deg, rgba(99, 102, 241, 0.18), rgba(168, 85, 247, 0.15)); border-color: rgba(99, 102, 241, 0.35); padding: 1.75rem 2rem;">
+        <div class="hyper-card hyper-col-12" style="background: linear-gradient(135deg, rgba(139, 92, 246, 0.08), rgba(14, 165, 233, 0.08)); border-color: rgba(139, 92, 246, 0.25); padding: 1.75rem 2rem;">
           <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
             <div>
               <span class="hyper-badge hyper-badge-primary" style="margin-bottom: 0.5rem;"><i class="fa-solid fa-wand-magic-sparkles"></i> AI Notes Engine</span>

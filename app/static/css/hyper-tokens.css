@@ -1,68 +1,78 @@
 /* ==========================================================================
-   noteX AI — Premium Global Design Tokens (Apple / Linear / Raycast / Arc / Vercel)
+   noteX AI — Premium Light Theme Design Tokens
+   Inspired by Apple Education, Notion, Canva, Khan Academy, Duolingo, Perplexity & Figma
    ========================================================================== */
 
 :root {
-  /* Pitch Obsidian Color Palette */
-  --hyper-bg-app: #030712;
-  --hyper-bg-sidebar: #090d16;
-  --hyper-bg-surface: #0f172a;
-  --hyper-bg-elevated: #1e293b;
-  --hyper-bg-card: #0b1329;
-  --hyper-bg-hover: #1e293b;
-  --hyper-bg-active: #334155;
+  /* Bright, Clean & Welcoming Canvas Backgrounds */
+  --hyper-bg-app: #F8FAFC;         /* Soft Cloud White */
+  --hyper-bg-sidebar: #FFFFFF;     /* Crisp Pure White */
+  --hyper-bg-surface: #FFFFFF;     /* Card Base Surface */
+  --hyper-bg-elevated: #F1F5F9;    /* Elevated Surface / Chips */
+  --hyper-bg-card: #FFFFFF;        /* Card Body */
+  --hyper-bg-hover: #F8FAFC;       /* Light Neutral Hover */
+  --hyper-bg-active: #E2E8F0;      /* Pressed State */
 
-  /* Neon Cyan & Indigo Primary Accents */
-  --hyper-accent-primary: #6366f1;
-  --hyper-accent-primary-hover: #4f46e5;
-  --hyper-accent-primary-light: rgba(99, 102, 241, 0.16);
-  
-  --hyper-accent-cyan: #06b6d4;
-  --hyper-accent-cyan-hover: #0891b2;
-  --hyper-accent-cyan-light: rgba(6, 182, 212, 0.16);
+  /* Palette: Sky Blue, Mint Green, Lavender, Soft Yellow, Coral Accent */
+  --hyper-accent-primary: #0EA5E9;       /* Sky Blue (Primary) */
+  --hyper-accent-primary-hover: #0284C7;
+  --hyper-accent-primary-light: rgba(14, 165, 233, 0.12);
 
-  --hyper-accent-emerald: #10b981;
-  --hyper-accent-emerald-light: rgba(16, 185, 129, 0.16);
+  --hyper-accent-cyan: #06B6D4;          /* Electric Cyan / Aqua */
+  --hyper-accent-cyan-hover: #0891B2;
+  --hyper-accent-cyan-light: rgba(6, 182, 212, 0.12);
 
-  --hyper-accent-rose: #f43f5e;
-  --hyper-accent-rose-light: rgba(244, 63, 94, 0.16);
+  --hyper-accent-emerald: #10B981;       /* Mint Green */
+  --hyper-accent-emerald-hover: #059669;
+  --hyper-accent-emerald-light: rgba(16, 185, 129, 0.12);
 
-  --hyper-accent-amber: #f59e0b;
-  --hyper-accent-amber-light: rgba(245, 158, 11, 0.16);
+  --hyper-accent-lavender: #8B5CF6;      /* Soft Lavender / Purple */
+  --hyper-accent-lavender-hover: #7C3AED;
+  --hyper-accent-lavender-light: rgba(139, 92, 246, 0.12);
 
-  /* Typography Color Scale */
-  --hyper-text-primary: #f8fafc;
-  --hyper-text-secondary: #94a3b8;
-  --hyper-text-muted: #64748b;
-  --hyper-text-dim: #475569;
+  --hyper-accent-rose: #FF6B6B;          /* Coral Accent */
+  --hyper-accent-rose-hover: #EE5253;
+  --hyper-accent-rose-light: rgba(255, 107, 107, 0.14);
 
-  /* Apple & Vercel Glassmorphism & Borders */
-  --hyper-border-subtle: rgba(255, 255, 255, 0.08);
-  --hyper-border-medium: rgba(255, 255, 255, 0.15);
-  --hyper-border-focus: rgba(99, 102, 241, 0.65);
-  --hyper-glass-blur: blur(24px) saturate(190%);
-  --hyper-glass-bg: rgba(15, 23, 42, 0.75);
+  --hyper-accent-amber: #F59E0B;         /* Soft Sunshine Yellow */
+  --hyper-accent-amber-hover: #D97706;
+  --hyper-accent-amber-light: rgba(245, 158, 11, 0.14);
 
-  /* Font Families: Plus Jakarta Sans + Inter + JetBrains Mono */
+  /* Typography Color Scale (Slate) */
+  --hyper-text-primary: #0F172A;         /* Slate 900 */
+  --hyper-text-secondary: #475569;       /* Slate 600 */
+  --hyper-text-muted: #64748B;           /* Slate 500 */
+  --hyper-text-dim: #94A3B8;             /* Slate 400 */
+
+  /* Glassmorphism & Soft Light Borders */
+  --hyper-border-subtle: rgba(226, 232, 240, 0.8);
+  --hyper-border-medium: #CBD5E1;
+  --hyper-border-focus: rgba(14, 165, 233, 0.65);
+  --hyper-glass-blur: blur(20px) saturate(180%);
+  --hyper-glass-bg: rgba(255, 255, 255, 0.85);
+
+  /* Modern Font Families */
   --hyper-font-heading: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   --hyper-font-body: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   --hyper-font-mono: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', monospace;
 
   /* Consistent Radii Scale */
-  --hyper-radius-xs: 6px;
-  --hyper-radius-sm: 10px;
-  --hyper-radius-md: 14px;
-  --hyper-radius-lg: 20px;
-  --hyper-radius-xl: 28px;
+  --hyper-radius-xs: 8px;
+  --hyper-radius-sm: 12px;
+  --hyper-radius-md: 16px;
+  --hyper-radius-lg: 24px;
+  --hyper-radius-xl: 32px;
   --hyper-radius-full: 9999px;
 
-  /* Soft Ambient Shadows & Neon Glows */
-  --hyper-shadow-subtle: 0 8px 32px rgba(0, 0, 0, 0.45);
-  --hyper-shadow-glow-primary: 0 0 30px rgba(99, 102, 241, 0.28);
-  --hyper-shadow-glow-cyan: 0 0 30px rgba(6, 182, 212, 0.28);
-  --hyper-shadow-glow-emerald: 0 0 30px rgba(16, 185, 129, 0.28);
+  /* Elevated Soft Light Multi-layered Shadows */
+  --hyper-shadow-subtle: 0 4px 20px -2px rgba(15, 23, 42, 0.05), 0 2px 6px -1px rgba(15, 23, 42, 0.03);
+  --hyper-shadow-card: 0 10px 30px -5px rgba(15, 23, 42, 0.06), 0 4px 10px -2px rgba(15, 23, 42, 0.02);
+  --hyper-shadow-glow-primary: 0 0 25px rgba(14, 165, 233, 0.2);
+  --hyper-shadow-glow-cyan: 0 0 25px rgba(6, 182, 212, 0.2);
+  --hyper-shadow-glow-emerald: 0 0 25px rgba(16, 185, 129, 0.2);
+  --hyper-shadow-glow-lavender: 0 0 25px rgba(139, 92, 246, 0.2);
 
-  /* Linear Smooth Transitions */
+  /* Transitions */
   --hyper-transition-fast: 0.15s cubic-bezier(0.4, 0, 0.2, 1);
   --hyper-transition-normal: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
   --hyper-transition-bounce: 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);

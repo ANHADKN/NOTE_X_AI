@@ -10,9 +10,9 @@ const DashboardModule = {
     container.innerHTML = `
       <div class="hyper-bento-grid">
         <!-- 1. Large Hero Section -->
-        <div class="hyper-card hyper-col-12" style="background: linear-gradient(135deg, rgba(99, 102, 241, 0.18), rgba(6, 182, 212, 0.15)); border-color: rgba(99, 102, 241, 0.35); padding: 2.25rem 2.5rem;">
+        <div class="hyper-card hyper-col-12" style="background: linear-gradient(135deg, rgba(14, 165, 233, 0.08), rgba(16, 185, 129, 0.08)); border-color: rgba(14, 165, 233, 0.25); padding: 2.25rem 2.5rem;">
           <div style="max-width: 820px; margin: 0 auto; text-align: center;">
-            <div style="display: inline-flex; align-items: center; gap: 0.5rem; background: rgba(99, 102, 241, 0.15); border: 1px solid rgba(99, 102, 241, 0.3); border-radius: var(--hyper-radius-full); padding: 0.3rem 0.85rem; font-size: 0.8rem; font-weight: 700; color: var(--hyper-accent-cyan); margin-bottom: 1rem;">
+            <div style="display: inline-flex; align-items: center; gap: 0.5rem; background: rgba(14, 165, 233, 0.12); border: 1px solid rgba(14, 165, 233, 0.25); border-radius: var(--hyper-radius-full); padding: 0.3rem 0.85rem; font-size: 0.8rem; font-weight: 700; color: var(--hyper-accent-primary); margin-bottom: 1rem;">
               <i data-lucide="sparkles" style="width: 14px; height: 14px;"></i> Intelligent Study Assistant • ${studentGrade}
             </div>
             
@@ -24,9 +24,9 @@ const DashboardModule = {
             </h2>
 
             <!-- 2. Large Centerpiece AI Prompt Box -->
-            <div class="hyper-query-card" style="text-align: left; background: rgba(10, 14, 23, 0.85); backdrop-filter: blur(16px);">
-              <div style="display: flex; align-items: center; gap: 0.75rem;">
-                <i data-lucide="bot" style="width: 22px; height: 22px; color: var(--hyper-accent-cyan);"></i>
+            <div class="hyper-query-card" style="text-align: left; background: #FFFFFF; backdrop-filter: blur(16px); border: 1px solid #CBD5E1; box-shadow: 0 10px 30px -5px rgba(15, 23, 42, 0.08); border-radius: var(--hyper-radius-lg); padding: 1.25rem;">
+              <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.85rem;">
+                <i data-lucide="bot" style="width: 22px; height: 22px; color: var(--hyper-accent-primary);"></i>
                 <input type="text" id="dashHeroInput" class="hyper-input" placeholder="Ask AI anything, generate notes, quizzes, or upload a textbook..." style="border: none; background: transparent; font-size: 1.05rem; padding: 0.4rem 0;" onkeypress="if(event.key==='Enter') DashboardModule.handleHeroSubmit()">
               </div>
               
