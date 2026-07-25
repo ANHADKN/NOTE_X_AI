@@ -7,7 +7,7 @@ from app.utils.response import api_response
 from app.models.mongo import mongo_manager
 from app.models.schemas import UserModel, OTPModel, BaseModel
 from app.utils.logger import logger
-from app.utils.email import send_otp_email
+from app.utils.email import send_otp_email, send_welcome_email
 
 auth_bp = Blueprint('auth_bp', __name__, url_prefix='/api/auth')
 
@@ -278,6 +278,12 @@ def verify_otp():
             return api_response(success=False, message="Invalid or previously used OTP code.", status_code=400)
 
         logger.info(f"OTP Verified successfully for {email} [Purpose: {purpose}]")
+
+        if purpose == 'email_verification':
+            user = db.users.find_one({"email": email}) if db is not None else IN_MEMORY_USERS.get(email)
+            if user:
+                send_welcome_email(email, user.get('name', 'Student'))
+
         return api_response(success=True, message="OTP verified successfully!", status_code=200)
     except Exception as e:
         logger.error(f"Verify OTP Error: {str(e)}")
