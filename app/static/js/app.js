@@ -23,7 +23,6 @@ const UI = {
 };
 
 document.addEventListener('DOMContentLoaded', () => {
-  const container = document.getElementById('app-view-container');
   const classSelectorBtn = document.getElementById('classSelectorBtn');
   const currentGradeLabel = document.getElementById('currentGradeLabel');
   const gradeModal = document.getElementById('gradeModal');
@@ -94,6 +93,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // SPA Router
   async function router() {
+    const targetContainer = document.getElementById('app-view-container');
+    if (!targetContainer) return;
+
     const hash = window.location.hash.replace('#', '') || 'dashboard';
     if (typeof APP_STATE !== 'undefined') {
       APP_STATE.activeView = hash;
@@ -110,37 +112,37 @@ document.addEventListener('DOMContentLoaded', () => {
     switch (hash) {
       case 'chat':
       case 'chatbot':
-        if (window.ChatbotModule) await ChatbotModule.render(container);
+        if (typeof ChatbotModule !== 'undefined') await ChatbotModule.render(targetContainer);
         break;
       case 'dashboard':
-        if (window.DashboardModule) await DashboardModule.render(container);
+        if (typeof DashboardModule !== 'undefined') await DashboardModule.render(targetContainer);
         break;
       case 'library':
-        if (window.LibraryModule) await LibraryModule.render(container);
+        if (typeof LibraryModule !== 'undefined') await LibraryModule.render(targetContainer);
         break;
       case 'rag':
-        if (window.RAGModule) await RAGModule.render(container);
+        if (typeof RAGModule !== 'undefined') await RAGModule.render(targetContainer);
         break;
       case 'study-plan':
-        if (window.StudyPlannerModule) await StudyPlannerModule.render(container);
+        if (typeof StudyPlannerModule !== 'undefined') await StudyPlannerModule.render(targetContainer);
         break;
       case 'notes':
-        if (window.NotesModule) await NotesModule.render(container);
+        if (typeof NotesModule !== 'undefined') await NotesModule.render(targetContainer);
         break;
       case 'quizzes':
-        if (window.QuizModule) await QuizModule.render(container);
+        if (typeof QuizModule !== 'undefined') await QuizModule.render(targetContainer);
         break;
       case 'flashcards':
-        if (window.FlashcardsModule) await FlashcardsModule.render(container);
+        if (typeof FlashcardsModule !== 'undefined') await FlashcardsModule.render(targetContainer);
         break;
       case 'analytics':
-        if (window.AnalyticsModule) await AnalyticsModule.render(container);
+        if (typeof AnalyticsModule !== 'undefined') await AnalyticsModule.render(targetContainer);
         break;
       case 'admin':
-        if (window.AdminModule) await AdminModule.render(container);
+        if (typeof AdminModule !== 'undefined') await AdminModule.render(targetContainer);
         break;
       default:
-        if (window.DashboardModule) await DashboardModule.render(container);
+        if (typeof DashboardModule !== 'undefined') await DashboardModule.render(targetContainer);
         break;
     }
 

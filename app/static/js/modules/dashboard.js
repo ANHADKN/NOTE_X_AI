@@ -23,7 +23,7 @@ const DashboardModule = {
               What would you like to learn today?
             </h2>
 
-            <!-- Large Centerpiece AI Prompt Box -->
+            <!-- 2. Large Centerpiece AI Prompt Box -->
             <div class="hyper-query-card" style="text-align: left; background: rgba(10, 14, 23, 0.85); backdrop-filter: blur(16px);">
               <div style="display: flex; align-items: center; gap: 0.75rem;">
                 <i data-lucide="bot" style="width: 22px; height: 22px; color: var(--hyper-accent-cyan);"></i>
@@ -45,7 +45,7 @@ const DashboardModule = {
           </div>
         </div>
 
-        <!-- 2. Learning Progress Ring Card -->
+        <!-- 3. Learning Progress Ring Card -->
         <div class="hyper-card hyper-col-4">
           <div class="hyper-card-header">
             <div class="hyper-card-title">
@@ -67,7 +67,7 @@ const DashboardModule = {
           </div>
         </div>
 
-        <!-- 3. Today's Study Goal Card -->
+        <!-- 4. Today's Study Goal Card -->
         <div class="hyper-card hyper-col-4">
           <div class="hyper-card-header">
             <div class="hyper-card-title">
@@ -92,7 +92,7 @@ const DashboardModule = {
           </div>
         </div>
 
-        <!-- 4. AI Assistant Quick Card -->
+        <!-- 5. AI Assistant Quick Card -->
         <div class="hyper-card hyper-col-4">
           <div class="hyper-card-header">
             <div class="hyper-card-title">
@@ -115,7 +115,7 @@ const DashboardModule = {
           </div>
         </div>
 
-        <!-- 5. Quick Actions Matrix (6 Items) -->
+        <!-- 6. Quick Actions Matrix (6 Items) -->
         <div class="hyper-card hyper-col-12">
           <div class="hyper-card-header">
             <div class="hyper-card-title">
@@ -186,7 +186,7 @@ const DashboardModule = {
           </div>
         </div>
 
-        <!-- 6. Continue Learning Card -->
+        <!-- 7. Continue Learning Card -->
         <div class="hyper-card hyper-col-8">
           <div class="hyper-card-header">
             <div class="hyper-card-title">
@@ -206,7 +206,7 @@ const DashboardModule = {
           </div>
         </div>
 
-        <!-- 7. AI Suggestions Card -->
+        <!-- 8. AI Suggestions Card -->
         <div class="hyper-card hyper-col-4">
           <div class="hyper-card-header">
             <div class="hyper-card-title">
@@ -223,7 +223,49 @@ const DashboardModule = {
           </div>
         </div>
 
-        <!-- 8. Recent PDFs Card -->
+        <!-- 9. Learning Analytics Mastery Card -->
+        <div class="hyper-card hyper-col-6">
+          <div class="hyper-card-header">
+            <div class="hyper-card-title">
+              <i data-lucide="bar-chart-3" style="color: var(--hyper-accent-primary); width: 18px;"></i> Learning Analytics Overview
+            </div>
+            <button class="hyper-btn hyper-btn-glass hyper-btn-sm" onclick="location.hash='#analytics'">View All</button>
+          </div>
+
+          <div style="display: flex; flex-direction: column; gap: 0.95rem;">
+            <div>
+              <div style="display: flex; justify-content: space-between; font-size: 0.82rem; margin-bottom: 0.25rem;">
+                <span style="color: var(--hyper-text-primary); font-weight: 600;">Mathematics</span>
+                <span style="color: var(--hyper-accent-cyan); font-weight: 700;">91% Mastery</span>
+              </div>
+              <div style="width: 100%; height: 6px; background: var(--hyper-bg-elevated); border-radius: var(--hyper-radius-full); overflow: hidden;">
+                <div style="width: 91%; height: 100%; background: var(--hyper-accent-cyan); border-radius: var(--hyper-radius-full);"></div>
+              </div>
+            </div>
+
+            <div>
+              <div style="display: flex; justify-content: space-between; font-size: 0.82rem; margin-bottom: 0.25rem;">
+                <span style="color: var(--hyper-text-primary); font-weight: 600;">Physics</span>
+                <span style="color: var(--hyper-accent-primary); font-weight: 700;">88% Mastery</span>
+              </div>
+              <div style="width: 100%; height: 6px; background: var(--hyper-bg-elevated); border-radius: var(--hyper-radius-full); overflow: hidden;">
+                <div style="width: 88%; height: 100%; background: var(--hyper-accent-primary); border-radius: var(--hyper-radius-full);"></div>
+              </div>
+            </div>
+
+            <div>
+              <div style="display: flex; justify-content: space-between; font-size: 0.82rem; margin-bottom: 0.25rem;">
+                <span style="color: var(--hyper-text-primary); font-weight: 600;">Chemistry</span>
+                <span style="color: var(--hyper-accent-emerald); font-weight: 700;">82% Mastery</span>
+              </div>
+              <div style="width: 100%; height: 6px; background: var(--hyper-bg-elevated); border-radius: var(--hyper-radius-full); overflow: hidden;">
+                <div style="width: 82%; height: 100%; background: var(--hyper-accent-emerald); border-radius: var(--hyper-radius-full);"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 10. Recent PDFs Card -->
         <div class="hyper-card hyper-col-6">
           <div class="hyper-card-header">
             <div class="hyper-card-title">
@@ -233,19 +275,6 @@ const DashboardModule = {
           </div>
           <div id="dashRecentPdfsList" style="display: flex; flex-direction: column; gap: 0.65rem;">
             ${this.getFallbackPdfsHTML()}
-          </div>
-        </div>
-
-        <!-- 9. Recent Chat Threads -->
-        <div class="hyper-card hyper-col-6">
-          <div class="hyper-card-header">
-            <div class="hyper-card-title">
-              <i data-lucide="message-square" style="color: var(--hyper-accent-primary); width: 18px;"></i> Recent AI Threads
-            </div>
-            <button class="hyper-btn hyper-btn-glass hyper-btn-sm" onclick="location.hash='#chat'">View All</button>
-          </div>
-          <div id="dashRecentChatsList" style="display: flex; flex-direction: column; gap: 0.65rem;">
-            ${this.getFallbackChatsHTML()}
           </div>
         </div>
       </div>
@@ -327,33 +356,11 @@ const DashboardModule = {
       }
     }
 
-    // 2. Fetch Chat Threads (Independent try-catch)
-    const chatContainer = document.getElementById('dashRecentChatsList');
-    if (chatContainer) {
-      try {
-        const chatRes = await API.get('/chat/conversations');
-        if (chatRes && chatRes.success && chatRes.data && chatRes.data.conversations && chatRes.data.conversations.length > 0) {
-          chatContainer.innerHTML = chatRes.data.conversations.slice(0, 3).map(conv => `
-            <div class="hyper-card hyper-card-interactive" style="padding: 0.85rem; display: flex; justify-content: space-between; align-items: center;">
-              <div style="display: flex; align-items: center; gap: 0.75rem;">
-                <i data-lucide="message-square" style="width: 18px; color: var(--hyper-accent-primary);"></i>
-                <div>
-                  <div style="font-weight: 600; font-size: 0.88rem; color: var(--hyper-text-primary);">${conv.title || 'Study Session'}</div>
-                  <div style="font-size: 0.75rem; color: var(--hyper-text-muted);">Active Session</div>
-                </div>
-              </div>
-              <button class="hyper-btn hyper-btn-glass hyper-btn-sm" onclick="location.hash = '#chat'">Resume</button>
-            </div>
-          `).join('');
-        }
-      } catch (e) {
-        // Fallback already pre-rendered
-      }
-    }
-
     // Refresh Lucide icons for any updated elements
     if (typeof lucide !== 'undefined') {
       lucide.createIcons();
     }
   }
 };
+
+window.DashboardModule = DashboardModule;
