@@ -19,21 +19,45 @@
   50% { opacity: 0.1; }
 }
 
-/* 1. Bento Box Cards & Micro Animations */
+/* 1. Bento Box Cards & 60 FPS Micro Animations */
 .hyper-card {
   background-color: var(--hyper-bg-card);
   border: 1px solid var(--hyper-border-subtle);
   border-radius: var(--hyper-radius-lg);
   padding: 1.5rem;
   box-shadow: var(--hyper-shadow-subtle);
-  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s ease, border-color 0.3s ease;
+  transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.35s ease, border-color 0.35s ease;
   position: relative;
   overflow: hidden;
+  will-change: transform, box-shadow;
+}
+
+/* Glass Reflection Sheen Effect */
+.hyper-card::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: linear-gradient(
+    45deg,
+    transparent 45%,
+    rgba(255, 255, 255, 0.35) 50%,
+    transparent 55%
+  );
+  transform: rotate(30deg) translateY(-100%);
+  transition: transform 0.75s ease;
+  pointer-events: none;
+}
+
+.hyper-card:hover::before {
+  transform: rotate(30deg) translateY(100%);
 }
 
 .hyper-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 16px 36px -8px rgba(15, 23, 42, 0.09), 0 4px 12px -2px rgba(15, 23, 42, 0.04);
+  transform: translateY(-5px);
+  box-shadow: 0 18px 40px -8px rgba(15, 23, 42, 0.1), 0 6px 16px -2px rgba(15, 23, 42, 0.04);
 }
 
 .hyper-card-interactive {
@@ -42,8 +66,37 @@
 
 .hyper-card-interactive:hover {
   border-color: var(--hyper-accent-primary);
-  transform: translateY(-6px);
-  box-shadow: 0 20px 40px -10px rgba(14, 165, 233, 0.18);
+  transform: translateY(-7px) scale(1.008);
+  box-shadow: 0 22px 45px -10px rgba(14, 165, 233, 0.22);
+}
+
+/* Page Transition & Viewport Animations */
+.hyper-view-viewport > div {
+  animation: hyperPageFadeIn 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes hyperPageFadeIn {
+  0% {
+    opacity: 0;
+    transform: translateY(12px) scale(0.985);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* Skeleton Loading Shimmer */
+.hyper-skeleton {
+  background: linear-gradient(90deg, #F1F5F9 25%, #E2E8F0 50%, #F1F5F9 75%);
+  background-size: 200% 100%;
+  animation: hyperSkeletonShimmer 1.5s infinite ease-in-out;
+  border-radius: var(--hyper-radius-xs);
+}
+
+@keyframes hyperSkeletonShimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
 }
 
 /* Button Ripple & Hover Animations */

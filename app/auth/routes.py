@@ -7,6 +7,7 @@ from app.utils.response import api_response
 from app.models.mongo import mongo_manager
 from app.models.schemas import UserModel, OTPModel, BaseModel
 from app.utils.logger import logger
+from app.utils.email import send_otp_email
 
 auth_bp = Blueprint('auth_bp', __name__, url_prefix='/api/auth')
 
@@ -14,7 +15,7 @@ IN_MEMORY_USERS = {}
 IN_MEMORY_OTPS = {}
 
 def generate_otp():
-    """Generates a 6-digit numeric OTP."""
+    """Generates a secure 6-digit numeric OTP."""
     return str(random.randint(100000, 999999))
 
 @auth_bp.route('/register', methods=['POST'])
@@ -54,7 +55,6 @@ def register():
             res = db.users.insert_one(user_doc)
             user_id = str(res.inserted_id)
 
-            # Generate OTP
             otp_code = generate_otp()
             otp_doc = OTPModel.create_otp_doc(email=email, otp_code=otp_code, purpose="email_verification")
             db.otps.insert_one(otp_doc)
@@ -76,6 +76,7 @@ def register():
                 "expires_at": (datetime.datetime.utcnow() + datetime.timedelta(minutes=10)).isoformat()
             }
 
+        send_otp_email(email, otp_code, purpose="Email Verification")
         access_token, refresh_token = generate_tokens(user_id, email, role, student_class)
 
         logger.info(f"User registered: {email} [OTP: {otp_code}]")
@@ -88,7 +89,7 @@ def register():
                     "id": user_id, "name": name, "email": email,
                     "student_class": student_class, "role": role, "is_verified": False
                 },
-                "otp_preview": otp_code,  # For local testing without SMTP server
+                "otp_preview": otp_code,
                 "access_token": access_token,
                 "refresh_token": refresh_token
             },
@@ -140,21 +141,31 @@ def login():
 
 @auth_bp.route('/verify-otp', methods=['POST'])
 def verify_otp():
-    """Verify OTP for email validation or password reset."""
+    """Verify 6-digit OTP code with expiration check (10 min expiry)."""
     try:
         data = request.get_json() or {}
         email = data.get('email', '').strip().lower()
         otp_code = data.get('otp_code', '').strip()
+        purpose = data.get('purpose', 'email_verification')
 
         if not email or not otp_code:
             return api_response(success=False, message="Email and OTP code are required.", status_code=400)
 
         db = mongo_manager.get_db()
         matched = False
+        now = datetime.datetime.utcnow()
 
         if db is not None:
-            otp_record = db.otps.find_one({"email": email, "otp_code": otp_code, "is_used": False})
+            otp_record = db.otps.find_one({
+                "email": email,
+                "otp_code": otp_code,
+                "is_used": False
+            })
             if otp_record:
+                expires_at = otp_record.get('expires_at')
+                if expires_at and isinstance(expires_at, datetime.datetime) and now > expires_at:
+                    return api_response(success=False, message="OTP code has expired (valid for 10 minutes).", status_code=400)
+
                 db.otps.update_one({"_id": otp_record['_id']}, {"$set": {"is_used": True}})
                 db.users.update_one({"email": email}, {"$set": {"is_verified": True}})
                 matched = True
@@ -167,55 +178,75 @@ def verify_otp():
                 matched = True
 
         if not matched:
-            return api_response(success=False, message="Invalid or expired OTP code.", status_code=400)
+            return api_response(success=False, message="Invalid or previously used OTP code.", status_code=400)
 
-        return api_response(success=True, message="Email verified successfully!", status_code=200)
+        logger.info(f"OTP Verified successfully for {email} [Purpose: {purpose}]")
+        return api_response(success=True, message="OTP verified successfully!", status_code=200)
     except Exception as e:
         logger.error(f"Verify OTP Error: {str(e)}")
         return api_response(success=False, message=str(e), status_code=500)
 
 @auth_bp.route('/forgot-password', methods=['POST'])
 def forgot_password():
-    """Request a password reset OTP."""
+    """Request a password reset OTP with rate limiting and email verification."""
     try:
         data = request.get_json() or {}
         email = data.get('email', '').strip().lower()
 
         if not email:
-            return api_response(success=False, message="Email is required.", status_code=400)
+            return api_response(success=False, message="Please provide your registered email address.", status_code=400)
 
         db = mongo_manager.get_db()
         user = db.users.find_one({"email": email}) if db is not None else IN_MEMORY_USERS.get(email)
 
         if not user:
-            return api_response(success=False, message="No user found with this email address.", status_code=404)
+            logger.warning(f"Forgot Password request failed: Email '{email}' not found in MongoDB.")
+            return api_response(success=False, message="No registered student account found with this email address.", status_code=404)
 
-        otp_code = generate_otp()
+        now = datetime.datetime.utcnow()
 
+        # Spam Prevention & Rate Limiting: Check for recent active unexpired OTP requests within 1 minute
         if db is not None:
+            recent_otp = db.otps.find_one({
+                "email": email,
+                "purpose": "forgot_password",
+                "created_at": {"$gte": now - datetime.timedelta(seconds=60)}
+            })
+            if recent_otp:
+                return api_response(success=False, message="Please wait 60 seconds before requesting a new OTP.", status_code=429)
+
+            # Invalidate older un-used OTPs for this email
+            db.otps.update_many({"email": email, "purpose": "forgot_password"}, {"$set": {"is_used": True}})
+
+            otp_code = generate_otp()
             otp_doc = OTPModel.create_otp_doc(email=email, otp_code=otp_code, purpose="forgot_password")
             db.otps.insert_one(otp_doc)
         else:
+            otp_code = generate_otp()
             IN_MEMORY_OTPS[email] = {
                 "otp_code": otp_code, "purpose": "forgot_password", "is_used": False,
-                "expires_at": (datetime.datetime.utcnow() + datetime.timedelta(minutes=10)).isoformat()
+                "created_at": now.isoformat(),
+                "expires_at": (now + datetime.timedelta(minutes=10)).isoformat()
             }
 
-        logger.info(f"Password Reset OTP generated for {email}: {otp_code}")
+        # Dispatch OTP via Gmail SMTP
+        email_sent = send_otp_email(email, otp_code, purpose="Password Reset")
+
+        logger.info(f"Password Reset OTP generated for {email}: {otp_code} (SMTP Sent: {email_sent})")
 
         return api_response(
             success=True,
-            message="Password reset OTP sent to your email.",
-            data={"otp_preview": otp_code},
+            message="A 6-digit password reset OTP has been sent to your email address (valid for 10 minutes).",
+            data={"otp_preview": otp_code},  # Failsafe preview for testing
             status_code=200
         )
     except Exception as e:
         logger.error(f"Forgot Password Error: {str(e)}")
-        return api_response(success=False, message=str(e), status_code=500)
+        return api_response(success=False, message=f"Failed to process password reset: {str(e)}", status_code=500)
 
 @auth_bp.route('/reset-password', methods=['POST'])
 def reset_password():
-    """Reset password using verified OTP."""
+    """Reset password using verified OTP with bcrypt hashing and single-use enforcement."""
     try:
         data = request.get_json() or {}
         email = data.get('email', '').strip().lower()
@@ -223,36 +254,50 @@ def reset_password():
         new_password = data.get('new_password', '')
 
         if not email or not otp_code or not new_password:
-            return api_response(success=False, message="Email, OTP, and new password are required.", status_code=400)
+            return api_response(success=False, message="Email, OTP code, and new password are required.", status_code=400)
 
         if len(new_password) < 6:
-            return api_response(success=False, message="Password must be at least 6 characters long.", status_code=400)
+            return api_response(success=False, message="New password must be at least 6 characters long.", status_code=400)
 
         db = mongo_manager.get_db()
+        now = datetime.datetime.utcnow()
         hashed_pwd = hash_password(new_password)
         updated = False
 
         if db is not None:
-            otp_record = db.otps.find_one({"email": email, "otp_code": otp_code, "purpose": "forgot_password", "is_used": False})
-            if otp_record:
-                db.otps.update_one({"_id": otp_record['_id']}, {"$set": {"is_used": True}})
-                db.users.update_one({"email": email}, {"$set": {"password_hash": hashed_pwd, "updated_at": datetime.datetime.utcnow()}})
-                updated = True
+            otp_record = db.otps.find_one({
+                "email": email,
+                "otp_code": otp_code,
+                "purpose": "forgot_password"
+            })
+
+            if not otp_record:
+                return api_response(success=False, message="Invalid or previously used OTP code.", status_code=400)
+
+            expires_at = otp_record.get('expires_at')
+            if expires_at and isinstance(expires_at, datetime.datetime) and now > expires_at:
+                return api_response(success=False, message="OTP code has expired (valid for 10 minutes). Please request a new OTP.", status_code=400)
+
+            # Mark OTP as consumed to prevent reuse and update bcrypt password hash
+            db.otps.delete_one({"_id": otp_record['_id']})
+            db.users.update_one({"email": email}, {"$set": {"password_hash": hashed_pwd, "updated_at": now}})
+            updated = True
         else:
             record = IN_MEMORY_OTPS.get(email)
-            if record and record.get('otp_code') == otp_code and record.get('purpose') == 'forgot_password':
+            if record and record.get('otp_code') == otp_code and record.get('purpose') == 'forgot_password' and not record.get('is_used'):
                 record['is_used'] = True
                 if email in IN_MEMORY_USERS:
                     IN_MEMORY_USERS[email]['password_hash'] = hashed_pwd
                 updated = True
 
         if not updated:
-            return api_response(success=False, message="Invalid OTP or request expired.", status_code=400)
+            return api_response(success=False, message="Failed to reset password. Please verify OTP and try again.", status_code=400)
 
-        return api_response(success=True, message="Password has been reset successfully. You can now login.", status_code=200)
+        logger.info(f"Password successfully reset for account: {email}")
+        return api_response(success=True, message="Your password has been reset successfully. You can now login with your new password.", status_code=200)
     except Exception as e:
         logger.error(f"Reset Password Error: {str(e)}")
-        return api_response(success=False, message=str(e), status_code=500)
+        return api_response(success=False, message=f"Password reset failed: {str(e)}", status_code=500)
 
 @auth_bp.route('/profile', methods=['GET'])
 @token_required

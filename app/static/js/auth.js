@@ -12,7 +12,6 @@ const Auth = {
     }
     this.updateUI();
 
-    // Redirect Admin users automatically to Admin Dashboard
     if (user && user.role === 'admin') {
       window.location.hash = '#admin';
     }
@@ -76,13 +75,66 @@ const Auth = {
     }
   },
 
+  async requestPasswordReset(email) {
+    try {
+      const res = await API.post('/auth/forgot-password', { email }, { skipAuthRedirect: true });
+      if (res && res.success) {
+        if (typeof UI !== 'undefined' && UI.showToast) {
+          UI.showToast(res.message || 'OTP sent to your email!', 'success');
+        }
+        return res;
+      }
+      throw new Error(res.message || 'Failed to request OTP');
+    } catch (err) {
+      if (typeof UI !== 'undefined' && UI.showToast) {
+        UI.showToast(err.message || 'Failed to request OTP', 'error');
+      }
+      throw err;
+    }
+  },
+
+  async verifyPasswordResetOTP(email, otp_code) {
+    try {
+      const res = await API.post('/auth/verify-otp', { email, otp_code, purpose: 'forgot_password' }, { skipAuthRedirect: true });
+      if (res && res.success) {
+        if (typeof UI !== 'undefined' && UI.showToast) {
+          UI.showToast('OTP verified successfully!', 'success');
+        }
+        return res;
+      }
+      throw new Error(res.message || 'OTP verification failed');
+    } catch (err) {
+      if (typeof UI !== 'undefined' && UI.showToast) {
+        UI.showToast(err.message || 'OTP verification failed', 'error');
+      }
+      throw err;
+    }
+  },
+
+  async submitNewPassword(email, otp_code, new_password) {
+    try {
+      const res = await API.post('/auth/reset-password', { email, otp_code, new_password }, { skipAuthRedirect: true });
+      if (res && res.success) {
+        if (typeof UI !== 'undefined' && UI.showToast) {
+          UI.showToast(res.message || 'Password reset successfully!', 'success');
+        }
+        return res;
+      }
+      throw new Error(res.message || 'Password reset failed');
+    } catch (err) {
+      if (typeof UI !== 'undefined' && UI.showToast) {
+        UI.showToast(err.message || 'Password reset failed', 'error');
+      }
+      throw err;
+    }
+  },
+
   updateUI() {
     const user = (typeof APP_STATE !== 'undefined' && APP_STATE.user) || JSON.parse(localStorage.getItem('notex_user') || 'null');
     const profileSection = document.getElementById('sidebarAuthProfileSection');
 
     if (profileSection) {
       if (user) {
-        // Authenticated Student Profile Pill
         const firstLetter = (user.name || 'Student').charAt(0).toUpperCase();
         profileSection.innerHTML = `
           <div style="display: flex; align-items: center; justify-content: space-between;">
@@ -99,7 +151,6 @@ const Auth = {
           </div>
         `;
       } else {
-        // Guest User Login / Register Trigger
         profileSection.innerHTML = `
           <button class="hyper-btn hyper-btn-primary hyper-btn-sm" style="width: 100%; border-radius: var(--hyper-radius-sm);" onclick="AuthModal.show('login')">
             <i class="fa-solid fa-user-lock"></i> Login / Register
@@ -111,7 +162,9 @@ const Auth = {
 };
 
 const AuthModal = {
-  mode: 'login',
+  mode: 'login', // 'login', 'register', 'forgot', 'verify_otp', 'reset_password', 'success'
+  resetEmail: '',
+  resetOTP: '',
 
   show(mode = 'login') {
     this.mode = mode;
@@ -121,24 +174,64 @@ const AuthModal = {
     const title = document.getElementById('authModalTitle');
     const sub = document.getElementById('authModalSubtitle');
     const nameGrp = document.getElementById('authNameGroup');
+    const pwdGrp = document.getElementById('authPasswordGroup');
+    const forgotLink = document.getElementById('authForgotLink');
+    const otpGrp = document.getElementById('authOtpGroup');
+    const newPwdGrp = document.getElementById('authNewPasswordGroup');
     const submitBtn = document.getElementById('authSubmitBtn');
-    const prompt = document.getElementById('authTogglePrompt');
-    const link = document.getElementById('authToggleLink');
+    const footerDiv = document.getElementById('authModalFooter');
+
+    // Reset visibility defaults
+    if (nameGrp) nameGrp.style.display = 'none';
+    if (pwdGrp) pwdGrp.style.display = 'block';
+    if (forgotLink) forgotLink.style.display = 'inline-block';
+    if (otpGrp) otpGrp.style.display = 'none';
+    if (newPwdGrp) newPwdGrp.style.display = 'none';
+    if (footerDiv) footerDiv.style.display = 'block';
 
     if (mode === 'register') {
       if (title) title.textContent = 'Create Student Account';
       if (sub) sub.textContent = 'Sign up for personalized AI study plans and notes.';
       if (nameGrp) nameGrp.style.display = 'block';
+      if (forgotLink) forgotLink.style.display = 'none';
       if (submitBtn) submitBtn.textContent = 'Register Account';
-      if (prompt) prompt.textContent = 'Already have an account?';
-      if (link) link.textContent = 'Sign In';
+      if (footerDiv) footerDiv.innerHTML = `<span>Already have an account?</span> <a href="javascript:void(0)" onclick="AuthModal.show('login')" style="color: var(--hyper-accent-primary); font-weight: 600; text-decoration: none; margin-left: 0.25rem;">Sign In</a>`;
+    } else if (mode === 'forgot') {
+      if (title) title.textContent = 'Forgot Password';
+      if (sub) sub.textContent = 'Enter your registered email address to receive a 6-digit OTP code.';
+      if (pwdGrp) pwdGrp.style.display = 'none';
+      if (forgotLink) forgotLink.style.display = 'none';
+      if (submitBtn) submitBtn.textContent = 'Send Verification OTP';
+      if (footerDiv) footerDiv.innerHTML = `<a href="javascript:void(0)" onclick="AuthModal.show('login')" style="color: var(--hyper-accent-primary); font-weight: 600; text-decoration: none;">← Back to Sign In</a>`;
+    } else if (mode === 'verify_otp') {
+      if (title) title.textContent = 'Verify 6-Digit OTP';
+      if (sub) sub.textContent = `Enter the verification code sent to ${this.resetEmail}.`;
+      if (pwdGrp) pwdGrp.style.display = 'none';
+      if (forgotLink) forgotLink.style.display = 'none';
+      if (otpGrp) otpGrp.style.display = 'block';
+      if (submitBtn) submitBtn.textContent = 'Verify OTP Code';
+      if (footerDiv) footerDiv.innerHTML = `<span>Didn't receive code?</span> <a href="javascript:void(0)" onclick="AuthModal.resendOTP()" style="color: var(--hyper-accent-primary); font-weight: 600; text-decoration: none; margin-left: 0.25rem;">Resend OTP</a>`;
+    } else if (mode === 'reset_password') {
+      if (title) title.textContent = 'Set New Password';
+      if (sub) sub.textContent = 'Enter your new secure password below.';
+      if (pwdGrp) pwdGrp.style.display = 'none';
+      if (forgotLink) forgotLink.style.display = 'none';
+      if (newPwdGrp) newPwdGrp.style.display = 'block';
+      if (submitBtn) submitBtn.textContent = 'Reset Password';
+      if (footerDiv) footerDiv.style.display = 'none';
+    } else if (mode === 'success') {
+      if (title) title.textContent = 'Password Reset Successful!';
+      if (sub) sub.textContent = 'Your password has been updated. You can now log in.';
+      if (pwdGrp) pwdGrp.style.display = 'none';
+      if (forgotLink) forgotLink.style.display = 'none';
+      if (submitBtn) submitBtn.textContent = 'Proceed to Sign In';
+      if (footerDiv) footerDiv.style.display = 'none';
     } else {
+      // Default Login Mode
       if (title) title.textContent = 'Student Account Login';
       if (sub) sub.textContent = 'Sign in to save your AI notes, quizzes & progress.';
-      if (nameGrp) nameGrp.style.display = 'none';
       if (submitBtn) submitBtn.textContent = 'Sign In';
-      if (prompt) prompt.textContent = "Don't have an account?";
-      if (link) link.textContent = 'Register Now';
+      if (footerDiv) footerDiv.innerHTML = `<span>Don't have an account?</span> <a href="javascript:void(0)" onclick="AuthModal.show('register')" style="color: var(--hyper-accent-primary); font-weight: 600; text-decoration: none; margin-left: 0.25rem;">Register Now</a>`;
     }
 
     modal.style.display = 'flex';
@@ -149,26 +242,62 @@ const AuthModal = {
     if (modal) modal.style.display = 'none';
   },
 
-  toggleMode() {
-    this.show(this.mode === 'login' ? 'register' : 'login');
+  async resendOTP() {
+    if (!this.resetEmail) return;
+    try {
+      await Auth.requestPasswordReset(this.resetEmail);
+    } catch (err) {}
   },
 
   async submit() {
     const email = document.getElementById('authEmailInput')?.value.trim();
     const password = document.getElementById('authPasswordInput')?.value.trim();
     const name = document.getElementById('authNameInput')?.value.trim();
+    const otpCode = document.getElementById('authOtpInput')?.value.trim();
+    const newPassword = document.getElementById('authNewPasswordInput')?.value.trim();
+    const submitBtn = document.getElementById('authSubmitBtn');
 
-    if (!email || !password) return;
+    if (submitBtn) {
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Processing...`;
+    }
 
     try {
       if (this.mode === 'register') {
+        if (!email || !password) return;
         await Auth.register(name || 'Student', email, password);
+        this.hide();
+      } else if (this.mode === 'forgot') {
+        if (!email) return;
+        this.resetEmail = email;
+        const res = await Auth.requestPasswordReset(email);
+        if (res && res.data && res.data.otp_preview) {
+          console.log("[Failsafe OTP Preview]:", res.data.otp_preview);
+        }
+        this.show('verify_otp');
+      } else if (this.mode === 'verify_otp') {
+        if (!otpCode) return;
+        this.resetOTP = otpCode;
+        await Auth.verifyPasswordResetOTP(this.resetEmail, otpCode);
+        this.show('reset_password');
+      } else if (this.mode === 'reset_password') {
+        if (!newPassword) return;
+        await Auth.submitNewPassword(this.resetEmail, this.resetOTP, newPassword);
+        this.show('success');
+      } else if (this.mode === 'success') {
+        this.show('login');
       } else {
+        if (!email || !password) return;
         await Auth.login(email, password);
+        this.hide();
       }
-      this.hide();
     } catch (err) {
-      // Error handled by Auth functions
+      // Handled via toast
+    } finally {
+      if (submitBtn) {
+        submitBtn.disabled = false;
+        submitBtn.textContent = (this.mode === 'login' ? 'Sign In' : (this.mode === 'register' ? 'Register Account' : 'Continue'));
+      }
     }
   }
 };

@@ -176,7 +176,7 @@
     </div>
   </div>
 
-  <!-- Auth Modal (Login / Register) -->
+  <!-- Auth Modal (Login / Register / Forgot Password / OTP) -->
   <div id="authModal" class="hyper-modal-backdrop" style="display: none;">
     <div class="hyper-modal-content" style="max-width: 420px; padding: 1.75rem;">
       <div style="text-align: center; margin-bottom: 1.5rem;">
@@ -191,14 +191,27 @@
           <input type="text" id="authNameInput" class="hyper-input" placeholder="e.g. Alex Sharma">
         </div>
 
-        <div style="margin-bottom: 1rem;">
+        <div id="authEmailGroup" style="margin-bottom: 1rem;">
           <label style="font-size: 0.8rem; font-weight: 600; color: var(--hyper-text-secondary); display: block; margin-bottom: 0.35rem;">Email Address</label>
           <input type="email" id="authEmailInput" class="hyper-input" placeholder="student@example.com" required>
         </div>
 
-        <div style="margin-bottom: 1.5rem;">
-          <label style="font-size: 0.8rem; font-weight: 600; color: var(--hyper-text-secondary); display: block; margin-bottom: 0.35rem;">Password</label>
-          <input type="password" id="authPasswordInput" class="hyper-input" placeholder="••••••••" required>
+        <div id="authPasswordGroup" style="margin-bottom: 1.25rem;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.35rem;">
+            <label style="font-size: 0.8rem; font-weight: 600; color: var(--hyper-text-secondary);">Password</label>
+            <a href="javascript:void(0)" id="authForgotLink" style="font-size: 0.78rem; color: var(--hyper-accent-primary); font-weight: 600; text-decoration: none;" onclick="AuthModal.show('forgot')">Forgot Password?</a>
+          </div>
+          <input type="password" id="authPasswordInput" class="hyper-input" placeholder="••••••••">
+        </div>
+
+        <div id="authOtpGroup" style="margin-bottom: 1.25rem; display: none;">
+          <label style="font-size: 0.8rem; font-weight: 600; color: var(--hyper-text-secondary); display: block; margin-bottom: 0.35rem;">6-Digit OTP Code</label>
+          <input type="text" id="authOtpInput" class="hyper-input" placeholder="123456" maxlength="6" style="letter-spacing: 4px; font-weight: 700; text-align: center; font-size: 1.1rem;">
+        </div>
+
+        <div id="authNewPasswordGroup" style="margin-bottom: 1.25rem; display: none;">
+          <label style="font-size: 0.8rem; font-weight: 600; color: var(--hyper-text-secondary); display: block; margin-bottom: 0.35rem;">New Password</label>
+          <input type="password" id="authNewPasswordInput" class="hyper-input" placeholder="At least 6 characters">
         </div>
 
         <button type="submit" id="authSubmitBtn" class="hyper-btn hyper-btn-primary" style="width: 100%; padding: 0.75rem; font-size: 0.95rem; margin-bottom: 1rem;">
@@ -206,9 +219,9 @@
         </button>
       </form>
 
-      <div style="text-align: center; font-size: 0.85rem; color: var(--hyper-text-secondary);">
+      <div id="authModalFooter" style="text-align: center; font-size: 0.85rem; color: var(--hyper-text-secondary);">
         <span id="authTogglePrompt">Don't have an account?</span>
-        <a href="javascript:void(0)" id="authToggleLink" style="color: var(--hyper-accent-primary); font-weight: 600; text-decoration: none; margin-left: 0.25rem;" onclick="AuthModal.toggleMode()">Register Now</a>
+        <a href="javascript:void(0)" id="authToggleLink" style="color: var(--hyper-accent-primary); font-weight: 600; text-decoration: none; margin-left: 0.25rem;" onclick="AuthModal.show('register')">Register Now</a>
       </div>
 
       <div style="text-align: center; margin-top: 1rem;">
