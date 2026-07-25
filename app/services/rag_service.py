@@ -5,7 +5,7 @@ from app.config import Config
 from app.utils.logger import logger
 
 class RAGService:
-    """Vector Storage & Retrieval-Augmented Generation (RAG) Engine."""
+    """Vector Storage & Retrieval-Augmented Generation (RAG) Engine with Groq Integration."""
     
     _chroma_client = None
     _collection = None
@@ -59,7 +59,7 @@ class RAGService:
 
     @classmethod
     def search_relevant_chunks(cls, doc_id: str, query: str, top_k: int = 3) -> list:
-        """Retrieves top-k semantically relevant chunks for a user query."""
+        """Retrieves top-k semantically relevant chunks for a user query from ChromaDB vector store."""
         collection = cls.get_chroma_collection()
 
         if collection is not None:
@@ -102,7 +102,10 @@ class RAGService:
 
     @classmethod
     def generate_rag_answer(cls, doc_id: str, doc_name: str, query: str, student_class: str = "Class 10") -> dict:
-        """Generates RAG response grounded in retrieved PDF context with citations."""
+        """Generates RAG response grounded in retrieved PDF context from ChromaDB sent directly to Groq API."""
+        from app.services.ai_service import AIService
+
+        # 1. Retrieve relevant chunks from ChromaDB vector database
         relevant_chunks = cls.search_relevant_chunks(doc_id, query, top_k=3)
 
         if not relevant_chunks:
@@ -111,19 +114,31 @@ class RAGService:
                 "citations": []
             }
 
+        # 2. Build context from retrieved chunks
         context_str = "\n\n".join([f"[{c['citation']}]: {c['text']}" for c in relevant_chunks])
         citations = list(set([c['citation'] for c in relevant_chunks]))
 
-        answer_text = (
-            f"### 📖 RAG Search Findings ({doc_name})\n\n"
-            f"Based on **{doc_name}** ({', '.join(citations)}):\n\n"
-            f"{relevant_chunks[0]['text'][:300]}...\n\n"
-            f"#### Key Information:\n"
-            f"- **Context Cited**: {', '.join(citations)}\n"
-            f"- **Grade Level**: Tailored for {student_class}\n\n"
-            f"Would you like me to summarize more pages or generate a practice quiz from this document?"
+        # 3. Build prompt containing context & user question for Groq API
+        rag_prompt = (
+            f"You are an expert AI tutor answering a question based strictly on the following retrieved textbook passages from '{doc_name}'.\n\n"
+            f"### RETRIEVED TEXTBOOK CONTEXT:\n{context_str}\n\n"
+            f"### STUDENT QUESTION:\n{query}\n\n"
+            f"INSTRUCTIONS:\n"
+            f"1. Provide a comprehensive, accurate answer grounded in the retrieved context above.\n"
+            f"2. Format your response in clean Markdown with subheadings (###), bold text, bullet points, and LaTeX math formatting ($...$ or $$...$$) where applicable.\n"
+            f"3. Explicitly cite the page numbers ({', '.join(citations)}) where relevant information was found.\n"
+            f"4. Conclude with a helpful follow-up question or concept check."
         )
 
+        # 4. Send context & question to Groq API and generate final answer
+        logger.info(f"[RAG -> Groq] Querying Groq API with {len(relevant_chunks)} context chunks for doc: {doc_name}")
+        answer_text = AIService.generate_chat_response(
+            user_prompt=rag_prompt,
+            student_class=student_class,
+            subject=f"PDF RAG ({doc_name})"
+        )
+
+        # 5. Return answer with citations
         return {
             "answer": answer_text,
             "citations": citations,
