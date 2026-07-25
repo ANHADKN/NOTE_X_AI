@@ -32,7 +32,9 @@ class Config:
     OPENAI_API_KEY = os.getenv('OPENAI_API_KEY', '')
     EMBEDDING_MODEL = os.getenv('EMBEDDING_MODEL', 'all-MiniLM-L6-v2')
     CHROMA_PERSIST_DIR = os.getenv('CHROMA_PERSIST_DIR', os.path.join(os.path.dirname(__file__), 'chroma_db'))
-    
+
+
+
     # Upload Settings
     MAX_CONTENT_LENGTH = 16 * 1024 * 1024  # 16 MB Max Upload Limit
     UPLOAD_FOLDER = os.path.join(os.path.dirname(__file__), 'uploads')
@@ -42,3 +44,6 @@ class Config:
         """Ensure necessary directories exist."""
         os.makedirs(Config.UPLOAD_FOLDER, exist_ok=True)
         os.makedirs(Config.CHROMA_PERSIST_DIR, exist_ok=True)
+
+
+

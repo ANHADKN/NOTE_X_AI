@@ -150,6 +150,8 @@ def google_login_redirect():
     """Redirect user to Google OAuth 2.0 Consent Screen."""
     if not Config.GOOGLE_CLIENT_ID:
         return api_response(success=False, message="Google OAuth is not configured on the server (Missing Client ID).", status_code=500)
+
+        
     
     auth_url = "https://accounts.google.com/o/oauth2/v2/auth"
     params = {
@@ -191,7 +193,14 @@ def google_callback():
         token_res.raise_for_status()
     except requests.exceptions.RequestException as e:
         logger.error(f"Failed to exchange OAuth code: {str(e)}")
-        error_msg = token_res.json().get('error', str(e)) if hasattr(token_res, 'json') else str(e)
+        error_msg = str(e)
+        if hasattr(token_res, 'json'):
+            try:
+                err_json = token_res.json()
+                logger.error(f"Google Token Error Details: {err_json}")
+                error_msg = err_json.get('error_description', err_json.get('error', error_msg))
+            except Exception:
+                pass
         return render_template_string("<h1>OAuth Token Exchange Failed</h1><p>Error: {{ error }}</p><a href='/'>Go Back</a>", error=error_msg), 400
 
     tokens = token_res.json()
@@ -288,7 +297,7 @@ def google_callback():
         <div class="loader"></div>
         <script>
             try {
-                localStorage.setItem('notex_access_token', '{{ access_token }}');
+                localStorage.setItem('notex_token', '{{ access_token }}');
                 localStorage.setItem('notex_refresh_token', '{{ refresh_token }}');
                 localStorage.setItem('notex_user', JSON.stringify({{ user | tojson | safe }}));
                 window.location.href = '/#dashboard';
@@ -494,3 +503,26 @@ def profile():
     except Exception as e:
         logger.error(f"Profile Error: {str(e)}")
         return api_response(success=False, message=str(e), status_code=500)
+
+@auth_bp.route('/update-class', methods=['POST'])
+@token_required
+def update_class(current_user):
+    """Update user's student class."""
+    try:
+        data = request.get_json() or {}
+        student_class = data.get('student_class', '').strip()
+
+        if not student_class:
+            return api_response(success=False, message="Student class is required.", status_code=400)
+
+        db = mongo_manager.get_db()
+        if db is not None:
+            db.users.update_one({"_id": ObjectId(current_user['_id'])}, {"$set": {"student_class": student_class}})
+        else:
+            if current_user['email'] in IN_MEMORY_USERS:
+                IN_MEMORY_USERS[current_user['email']]['student_class'] = student_class
+                
+        return api_response(success=True, message="Class updated successfully.")
+    except Exception as e:
+        logger.error(f"Update Class Error: {str(e)}")
+        return api_response(success=False, message=f"Failed to update class: {str(e)}", status_code=500)

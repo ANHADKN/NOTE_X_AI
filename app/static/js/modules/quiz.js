@@ -484,11 +484,6 @@ const QuizModule = {
         </div>
       </div>
     `;
-      <div style="text-align: center; padding: 3rem;">
-        <i class="fa-solid fa-spinner fa-spin" style="font-size: 2.5rem; color: var(--hyper-accent-emerald); margin-bottom: 1rem;"></i>
-        <h3 style="color: var(--hyper-text-primary); font-size: 1.3rem;">Evaluating Quiz Answers & Saving to MongoDB...</h3>
-      </div>
-    `;
 
     let submitResult = null;
     try {

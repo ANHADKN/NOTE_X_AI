@@ -30,11 +30,14 @@
   <link rel="stylesheet" href="/static/css/hyper-tokens.css">
   <link rel="stylesheet" href="/static/css/hyper-layout.css">
   <link rel="stylesheet" href="/static/css/hyper-components.css">
+  <link rel="stylesheet" href="/static/css/hyper-auth.css">
+  <link rel="stylesheet" href="/static/css/hyper-dashboard.css">
 
-  <!-- Chart.js, Canvas Confetti & Highlight.js -->
+  <!-- Chart.js, Canvas Confetti & Highlight.js, Lottie Player -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+  <script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/atom-one-light.min.css">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
 </head>
@@ -43,79 +46,66 @@
   <canvas id="scienceCanvas"></canvas>
   <div class="hyper-ambient-bg"></div>
 
-  <div class="hyper-app-wrapper">
-    <!-- Bright Minimalist Sidebar -->
-    <aside class="hyper-sidebar" id="mainSidebar">
-      <div class="hyper-brand">
-        <div class="hyper-brand-logo">𝝌</div>
-        <div class="hyper-brand-title">noteX AI</div>
+  <div class="hyper-main-wrapper-new">
+    
+    <!-- Top Header (replaces sidebar branding and profile) -->
+    <header class="hyper-top-header">
+      <div class="hyper-brand-new">
+        <div class="hyper-brand-logo-new">𝝌</div>
+        <div class="hyper-brand-text">noteX AI</div>
       </div>
       
-      <!-- Student Study Platform Navigation -->
-      <ul class="hyper-nav-list" id="studentNavList">
-        <li class="hyper-nav-item active" data-view="dashboard">
-          <a href="#dashboard"><i data-lucide="layout-dashboard"></i> <span>Dashboard</span></a>
-        </li>
-        <li class="hyper-nav-item" data-view="chat">
-          <a href="#chat"><i data-lucide="sparkles"></i> <span>AI Chat Assistant</span></a>
-        </li>
-        <li class="hyper-nav-item" data-view="library">
-          <a href="#library"><i data-lucide="folder-open"></i> <span>My Library</span></a>
-        </li>
-        <li class="hyper-nav-item" data-view="rag">
-          <a href="#rag"><i data-lucide="file-text"></i> <span>PDF Assistant</span></a>
-        </li>
-        <li class="hyper-nav-item" data-view="notes">
-          <a href="#notes"><i data-lucide="sticky-note"></i> <span>AI Notes</span></a>
-        </li>
-        <li class="hyper-nav-item" data-view="study-plan">
-          <a href="#study-plan"><i data-lucide="calendar"></i> <span>Study Planner</span></a>
-        </li>
-        <li class="hyper-nav-item" data-view="flashcards">
-          <a href="#flashcards"><i data-lucide="layers"></i> <span>Flashcards</span></a>
-        </li>
-        <li class="hyper-nav-item" data-view="quizzes">
-          <a href="#quizzes"><i data-lucide="help-circle"></i> <span>AI Quiz</span></a>
-        </li>
-        <li class="hyper-nav-item" data-view="analytics">
-          <a href="#analytics"><i data-lucide="bar-chart-3"></i> <span>Analytics</span></a>
-        </li>
-        <li class="hyper-nav-item" data-view="settings">
-          <a href="#settings"><i data-lucide="settings"></i> <span>Settings</span></a>
-        </li>
-      </ul>
-
-      <!-- Role-Based Bottom Profile / Authentication Section -->
-      <div id="sidebarAuthProfileSection" style="padding: 0.75rem; border-top: 1px solid var(--hyper-border-subtle); background: var(--hyper-bg-surface); border-radius: var(--hyper-radius-sm);">
-        <!-- Rendered dynamically by Auth.updateUI() -->
-      </div>
-    </aside>
-
-    <!-- Main View Shell -->
-    <main class="hyper-main-content">
-      <!-- Floating Glass Navigation Bar -->
-      <header class="hyper-float-nav">
-        <div style="display: flex; align-items: center; gap: 1rem;">
-          <!-- Raycast Command Trigger Bar -->
-          <div class="hyper-command-trigger" onclick="document.getElementById('commandPaletteModal').style.display = 'flex'">
-            <i data-lucide="search" style="width: 16px; height: 16px; color: var(--hyper-accent-primary);"></i>
-            <span>Search or run command...</span>
-            <span class="hyper-kbd" style="margin-left: auto;">⌘ K</span>
-          </div>
+      <div style="display: flex; align-items: center; gap: 1rem;">
+        <button id="classSelectorBtn" class="hyper-btn hyper-btn-glass hyper-btn-sm" style="border-radius: var(--hyper-radius-full);">
+          <i data-lucide="graduation-cap" style="width: 15px; height: 15px; color: var(--hyper-accent-primary);"></i> <span id="currentGradeLabel" style="color: var(--hyper-accent-primary); font-weight: 700;">Class 10</span>
+        </button>
+        <!-- Raycast Command Trigger Bar -->
+        <div class="hyper-command-trigger" onclick="document.getElementById('commandPaletteModal').style.display = 'flex'" style="margin: 0; padding: 0.4rem 0.75rem;">
+          <i data-lucide="search" style="width: 16px; height: 16px; color: var(--hyper-accent-primary);"></i>
+          <span style="font-size: 0.8rem;">Search...</span>
+          <span class="hyper-kbd" style="margin-left: 0.5rem; font-size: 0.7rem;">⌘ K</span>
         </div>
-
-        <div style="display: flex; align-items: center; gap: 0.85rem;">
-          <button id="classSelectorBtn" class="hyper-btn hyper-btn-glass hyper-btn-sm" style="border-radius: var(--hyper-radius-full);">
-            <i data-lucide="graduation-cap" style="width: 15px; height: 15px; color: var(--hyper-accent-primary);"></i> Target: <span id="currentGradeLabel" style="color: var(--hyper-accent-primary); font-weight: 700;">Class 10</span>
-          </button>
+        
+        <!-- Auth Profile Section moved here -->
+        <div id="sidebarAuthProfileSection">
+          <!-- Rendered dynamically by Auth.updateUI() -->
         </div>
-      </header>
-
-      <!-- Dynamic View Viewport -->
-      <div id="app-view-container" class="hyper-view-viewport">
-        <!-- SPA View Module HTML Rendered Here -->
       </div>
-    </main>
+    </header>
+
+      <div id="app-view-container" style="flex-grow: 1;">
+        <!-- JS modules render views here -->
+      </div>
+      
+      <!-- Floating Bottom Dock Navigation -->
+      <nav id="floating-bottom-nav" class="hyper-bottom-dock">
+        <a href="#dashboard" class="hyper-dock-item active" data-view="dashboard">
+          <i data-lucide="layout-dashboard"></i>
+          <span class="hyper-dock-tooltip">Dashboard</span>
+        </a>
+        <a href="#chat" class="hyper-dock-item" data-view="chat">
+          <i data-lucide="bot"></i>
+          <span class="hyper-dock-tooltip">AI Chat</span>
+        </a>
+        <a href="#notes" class="hyper-dock-item" data-view="notes">
+          <i data-lucide="sticky-note"></i>
+          <span class="hyper-dock-tooltip">AI Notes</span>
+        </a>
+        <a href="#flashcards" class="hyper-dock-item" data-view="flashcards">
+          <i data-lucide="layers"></i>
+          <span class="hyper-dock-tooltip">Flashcards</span>
+        </a>
+        <a href="#quizzes" class="hyper-dock-item" data-view="quizzes">
+          <i data-lucide="help-circle"></i>
+          <span class="hyper-dock-tooltip">AI Quizzes</span>
+        </a>
+        <a href="#rag" class="hyper-dock-item" data-view="rag">
+          <i data-lucide="file-text"></i>
+          <span class="hyper-dock-tooltip">PDF Reader</span>
+        </a>
+      </nav>
+
+    </div>
   </div>
 
   <!-- Raycast Style Command Palette Modal (`⌘K`) -->
@@ -179,89 +169,120 @@
     </div>
   </div>
 
-  <!-- Auth Modal (Login / Register / Forgot Password / OTP) -->
+  <!-- Auth Overlay (Login / Register / Forgot Password / OTP) -->
   <div id="authModal" class="hyper-modal-backdrop" style="display: none;">
+    <div class="auth-bg-blob blob-1"></div>
+    <div class="auth-bg-blob blob-2"></div>
+    <div class="auth-bg-blob blob-3"></div>
+
     <div class="hyper-auth-modal-content">
       
-      <!-- Left Pane: Visuals & Illustrations -->
-      <div class="hyper-auth-visual">
-        <i data-lucide="book-open" class="hyper-floating-icon icon-book"></i>
-        <i data-lucide="brain-circuit" class="hyper-floating-icon icon-brain"></i>
-        <i data-lucide="graduation-cap" class="hyper-floating-icon icon-cap"></i>
-        <i data-lucide="sparkles" class="hyper-floating-icon icon-sparkle"></i>
+      <!-- Left Pane (45%): Visuals & Illustrations -->
+      <div class="auth-left-pane">
+        <div class="auth-floating-graphics">
+          <div class="auth-float-item auth-item-1"><i data-lucide="book-open"></i></div>
+          <div class="auth-float-item auth-item-2"><i data-lucide="brain-circuit"></i></div>
+          <div class="auth-float-item auth-item-3"><i data-lucide="graduation-cap"></i></div>
+          <div class="auth-float-item auth-item-4"><i data-lucide="microscope"></i></div>
+          <div class="auth-float-item auth-item-5"><i data-lucide="atom"></i></div>
+        </div>
         
-        <div class="hyper-auth-brand">
-          <div class="hyper-auth-brand-logo">𝝌</div>
+        <div class="auth-hero-text">
           <h1>noteX AI</h1>
-          <p>Your intelligent study companion.</p>
+          <p>Learn Smarter with AI.</p>
         </div>
       </div>
 
-      <!-- Right Pane: Glass Form -->
-      <div class="hyper-auth-form-container">
-        <div class="hyper-auth-header">
-          <h2 id="authModalTitle">Welcome Back</h2>
-          <p id="authModalSubtitle">Sign in to continue your learning journey.</p>
-        </div>
-
-        <form id="authForm" onsubmit="event.preventDefault(); AuthModal.submit();">
-          
-          <div id="authNameGroup" class="hyper-auth-input-group" style="display: none;">
-            <label class="hyper-auth-label">Full Name</label>
-            <input type="text" id="authNameInput" class="hyper-auth-input" placeholder="e.g. Alex Sharma">
-          </div>
-
-          <div id="authEmailGroup" class="hyper-auth-input-group">
-            <label class="hyper-auth-label">Email Address</label>
-            <input type="email" id="authEmailInput" class="hyper-auth-input" placeholder="student@example.com" required>
-          </div>
-
-          <div id="authPasswordGroup" class="hyper-auth-input-group">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.4rem;">
-              <label class="hyper-auth-label" style="margin: 0;">Password</label>
-              <a href="javascript:void(0)" id="authForgotLink" style="font-size: 0.75rem; color: var(--hyper-accent-primary); font-weight: 700; text-decoration: none;" onclick="AuthModal.show('forgot')">Forgot Password?</a>
-            </div>
-            <input type="password" id="authPasswordInput" class="hyper-auth-input" placeholder="••••••••">
-          </div>
-
-          <div id="authOtpGroup" class="hyper-auth-input-group" style="display: none;">
-            <label class="hyper-auth-label">6-Digit OTP Code</label>
-            <input type="text" id="authOtpInput" class="hyper-auth-input" placeholder="123456" maxlength="6" style="letter-spacing: 6px; font-weight: 800; text-align: center; font-size: 1.2rem;">
-          </div>
-
-          <div id="authNewPasswordGroup" class="hyper-auth-input-group" style="display: none;">
-            <label class="hyper-auth-label">New Password</label>
-            <input type="password" id="authNewPasswordInput" class="hyper-auth-input" placeholder="At least 6 characters">
-          </div>
-
-          <button type="submit" id="authSubmitBtn" class="hyper-btn hyper-btn-primary" style="width: 100%; padding: 0.85rem; font-size: 1rem; border-radius: 12px; margin-bottom: 1.5rem; box-shadow: 0 4px 12px rgba(14, 165, 233, 0.25);">
-            Sign In
+      <!-- Right Pane (55%): Glass Form -->
+      <div class="auth-right-pane">
+        <div class="auth-glass-card">
+          <button class="auth-close-btn" onclick="AuthModal.hide()">
+            <i data-lucide="x"></i>
           </button>
 
-          <div id="authGoogleDiv" style="margin-bottom: 1.5rem;">
-            <div style="display: flex; align-items: center; margin-bottom: 1.5rem;">
-              <div style="flex-grow: 1; height: 1px; background: #E2E8F0;"></div>
-              <div style="padding: 0 15px; color: #94A3B8; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em;">Or continue with</div>
-              <div style="flex-grow: 1; height: 1px; background: #E2E8F0;"></div>
+          <div class="auth-card-header">
+            <h2 id="authModalTitle">Welcome Back</h2>
+            <p id="authModalSubtitle">Sign in to continue your learning journey.</p>
+          </div>
+
+          <form id="authForm" onsubmit="event.preventDefault(); AuthModal.submit();">
+            
+            <div id="authNameGroup" class="auth-input-group" style="display: none;">
+              <label>Full Name</label>
+              <input type="text" id="authNameInput" class="auth-input" placeholder="e.g. Alex Sharma">
             </div>
-            <div style="display: flex; justify-content: center; width: 100%;">
-              <a href="/api/auth/google/login" class="hyper-btn" style="width: 100%; display: flex; align-items: center; justify-content: center; gap: 0.5rem; padding: 0.75rem; background: #FFFFFF; border: 1px solid #CBD5E1; border-radius: 12px; color: #334155; font-weight: 600; text-decoration: none; box-shadow: 0 1px 3px rgba(0,0,0,0.05);">
-                <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" style="width: 18px; height: 18px;">
+
+            <div id="authEmailGroup" class="auth-input-group">
+              <label>Email Address</label>
+              <input type="email" id="authEmailInput" class="auth-input" placeholder="student@example.com" required>
+            </div>
+
+            <div id="authPasswordGroup" class="auth-input-group">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                <label style="margin: 0;">Password</label>
+                <a href="javascript:void(0)" id="authForgotLink" style="font-size: 0.85rem; color: var(--auth-accent); font-weight: 700; text-decoration: none;" onclick="AuthModal.show('forgot')">Forgot Password?</a>
+              </div>
+              <div class="auth-pwd-wrapper">
+                <input type="password" id="authPasswordInput" class="auth-input" placeholder="••••••••">
+                <button type="button" class="auth-pwd-toggle" onclick="const p = document.getElementById('authPasswordInput'); p.type = p.type === 'password' ? 'text' : 'password';"><i data-lucide="eye"></i></button>
+              </div>
+            </div>
+
+            <div id="authOtpGroup" class="auth-input-group" style="display: none;">
+              <label>6-Digit OTP Code</label>
+              <div class="auth-otp-wrapper">
+                <input type="text" id="authOtpInput" class="auth-input" placeholder="123456" maxlength="6">
+              </div>
+            </div>
+
+            <div id="authNewPasswordGroup" class="auth-input-group" style="display: none;">
+              <label>New Password</label>
+              <div class="auth-pwd-wrapper">
+                <input type="password" id="authNewPasswordInput" class="auth-input" placeholder="At least 6 characters">
+                <button type="button" class="auth-pwd-toggle" onclick="const p = document.getElementById('authNewPasswordInput'); p.type = p.type === 'password' ? 'text' : 'password';"><i data-lucide="eye"></i></button>
+              </div>
+            </div>
+
+            <!-- Student Class Select will be dynamically shown based on register logic (we keep it hidden by default or handled by auth.js) -->
+            <div id="authClassGroup" class="auth-input-group" style="display: none;">
+                <label>Select Class</label>
+                <select id="authClassInput" class="auth-input auth-select">
+                    <option value="Class 1">Class 1</option>
+                    <option value="Class 2">Class 2</option>
+                    <option value="Class 3">Class 3</option>
+                    <option value="Class 4">Class 4</option>
+                    <option value="Class 5">Class 5</option>
+                    <option value="Class 6">Class 6</option>
+                    <option value="Class 7">Class 7</option>
+                    <option value="Class 8">Class 8</option>
+                    <option value="Class 9">Class 9</option>
+                    <option value="Class 10" selected>Class 10</option>
+                    <option value="Class 11">Class 11</option>
+                    <option value="Class 12">Class 12</option>
+                </select>
+            </div>
+
+            <button type="submit" id="authSubmitBtn" class="auth-btn-primary">
+              Sign In
+            </button>
+
+            <div id="authGoogleDiv">
+              <div class="auth-divider">
+                <span>Or continue with</span>
+              </div>
+              <a href="/api/auth/google/login" class="auth-google-btn">
+                <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" style="width: 20px; height: 20px;">
                 Continue with Google
               </a>
             </div>
+          </form>
+
+          <div class="auth-footer">
+            <span id="authTogglePrompt">Don't have an account?</span>
+            <a href="javascript:void(0)" id="authToggleLink" onclick="AuthModal.show('register')">Register Now</a>
           </div>
-        </form>
 
-        <div id="authModalFooter" style="text-align: center; font-size: 0.85rem; color: var(--hyper-text-secondary); margin-top: auto;">
-          <span id="authTogglePrompt">Don't have an account?</span>
-          <a href="javascript:void(0)" id="authToggleLink" style="color: var(--hyper-accent-primary); font-weight: 700; text-decoration: none; margin-left: 0.25rem;" onclick="AuthModal.show('register')">Register Now</a>
         </div>
-
-        <button class="hyper-btn hyper-btn-ghost hyper-btn-sm" style="position: absolute; top: 1rem; right: 1rem; color: var(--hyper-text-muted);" onclick="AuthModal.hide()">
-          <i data-lucide="x"></i>
-        </button>
-
       </div>
     </div>
   </div>

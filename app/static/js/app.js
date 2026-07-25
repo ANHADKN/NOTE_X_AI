@@ -106,6 +106,7 @@ document.addEventListener('DOMContentLoaded', () => {
       APP_STATE.activeView = hash;
     }
 
+    const navItems = document.querySelectorAll('.hyper-dock-item');
     navItems.forEach(item => {
       if (item.getAttribute('data-view') === hash) {
         item.classList.add('active');

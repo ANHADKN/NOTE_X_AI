@@ -204,6 +204,7 @@ const AuthModal = {
     const forgotLink = document.getElementById('authForgotLink');
     const otpGrp = document.getElementById('authOtpGroup');
     const newPwdGrp = document.getElementById('authNewPasswordGroup');
+    const classGrp = document.getElementById('authClassGroup');
     const submitBtn = document.getElementById('authSubmitBtn');
     const footerDiv = document.getElementById('authModalFooter');
 
@@ -213,15 +214,17 @@ const AuthModal = {
     if (forgotLink) forgotLink.style.display = 'inline-block';
     if (otpGrp) otpGrp.style.display = 'none';
     if (newPwdGrp) newPwdGrp.style.display = 'none';
+    if (classGrp) classGrp.style.display = 'none';
     if (footerDiv) footerDiv.style.display = 'block';
 
     if (mode === 'register') {
       if (title) title.textContent = 'Create Student Account';
       if (sub) sub.textContent = 'Sign up for personalized AI study plans and notes.';
       if (nameGrp) nameGrp.style.display = 'block';
+      if (classGrp) classGrp.style.display = 'block';
       if (forgotLink) forgotLink.style.display = 'none';
       if (submitBtn) submitBtn.textContent = 'Register Account';
-      if (footerDiv) footerDiv.innerHTML = `<span>Already have an account?</span> <a href="javascript:void(0)" onclick="AuthModal.show('login')" style="color: var(--hyper-accent-primary); font-weight: 600; text-decoration: none; margin-left: 0.25rem;">Sign In</a>`;
+      if (footerDiv) footerDiv.innerHTML = `<span>Already have an account?</span> <a href="javascript:void(0)" onclick="AuthModal.show('login')" style="color: var(--auth-accent); font-weight: 600; text-decoration: none; margin-left: 0.25rem;">Sign In</a>`;
     } else if (mode === 'forgot') {
       if (title) title.textContent = 'Forgot Password';
       if (sub) sub.textContent = 'Enter your registered email address to receive a 6-digit OTP code.';
@@ -281,6 +284,7 @@ const AuthModal = {
     const name = document.getElementById('authNameInput')?.value.trim();
     const otpCode = document.getElementById('authOtpInput')?.value.trim();
     const newPassword = document.getElementById('authNewPasswordInput')?.value.trim();
+    const studentClass = document.getElementById('authClassInput')?.value || 'Class 10';
     const submitBtn = document.getElementById('authSubmitBtn');
 
     if (submitBtn) {
@@ -290,8 +294,8 @@ const AuthModal = {
 
     try {
       if (this.mode === 'register') {
-        if (!email || !password) return;
-        await Auth.register(name || 'Student', email, password);
+        if (!email || !password || !name) return;
+        await Auth.register(name, email, password, studentClass);
         this.hide();
       } else if (this.mode === 'forgot') {
         if (!email) return;
