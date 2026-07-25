@@ -1,68 +1,8 @@
-/* noteX AI - Active Recall Flashcards Controller (Hyper Pro) */
+/* noteX AI - Active Recall Flashcards Controller (3D Flip & Spaced Repetition) */
 const FlashcardsModule = {
-  async render(container) {
-    if (!container) container = document.getElementById('app-view-container');
-    if (!container) return;
-
-    container.innerHTML = `
-      <div class="hyper-bento-grid">
-        <!-- Hero Header -->
-        <div class="hyper-card hyper-col-12" style="background: linear-gradient(135deg, rgba(245, 158, 11, 0.15), rgba(99, 102, 241, 0.15)); border-color: rgba(245, 158, 11, 0.35); padding: 1.75rem 2rem;">
-          <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
-            <div>
-              <span class="hyper-badge hyper-badge-amber" style="margin-bottom: 0.5rem;"><i data-lucide="layers"></i> Active Recall Deck</span>
-              <h2 style="font-size: 1.75rem; font-weight: 800; letter-spacing: -0.03em;">AI Interactive Flashcard Decks</h2>
-              <p style="color: var(--hyper-text-secondary); font-size: 0.95rem; margin-top: 0.25rem;">
-                Spaced repetition revision stage with 20 master Class 10 cards.
-              </p>
-            </div>
-          </div>
-        </div>
-
-        <!-- 3D Active Recall Card Interactive Stage -->
-        <div class="hyper-card hyper-col-12" style="min-height: 280px; display: flex; flex-direction: column; justify-content: space-between; align-items: center; background: rgba(10, 14, 23, 0.9); border: 2px solid var(--hyper-accent-amber); text-align: center; padding: 2rem;" id="flashcardStage">
-          <div style="width: 100%; display: flex; justify-content: space-between; align-items: center;">
-            <span class="hyper-badge hyper-badge-amber" id="fcSubjectBadge">Physics</span>
-            <span style="font-size: 0.85rem; font-weight: 700; color: var(--hyper-text-muted);" id="fcCounter">Card 1 / 20</span>
-          </div>
-
-          <div style="margin: 1.5rem 0;" id="fcContentArea" onclick="FlashcardsModule.flipCard()">
-            <div style="font-size: 0.78rem; font-weight: 700; color: var(--hyper-accent-amber); text-transform: uppercase; margin-bottom: 0.5rem;" id="fcStateLabel">QUESTION (Click to reveal answer)</div>
-            <h3 style="font-size: 1.4rem; font-weight: 700; color: var(--hyper-text-primary);" id="fcText">
-              What is Snell's Law formula for light refraction?
-            </h3>
-          </div>
-
-          <div style="display: flex; gap: 1rem; width: 100%; justify-content: center;" id="fcRatingButtons">
-            <button class="hyper-btn hyper-btn-glass" onclick="FlashcardsModule.rateCard('hard')" style="color: var(--hyper-accent-rose);">🔴 Hard (1 day)</button>
-            <button class="hyper-btn hyper-btn-glass" onclick="FlashcardsModule.rateCard('medium')" style="color: var(--hyper-accent-amber);">🟡 Medium (3 days)</button>
-            <button class="hyper-btn hyper-btn-glass" onclick="FlashcardsModule.rateCard('easy')" style="color: var(--hyper-accent-emerald);">🟢 Easy (7 days)</button>
-            <button class="hyper-btn hyper-btn-amber" onclick="FlashcardsModule.nextCard()">Next Card <i data-lucide="arrow-right" style="width: 15px;"></i></button>
-          </div>
-        </div>
-
-        <!-- 20 Flashcards Deck Grid -->
-        <div class="hyper-card hyper-col-12">
-          <div class="hyper-card-header">
-            <div class="hyper-card-title">
-              <i data-lucide="layers" style="color: var(--hyper-accent-amber); width: 18px;"></i> All Active Recall Cards (20)
-            </div>
-          </div>
-
-          <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 0.85rem;">
-            ${this.get20CardsHTML()}
-          </div>
-        </div>
-      </div>
-    `;
-
-    this.currentIndex = 0;
-    this.isFlipped = false;
-
-    if (typeof lucide !== 'undefined') {
-      lucide.createIcons();
-    }
-  },
+  currentIndex: 0,
+  isFlipped: false,
+  streakCount: 7,
 
   cards: [
     { id: 1, subject: "Physics", q: "What is Snell's Law formula for light refraction?", a: "n₁ sin(θ₁) = n₂ sin(θ₂)" },
@@ -87,74 +27,154 @@ const FlashcardsModule = {
     { id: 20, subject: "Mathematics", q: "Formula for the sum of first N natural numbers?", a: "S_n = [ n(n + 1) ] / 2" }
   ],
 
-  currentIndex: 0,
-  isFlipped: false,
+  async render(container) {
+    if (!container) container = document.getElementById('app-view-container');
+    if (!container) return;
+
+    container.innerHTML = `
+      <div class="hyper-bento-grid">
+        <!-- Hero Header -->
+        <div class="hyper-card hyper-col-12" style="background: linear-gradient(135deg, rgba(245, 158, 11, 0.08), rgba(14, 165, 233, 0.08)); border-color: rgba(245, 158, 11, 0.25); padding: 1.75rem 2rem;">
+          <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+            <div>
+              <span class="hyper-badge hyper-badge-amber" style="margin-bottom: 0.5rem;"><i data-lucide="layers"></i> Active Recall Deck</span>
+              <h2 style="font-size: 1.75rem; font-weight: 800; letter-spacing: -0.03em;">3D Active Recall Flashcard Decks</h2>
+              <p style="color: var(--hyper-text-secondary); font-size: 0.95rem; margin-top: 0.25rem;">
+                Spaced repetition revision stage with 3D flip card memory training.
+              </p>
+            </div>
+            <div style="display: flex; gap: 1rem; align-items: center;">
+              <span class="hyper-badge hyper-badge-amber" style="padding: 0.4rem 0.85rem; font-size: 0.85rem;">🔥 ${this.streakCount} Day Memory Streak</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Progress Indicator Bar -->
+        <div class="hyper-col-12" style="background: #FFFFFF; border: 1px solid #CBD5E1; border-radius: var(--hyper-radius-md); padding: 1rem 1.5rem; display: flex; justify-content: space-between; align-items: center;">
+          <div style="flex: 1; margin-right: 1.5rem;">
+            <div style="display: flex; justify-content: space-between; font-size: 0.82rem; font-weight: 700; color: var(--hyper-text-secondary); margin-bottom: 0.35rem;">
+              <span>Session Progress</span>
+              <span id="fcProgressText">Card 1 of 20 (5%)</span>
+            </div>
+            <div style="width: 100%; height: 8px; background: #F1F5F9; border-radius: var(--hyper-radius-full); overflow: hidden;">
+              <div id="fcProgressBar" style="width: 5%; height: 100%; background: linear-gradient(90deg, var(--hyper-accent-amber), var(--hyper-accent-primary)); transition: width 0.3s ease;"></div>
+            </div>
+          </div>
+          <span class="hyper-badge hyper-badge-primary" id="fcSubjectBadge">Physics</span>
+        </div>
+
+        <!-- 3D Card Stage -->
+        <div class="hyper-col-12" style="display: flex; justify-content: center; padding: 1rem 0;">
+          <div style="perspective: 1000px; width: 100%; max-width: 650px; height: 320px; cursor: pointer;" onclick="FlashcardsModule.flipCard()">
+            <div id="fc3DCard" style="width: 100%; height: 100%; position: relative; transform-style: preserve-3d; transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: 0 16px 36px -8px rgba(15, 23, 42, 0.08); border-radius: var(--hyper-radius-lg);">
+              <!-- Front Face (Question) -->
+              <div style="position: absolute; width: 100%; height: 100%; backface-visibility: hidden; background: #FFFFFF; border: 2px solid var(--hyper-accent-amber); border-radius: var(--hyper-radius-lg); padding: 2.5rem 2rem; display: flex; flex-direction: column; justify-content: space-between; align-items: center; text-align: center;">
+                <div style="font-size: 0.78rem; font-weight: 700; color: var(--hyper-accent-amber); text-transform: uppercase; letter-spacing: 0.05em;">QUESTION (Click to flip 3D)</div>
+                <h3 style="font-size: 1.35rem; font-weight: 700; color: var(--hyper-text-primary); line-height: 1.5;" id="fcQuestionText">
+                  ${this.cards[0].q}
+                </h3>
+                <div style="font-size: 0.78rem; color: var(--hyper-text-muted);">💡 Click card or press Spacebar to reveal solution key</div>
+              </div>
+
+              <!-- Back Face (Answer) -->
+              <div style="position: absolute; width: 100%; height: 100%; backface-visibility: hidden; transform: rotateY(180deg); background: #F8FAFC; border: 2px solid var(--hyper-accent-primary); border-radius: var(--hyper-radius-lg); padding: 2.5rem 2rem; display: flex; flex-direction: column; justify-content: space-between; align-items: center; text-align: center;">
+                <div style="font-size: 0.78rem; font-weight: 700; color: var(--hyper-accent-primary); text-transform: uppercase; letter-spacing: 0.05em;">ANSWER & SOLUTION</div>
+                <h3 style="font-size: 1.35rem; font-weight: 700; color: var(--hyper-accent-primary); line-height: 1.5;" id="fcAnswerText">
+                  ${this.cards[0].a}
+                </h3>
+                <div style="font-size: 0.78rem; color: var(--hyper-text-muted);">Rate difficulty below to schedule spaced recall</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Difficulty Ratings Bar -->
+        <div class="hyper-col-12" style="display: flex; justify-content: center; gap: 0.85rem; flex-wrap: wrap;">
+          <button class="hyper-btn hyper-btn-glass" onclick="FlashcardsModule.rateCard('hard')" style="color: var(--hyper-accent-rose); border-color: rgba(255,107,107,0.3);">🔴 Hard (1 Day)</button>
+          <button class="hyper-btn hyper-btn-glass" onclick="FlashcardsModule.rateCard('medium')" style="color: var(--hyper-accent-amber); border-color: rgba(245,158,11,0.3);">🟡 Medium (3 Days)</button>
+          <button class="hyper-btn hyper-btn-glass" onclick="FlashcardsModule.rateCard('easy')" style="color: var(--hyper-accent-emerald); border-color: rgba(16,185,129,0.3);">🟢 Easy (7 Days)</button>
+          <button class="hyper-btn hyper-btn-primary" onclick="FlashcardsModule.nextCard()">Next Card <i data-lucide="arrow-right" style="width: 16px;"></i></button>
+        </div>
+
+        <!-- 20 Cards Overview Deck Grid -->
+        <div class="hyper-card hyper-col-12" style="margin-top: 1rem;">
+          <div class="hyper-card-header">
+            <div class="hyper-card-title">
+              <i data-lucide="layers" style="color: var(--hyper-accent-amber); width: 18px;"></i> All Spaced Recall Cards (20)
+            </div>
+          </div>
+
+          <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 0.85rem;">
+            ${this.cards.map((c, i) => `
+              <div class="hyper-card hyper-card-interactive" style="padding: 1rem; border-left: 3px solid var(--hyper-accent-amber); background: #FFFFFF;" onclick="FlashcardsModule.jumpToCard(${i})">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.4rem;">
+                  <span class="hyper-badge hyper-badge-amber">Card ${i + 1}</span>
+                  <span style="font-size: 0.75rem; font-weight: 700; color: var(--hyper-text-muted);">${c.subject}</span>
+                </div>
+                <div style="font-weight: 700; font-size: 0.88rem; color: var(--hyper-text-primary); text-overflow: ellipsis; overflow: hidden; white-space: nowrap;">${c.q}</div>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+      </div>
+    `;
+
+    this.currentIndex = 0;
+    this.isFlipped = false;
+
+    if (typeof lucide !== 'undefined') {
+      lucide.createIcons();
+    }
+  },
 
   flipCard() {
     this.isFlipped = !this.isFlipped;
-    const card = this.cards[this.currentIndex];
-    const text = document.getElementById('fcText');
-    const label = document.getElementById('fcStateLabel');
-
-    if (text && label) {
-      if (this.isFlipped) {
-        label.textContent = "ANSWER";
-        label.style.color = "var(--hyper-accent-emerald)";
-        text.textContent = card.a;
-      } else {
-        label.textContent = "QUESTION (Click to reveal answer)";
-        label.style.color = "var(--hyper-accent-amber)";
-        text.textContent = card.q;
-      }
+    const cardEl = document.getElementById('fc3DCard');
+    if (cardEl) {
+      cardEl.style.transform = this.isFlipped ? 'rotateY(180deg)' : 'rotateY(0deg)';
     }
+  },
+
+  updateCardStage() {
+    this.isFlipped = false;
+    const cardEl = document.getElementById('fc3DCard');
+    if (cardEl) {
+      cardEl.style.transform = 'rotateY(0deg)';
+    }
+
+    const card = this.cards[this.currentIndex];
+    const qText = document.getElementById('fcQuestionText');
+    const aText = document.getElementById('fcAnswerText');
+    const badge = document.getElementById('fcSubjectBadge');
+    const progText = document.getElementById('fcProgressText');
+    const progBar = document.getElementById('fcProgressBar');
+
+    if (qText) qText.textContent = card.q;
+    if (aText) aText.textContent = card.a;
+    if (badge) badge.textContent = card.subject;
+    
+    const pct = Math.round(((this.currentIndex + 1) / this.cards.length) * 100);
+    if (progText) progText.textContent = `Card ${this.currentIndex + 1} of ${this.cards.length} (${pct}%)`;
+    if (progBar) progBar.style.width = `${pct}%`;
   },
 
   nextCard() {
     this.currentIndex = (this.currentIndex + 1) % this.cards.length;
-    this.isFlipped = false;
-    this.updateCardView();
+    this.updateCardStage();
   },
 
-  selectCard(index) {
-    this.currentIndex = index;
-    this.isFlipped = false;
-    this.updateCardView();
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  },
-
-  updateCardView() {
-    const card = this.cards[this.currentIndex];
-    const counter = document.getElementById('fcCounter');
-    const badge = document.getElementById('fcSubjectBadge');
-    const text = document.getElementById('fcText');
-    const label = document.getElementById('fcStateLabel');
-
-    if (counter) counter.textContent = `Card ${this.currentIndex + 1} / ${this.cards.length}`;
-    if (badge) badge.textContent = card.subject;
-    if (label) {
-      label.textContent = "QUESTION (Click to reveal answer)";
-      label.style.color = "var(--hyper-accent-amber)";
-    }
-    if (text) text.textContent = card.q;
+  jumpToCard(idx) {
+    this.currentIndex = idx;
+    this.updateCardStage();
+    window.scrollTo({ top: 150, behavior: 'smooth' });
   },
 
   rateCard(rating) {
-    UI.showToast(`Card rated ${rating}. Spaced repetition interval updated!`, 'info');
+    if (typeof UI !== 'undefined' && UI.showToast) {
+      const msg = rating === 'easy' ? 'Scheduled for 7 days revision!' : (rating === 'medium' ? 'Scheduled for 3 days revision!' : 'Scheduled for 1 day revision!');
+      UI.showToast(`Card rated ${rating.toUpperCase()} — ${msg}`, 'success');
+    }
     this.nextCard();
-  },
-
-  get20CardsHTML() {
-    return this.cards.map((c, idx) => `
-      <div class="hyper-card hyper-card-interactive" style="padding: 0.85rem;" onclick="FlashcardsModule.selectCard(${idx})">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.35rem;">
-          <span class="hyper-badge hyper-badge-amber">${c.subject}</span>
-          <span style="font-size: 0.75rem; color: var(--hyper-text-muted);">#${c.id}</span>
-        </div>
-        <div style="font-size: 0.85rem; font-weight: 600; color: var(--hyper-text-primary); line-height: 1.3;">
-          ${c.q}
-        </div>
-      </div>
-    `).join('');
   }
 };
 

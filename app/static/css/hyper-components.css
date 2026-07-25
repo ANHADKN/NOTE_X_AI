@@ -434,7 +434,47 @@
   color: var(--hyper-text-primary) !important;
   border: 1px solid #E2E8F0;
 }
-.katex-display { margin: 1rem 0; overflow-x: auto; overflow-y: hidden; }
+/* Callouts, Highlight Boxes & Diagrams */
+.note-callout-summary {
+  background: #F0F9FF;
+  border-left: 4px solid var(--hyper-accent-primary);
+  border-radius: var(--hyper-radius-xs);
+  padding: 0.85rem 1.15rem;
+  margin: 0.85rem 0;
+}
+
+.note-callout-formula {
+  background: #F5F3FF;
+  border-left: 4px solid var(--hyper-accent-lavender);
+  border-radius: var(--hyper-radius-xs);
+  padding: 0.85rem 1.15rem;
+  margin: 0.85rem 0;
+  font-family: var(--hyper-font-mono);
+}
+
+.note-callout-exam {
+  background: #FFFBEB;
+  border-left: 4px solid var(--hyper-accent-amber);
+  border-radius: var(--hyper-radius-xs);
+  padding: 0.85rem 1.15rem;
+  margin: 0.85rem 0;
+}
+
+.note-callout-memory {
+  background: #ECFDF5;
+  border-left: 4px solid var(--hyper-accent-emerald);
+  border-radius: var(--hyper-radius-xs);
+  padding: 0.85rem 1.15rem;
+  margin: 0.85rem 0;
+}
+
+.note-callout-diagram {
+  background: #FFF1F2;
+  border-left: 4px solid var(--hyper-accent-rose);
+  border-radius: var(--hyper-radius-xs);
+  padding: 0.85rem 1.15rem;
+  margin: 0.85rem 0;
+}
 
 /* ChatGPT / Gemini Multiline Input Box */
 .hyper-chat-input-card {

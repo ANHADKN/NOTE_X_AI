@@ -39,10 +39,10 @@ const ChatbotModule = {
         <!-- Main Chat Feed Area -->
         <div class="hyper-chat-feed">
           <!-- Top Feed Navbar -->
-          <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.75rem 1.5rem; border-bottom: 1px solid var(--hyper-border-subtle); background: var(--hyper-bg-surface);">
+          <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.85rem 1.5rem; border-bottom: 1px solid var(--hyper-border-subtle); background: #FFFFFF;">
             <div style="display: flex; align-items: center; gap: 0.75rem;">
-              <span class="hyper-badge hyper-badge-cyan"><i class="fa-solid fa-bolt"></i> Groq Llama-3.3 Engine</span>
-              <span style="font-size: 0.85rem; color: var(--hyper-text-muted);">Curriculum: <strong id="chatCurriculumGrade" style="color: var(--hyper-accent-primary);">${currentClass}</strong></span>
+              <span class="hyper-badge hyper-badge-primary"><i class="fa-solid fa-bolt"></i> Groq Llama-3.3 AI Tutor</span>
+              <span style="font-size: 0.85rem; color: var(--hyper-text-muted);">Grade: <strong id="chatCurriculumGrade" style="color: var(--hyper-accent-primary); font-weight: 700;">${currentClass}</strong></span>
             </div>
             <div style="display: flex; gap: 0.5rem;">
               <button class="hyper-btn hyper-btn-glass hyper-btn-sm" onclick="ChatbotModule.exportFullThreadMarkdown()" title="Export Thread as Markdown">
@@ -51,22 +51,23 @@ const ChatbotModule = {
             </div>
           </div>
 
-          <!-- Chat Messages Container (Max 850px Centered Content) -->
+          <!-- Chat Messages Container -->
           <div id="chatMessagesBox" class="hyper-chat-messages">
-            <!-- Perplexity / Gemini Style Hero Experience -->
+            <!-- ChatGPT / Perplexity Style Premium Light Welcome Screen -->
             <div id="chatWelcomeHero" style="text-align: center; padding: 3rem 1rem; max-width: 780px; width: 100%; margin: 0 auto;">
-              <div style="font-size: 3.5rem; margin-bottom: 0.75rem; color: var(--hyper-accent-cyan);">
-                <i class="fa-solid fa-wand-magic-sparkles"></i>
+              <div style="width: 64px; height: 64px; border-radius: 20px; background: linear-gradient(135deg, var(--hyper-accent-primary), var(--hyper-accent-cyan)); display: flex; align-items: center; justify-content: center; font-size: 2.2rem; color: #ffffff; margin: 0 auto 1.25rem auto; box-shadow: var(--hyper-shadow-glow-primary);">
+                𝝌
               </div>
               <h1 style="font-size: 2.4rem; font-weight: 800; margin-bottom: 0.4rem; color: var(--hyper-text-primary); letter-spacing: -0.03em;">Where curiosity meets mastery</h1>
-              <p style="color: var(--hyper-text-secondary); font-size: 1rem; margin-bottom: 2rem;">Ask anything, solve complex science problems, generate smart notes & quizzes instantly with real-time streaming.</p>
+              <p style="color: var(--hyper-text-secondary); font-size: 1rem; margin-bottom: 2rem;">Ask anything, solve science problems, generate smart notes & quizzes instantly with real-time AI streaming.</p>
 
-              <!-- ChatGPT Input Box in Hero -->
-              <div class="hyper-chat-input-card">
-                <textarea id="chatHeroTextarea" class="hyper-chat-textarea" placeholder="Ask AI tutor anything or drag & drop a PDF..." rows="2" onkeydown="ChatbotModule.handleKeyDown(event, true)"></textarea>
-                <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--hyper-border-subtle); padding-top: 0.5rem;">
+              <!-- Glass Input Box in Hero -->
+              <div class="hyper-chat-input-card" style="background: #FFFFFF; border: 1px solid #CBD5E1; box-shadow: 0 12px 32px -6px rgba(15, 23, 42, 0.08);">
+                <textarea id="chatHeroTextarea" class="hyper-chat-textarea" placeholder="Ask AI tutor anything, attach an image, or drag & drop a PDF..." rows="2" onkeydown="ChatbotModule.handleKeyDown(event, true)"></textarea>
+                <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--hyper-border-subtle); padding-top: 0.6rem;">
                   <div style="display: flex; gap: 0.5rem; align-items: center;">
-                    <button class="hyper-btn hyper-btn-ghost hyper-btn-sm" onclick="location.hash='#rag'"><i class="fa-solid fa-paperclip"></i> Attach PDF</button>
+                    <button class="hyper-btn hyper-btn-ghost hyper-btn-sm" onclick="location.hash='#rag'"><i class="fa-solid fa-paperclip" style="color: var(--hyper-accent-primary);"></i> Attach PDF</button>
+                    <button class="hyper-btn hyper-btn-ghost hyper-btn-sm" onclick="ChatbotModule.toggleVoiceInput()"><i class="fa-solid fa-microphone" style="color: var(--hyper-accent-rose);"></i> Voice</button>
                     <span class="hyper-badge hyper-badge-primary"><i class="fa-solid fa-bolt"></i> Live Stream</span>
                   </div>
                   <button class="hyper-btn hyper-btn-primary" onclick="ChatbotModule.sendHeroMessage()">
@@ -75,33 +76,33 @@ const ChatbotModule = {
                 </div>
               </div>
 
-              <!-- Suggested Prompt Chips -->
+              <!-- Suggested Questions Matrix -->
               <div style="display: flex; gap: 0.6rem; flex-wrap: wrap; justify-content: center; margin-top: 2rem;">
                 <div class="hyper-chip" onclick="ChatbotModule.useSuggestedPrompt('Explain Newton\'s Three Laws of Motion with real world examples')">
-                  ⚡ Explain Newton's Laws
+                  ⚡ Newton's Laws of Motion
                 </div>
-                <div class="hyper-chip" onclick="ChatbotModule.useSuggestedPrompt('Generate Smart Notes on Chemical Reactions')">
-                  🎯 Generate Smart Notes
+                <div class="hyper-chip" onclick="ChatbotModule.useSuggestedPrompt('Generate Smart Notes on Chemical Reactions & Equations')">
+                  🎯 Chemical Reactions Smart Notes
                 </div>
-                <div class="hyper-chip" onclick="ChatbotModule.useSuggestedPrompt('Generate 5 MCQs for Science Class 10')">
-                  ❓ Generate 5 MCQs
+                <div class="hyper-chip" onclick="ChatbotModule.useSuggestedPrompt('Generate 5 MCQs for Science Class 10 with explanations')">
+                  ❓ 5 Practice Science MCQs
                 </div>
                 <div class="hyper-chip" onclick="ChatbotModule.useSuggestedPrompt('Create active recall flashcards for Physics Optics')">
-                  🧠 Create Flashcards
+                  🧠 Physics Optics Flashcards
                 </div>
               </div>
             </div>
           </div>
 
-          <!-- Bottom ChatGPT / Gemini Style Input Card (Max 850px Width) -->
-          <div id="chatInputBar" style="padding: 1rem 1.5rem; background: var(--hyper-bg-surface); border-top: 1px solid var(--hyper-border-subtle); display: none; justify-content: center;">
+          <!-- Bottom Floating Glass Input Bar -->
+          <div id="chatInputBar" style="padding: 1rem 1.5rem; background: #FFFFFF; border-top: 1px solid var(--hyper-border-subtle); display: none; justify-content: center;">
             <div class="hyper-chat-input-card">
-              <textarea id="chatInputTextarea" class="hyper-chat-textarea" placeholder="Ask follow-up question or rephrase... (Shift + Enter for newline)" rows="1" oninput="ChatbotModule.autoResizeTextarea(this)" onkeydown="ChatbotModule.handleKeyDown(event, false)"></textarea>
+              <textarea id="chatInputTextarea" class="hyper-chat-textarea" placeholder="Ask follow-up question or request code... (Shift + Enter for newline)" rows="1" oninput="ChatbotModule.autoResizeTextarea(this)" onkeydown="ChatbotModule.handleKeyDown(event, false)"></textarea>
               
               <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--hyper-border-subtle); padding-top: 0.5rem;">
                 <div style="display: flex; gap: 0.4rem; align-items: center;">
-                  <button class="hyper-btn hyper-btn-ghost hyper-btn-sm" title="Attach PDF file" onclick="location.hash='#rag'">
-                    <i class="fa-solid fa-paperclip" style="color: var(--hyper-accent-cyan);"></i> PDF
+                  <button class="hyper-btn hyper-btn-ghost hyper-btn-sm" title="Attach PDF document" onclick="location.hash='#rag'">
+                    <i class="fa-solid fa-paperclip" style="color: var(--hyper-accent-primary);"></i> PDF
                   </button>
                   <button class="hyper-btn hyper-btn-ghost hyper-btn-sm" title="Voice Input" onclick="ChatbotModule.toggleVoiceInput()">
                     <i class="fa-solid fa-microphone" id="voiceInputIcon" style="color: var(--hyper-text-muted);"></i> Voice
@@ -457,6 +458,9 @@ const ChatbotModule = {
         <button class="hyper-btn hyper-btn-glass hyper-btn-sm" onclick="ChatbotModule.regenerateLastResponse()">
           <i class="fa-solid fa-rotate-right"></i> Regenerate
         </button>
+        <button class="hyper-btn hyper-btn-glass hyper-btn-sm" onclick="ChatbotModule.shareMessage(this)" title="Share Response">
+          <i class="fa-solid fa-share-nodes"></i> Share
+        </button>
         <div style="margin-left: auto; display: flex; gap: 0.35rem;">
           <button class="hyper-btn hyper-btn-ghost hyper-btn-sm" onclick="ChatbotModule.exportMessageMarkdown(\`${this.escapeQuotes(fullMarkdownText)}\`)" title="Export as Markdown">
             <i class="fa-solid fa-file-code"></i> .MD
@@ -548,6 +552,22 @@ const ChatbotModule = {
         btn.innerHTML = `<i class="fa-solid fa-check"></i> Copied`;
         setTimeout(() => { btn.innerHTML = `<i class="fa-solid fa-copy"></i> Copy`; }, 2000);
       });
+    }
+  },
+
+  shareMessage(btn) {
+    const bubble = btn.closest('div').parentElement.querySelector('.hyper-bubble-ai');
+    if (bubble && navigator.share) {
+      navigator.share({
+        title: 'noteX AI Study Response',
+        text: bubble.innerText,
+        url: window.location.href
+      }).catch(() => {});
+    } else {
+      this.copyToClipboard(btn);
+      if (typeof UI !== 'undefined' && UI.showToast) {
+        UI.showToast('Response copied to clipboard for sharing!', 'success');
+      }
     }
   },
 

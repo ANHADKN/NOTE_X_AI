@@ -446,8 +446,44 @@ const QuizModule = {
     else if (accuracy < 85) { grade = "B (Good)"; badgeClass = "hyper-badge-cyan"; }
     else if (accuracy < 95) { grade = "A (Excellent)"; badgeClass = "hyper-badge-primary"; }
 
-    // Display loading state while saving to MongoDB
+    // Trigger Confetti Celebration for high score
+    if (accuracy >= 70 && typeof confetti !== 'undefined') {
+      try { confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } }); } catch(e){}
+    }
+
     activeBox.innerHTML = `
+      <div style="text-align: center; padding: 2rem 1rem;">
+        <div style="font-size: 3.5rem; margin-bottom: 0.5rem;">🎉</div>
+        <span class="hyper-badge ${badgeClass}" style="font-size: 0.9rem; padding: 0.35rem 0.95rem; margin-bottom: 1rem;">${grade}</span>
+        <h2 style="font-size: 2rem; font-weight: 800; color: var(--hyper-text-primary); margin-bottom: 0.5rem;">Quiz Challenge Completed!</h2>
+        <p style="color: var(--hyper-text-secondary); font-size: 0.95rem; margin-bottom: 2rem;">Here is your performance breakdown and solution key.</p>
+
+        <!-- Result Stats Grid -->
+        <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; max-width: 700px; margin: 0 auto 2rem auto;">
+          <div style="background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: var(--hyper-radius-sm); padding: 1rem; text-align: center;">
+            <div style="font-size: 1.6rem; font-weight: 800; color: var(--hyper-accent-emerald);">${this.score} / ${total}</div>
+            <div style="font-size: 0.78rem; color: var(--hyper-text-muted); font-weight: 600;">Score</div>
+          </div>
+          <div style="background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: var(--hyper-radius-sm); padding: 1rem; text-align: center;">
+            <div style="font-size: 1.6rem; font-weight: 800; color: var(--hyper-accent-primary);">${accuracy}%</div>
+            <div style="font-size: 0.78rem; color: var(--hyper-text-muted); font-weight: 600;">Accuracy</div>
+          </div>
+          <div style="background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: var(--hyper-radius-sm); padding: 1rem; text-align: center;">
+            <div style="font-size: 1.6rem; font-weight: 800; color: var(--hyper-accent-amber);">${timeStr}</div>
+            <div style="font-size: 0.78rem; color: var(--hyper-text-muted); font-weight: 600;">Time Spent</div>
+          </div>
+          <div style="background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: var(--hyper-radius-sm); padding: 1rem; text-align: center;">
+            <div style="font-size: 1.6rem; font-weight: 800; color: var(--hyper-accent-rose);">+75 XP</div>
+            <div style="font-size: 0.78rem; color: var(--hyper-text-muted); font-weight: 600;">XP Earned</div>
+          </div>
+        </div>
+
+        <div style="display: flex; justify-content: center; gap: 1rem;">
+          <button class="hyper-btn hyper-btn-glass" onclick="QuizModule.startQuiz(QuizModule.currentQuiz)"><i class="fa-solid fa-rotate-right"></i> Retake Quiz</button>
+          <button class="hyper-btn hyper-btn-primary" onclick="document.getElementById('activeQuizBox').style.display='none'; location.hash='#analytics';">View Analytics <i class="fa-solid fa-arrow-right"></i></button>
+        </div>
+      </div>
+    `;
       <div style="text-align: center; padding: 3rem;">
         <i class="fa-solid fa-spinner fa-spin" style="font-size: 2.5rem; color: var(--hyper-accent-emerald); margin-bottom: 1rem;"></i>
         <h3 style="color: var(--hyper-text-primary); font-size: 1.3rem;">Evaluating Quiz Answers & Saving to MongoDB...</h3>

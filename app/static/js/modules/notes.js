@@ -1,4 +1,4 @@
-/* noteX AI - AI Smart Notes & Formula Sheet Generator (Production Edition) */
+/* noteX AI - Premium AI Smart Notes & Reading Experience Engine */
 const NotesModule = {
   notesCache: [],
   activeSubjectFilter: 'All',
@@ -9,20 +9,20 @@ const NotesModule = {
 
     container.innerHTML = `
       <div class="hyper-bento-grid">
-        <!-- Hero Header -->
-        <div class="hyper-card hyper-col-12" style="background: linear-gradient(135deg, rgba(139, 92, 246, 0.08), rgba(14, 165, 233, 0.08)); border-color: rgba(139, 92, 246, 0.25); padding: 1.75rem 2rem;">
+        <!-- Sticky Action Toolbar Header -->
+        <div class="hyper-card hyper-col-12" style="position: sticky; top: 0; z-index: 20; background: rgba(255, 255, 255, 0.92); backdrop-filter: blur(16px); border-color: #CBD5E1; padding: 1.25rem 2rem;">
           <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
             <div>
-              <span class="hyper-badge hyper-badge-primary" style="margin-bottom: 0.5rem;"><i class="fa-solid fa-wand-magic-sparkles"></i> AI Notes Engine</span>
-              <h2 style="font-size: 1.75rem; font-weight: 800; letter-spacing: -0.03em;">Smart AI Notes & Formula Sheets</h2>
-              <p style="color: var(--hyper-text-secondary); font-size: 0.95rem; margin-top: 0.25rem;">
-                Generate structured subject notes, formula cheat sheets, and board exam summaries powered by Groq AI.
-              </p>
+              <span class="hyper-badge hyper-badge-primary" style="margin-bottom: 0.25rem;"><i class="fa-solid fa-book-open"></i> Premium Reading Engine</span>
+              <h2 style="font-size: 1.6rem; font-weight: 800; letter-spacing: -0.03em;">AI Smart Notes & Exam Study Sheets</h2>
+            </div>
+            <div style="display: flex; gap: 0.5rem; align-items: center;">
+              <button class="hyper-btn hyper-btn-glass hyper-btn-sm" onclick="window.print()"><i class="fa-solid fa-print"></i> Print View</button>
             </div>
           </div>
         </div>
 
-        <!-- Note Generation Form Card -->
+        <!-- Note Generation Input Box -->
         <div class="hyper-card hyper-col-12">
           <div style="display: flex; flex-direction: column; gap: 1rem;">
             <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem;">
@@ -45,12 +45,11 @@ const NotesModule = {
               <div>
                 <label style="font-size: 0.82rem; font-weight: 600; color: var(--hyper-text-secondary); margin-bottom: 0.35rem; display: block;">Note Format:</label>
                 <select id="noteFormatSelect" class="hyper-select">
-                  <option value="Smart Summary">Smart Summary</option>
-                  <option value="Formula Sheet">Formula Cheat Sheet</option>
+                  <option value="Smart Summary">Smart Summary & Key Points</option>
+                  <option value="Formula Sheet">Formula Cheat Sheet & Equations</option>
                   <option value="Key Concepts">Key Concepts & Definitions</option>
-                  <option value="Smart Notes">Smart Study Notes</option>
-                  <option value="Revision Notes">Exam Revision Notes</option>
-                  <option value="Exam Notes">High-Yield Exam Notes</option>
+                  <option value="Smart Notes">High-Yield Exam Notes</option>
+                  <option value="Revision Notes">Memory Tricks & Exam Tips</option>
                 </select>
               </div>
             </div>
@@ -63,9 +62,9 @@ const NotesModule = {
           </div>
         </div>
 
-        <!-- Subject Filter Tabs & Title -->
+        <!-- Subject Filter Navigation Tabs -->
         <div class="hyper-col-12" style="display: flex; justify-content: space-between; align-items: center; margin-top: 0.5rem;">
-          <h3 style="font-size: 1.15rem; font-weight: 700; color: var(--hyper-text-primary);">Saved Subject Notes</h3>
+          <h3 style="font-size: 1.15rem; font-weight: 700; color: var(--hyper-text-primary);">Saved Study Notes</h3>
           <div style="display: flex; gap: 0.4rem; flex-wrap: wrap;">
             <button class="hyper-btn hyper-btn-glass hyper-btn-sm note-filter-btn active" data-subject="All" onclick="NotesModule.filterBySubject('All', this)">All</button>
             <button class="hyper-btn hyper-btn-glass hyper-btn-sm note-filter-btn" data-subject="Physics" onclick="NotesModule.filterBySubject('Physics', this)">Physics</button>
@@ -75,9 +74,9 @@ const NotesModule = {
           </div>
         </div>
 
-        <!-- Notes List Viewport (Dynamic Cards) -->
+        <!-- Dynamic Notes Reading Viewport -->
         <div class="hyper-col-12" id="notesListContainer">
-          <div style="text-align: center; color: var(--hyper-text-muted); padding: 3rem;"><i class="fa-solid fa-spinner fa-spin"></i> Loading saved notes from database...</div>
+          <div style="text-align: center; color: var(--hyper-text-muted); padding: 3rem;"><i class="fa-solid fa-spinner fa-spin"></i> Loading saved study notes...</div>
         </div>
       </div>
     `;
@@ -128,7 +127,7 @@ const NotesModule = {
 
     if (filtered.length === 0) {
       container.innerHTML = `
-        <div style="text-align: center; color: var(--hyper-text-muted); padding: 3rem; background: var(--hyper-bg-surface); border-radius: var(--hyper-radius-md); border: 1px dashed var(--hyper-border-subtle);">
+        <div style="text-align: center; color: var(--hyper-text-muted); padding: 3rem; background: #FFFFFF; border-radius: var(--hyper-radius-md); border: 1px dashed #CBD5E1;">
           <i class="fa-solid fa-sticky-note" style="font-size: 2.5rem; color: var(--hyper-text-muted); margin-bottom: 0.75rem;"></i>
           <p>No notes found for <strong>${this.activeSubjectFilter}</strong>.</p>
         </div>
@@ -137,35 +136,30 @@ const NotesModule = {
     }
 
     container.innerHTML = `
-      <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.25rem;">
+      <div style="display: flex; flex-direction: column; gap: 1.5rem;">
         ${filtered.map(note => `
-          <div class="hyper-card hyper-card-interactive" id="note_card_${note.id}" style="display: flex; flex-direction: column; justify-content: space-between;">
-            <div>
-              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
+          <div class="hyper-card" id="note_card_${note.id}" style="background: #FFFFFF; border: 1px solid #CBD5E1; box-shadow: 0 8px 24px -4px rgba(15, 23, 42, 0.06); padding: 1.75rem;">
+            <!-- Note Header Sticky Bar -->
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem; border-bottom: 1px solid var(--hyper-border-subtle); padding-bottom: 0.85rem; flex-wrap: wrap; gap: 0.5rem;">
+              <div style="display: flex; align-items: center; gap: 0.65rem;">
                 <span class="hyper-badge hyper-badge-primary">${note.subject || 'General'}</span>
-                <span class="hyper-badge hyper-badge-cyan">${note.note_type || note.format || 'Smart Notes'}</span>
+                <span class="hyper-badge hyper-badge-cyan">${note.note_type || 'Smart Notes'}</span>
+                <span class="hyper-badge hyper-badge-amber">Class 10</span>
               </div>
-              <h3 style="font-size: 1.15rem; font-weight: 700; color: var(--hyper-text-primary); margin-bottom: 0.75rem;">${note.chapter || note.title || 'Untitled Topic'}</h3>
-              
-              <!-- Formatted Markdown & LaTeX Note Body -->
-              <div class="hyper-bubble-ai" style="font-size: 0.88rem; color: var(--hyper-text-primary); line-height: 1.6; padding: 1.15rem; background: var(--hyper-bg-elevated); border-radius: var(--hyper-radius-sm); max-height: 380px; overflow-y: auto;">
-                ${this.formatMarkdown(note.content || note.text || '')}
-              </div>
-            </div>
-
-            <!-- Action Toolbar (Copy, PDF, Markdown, Delete) -->
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 1rem; border-top: 1px solid var(--hyper-border-subtle); padding-top: 0.75rem;">
-              <div style="font-size: 0.72rem; color: var(--hyper-text-muted);">
-                Class: ${note.student_class || 'Class 10'}
-              </div>
-              <div style="display: flex; gap: 0.4rem;">
+              <div style="display: flex; gap: 0.4rem; align-items: center;">
+                <button class="hyper-btn hyper-btn-glass hyper-btn-sm" onclick="NotesModule.toggleBookmark('${note.id}', this)" title="Bookmark Note">
+                  <i class="fa-regular fa-bookmark" id="bm_icon_${note.id}"></i> Bookmark
+                </button>
                 <button class="hyper-btn hyper-btn-glass hyper-btn-sm" onclick="NotesModule.copyNote(this)" title="Copy text">
                   <i class="fa-solid fa-copy"></i> Copy
                 </button>
-                <button class="hyper-btn hyper-btn-ghost hyper-btn-sm" onclick="NotesModule.downloadMarkdown('${note.id}')" title="Download Markdown .md">
+                <button class="hyper-btn hyper-btn-ghost hyper-btn-sm" onclick="NotesModule.downloadMarkdown('${note.id}')" title="Download Markdown .MD">
                   <i class="fa-solid fa-file-code"></i> .MD
                 </button>
-                <button class="hyper-btn hyper-btn-ghost hyper-btn-sm" onclick="NotesModule.downloadPDF('${note.id}')" title="Download Printable PDF">
+                <button class="hyper-btn hyper-btn-ghost hyper-btn-sm" onclick="NotesModule.downloadDOCX('${note.id}')" title="Download Word .DOCX">
+                  <i class="fa-solid fa-file-word"></i> .DOCX
+                </button>
+                <button class="hyper-btn hyper-btn-ghost hyper-btn-sm" onclick="NotesModule.downloadPDF('${note.id}')" title="Download PDF Document">
                   <i class="fa-solid fa-file-pdf"></i> .PDF
                 </button>
                 <button class="hyper-btn hyper-btn-ghost hyper-btn-sm" onclick="NotesModule.deleteNote('${note.id}')" title="Delete Note" style="color: var(--hyper-accent-rose);">
@@ -173,16 +167,56 @@ const NotesModule = {
                 </button>
               </div>
             </div>
+
+            <!-- Main Reading Layout Title -->
+            <h2 style="font-size: 1.6rem; font-weight: 800; color: var(--hyper-text-primary); margin-bottom: 1.25rem;">${note.chapter || note.title || 'Untitled Topic'}</h2>
+            
+            <!-- Structured Highlight & Callout Grid -->
+            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.85rem; margin-bottom: 1.5rem;">
+              <div class="note-callout-summary">
+                <div style="font-weight: 700; font-size: 0.85rem; color: var(--hyper-accent-primary); margin-bottom: 0.25rem;"><i class="fa-solid fa-list-check"></i> AI Summary & Key Points</div>
+                <div style="font-size: 0.8rem; color: var(--hyper-text-secondary); font-style: italic;">High-yield key concepts curated for fast revision.</div>
+              </div>
+              <div class="note-callout-formula">
+                <div style="font-weight: 700; font-size: 0.85rem; color: var(--hyper-accent-lavender); margin-bottom: 0.25rem;"><i class="fa-solid fa-square-root-variable"></i> Key Formulas</div>
+                <div style="font-size: 0.8rem; color: var(--hyper-text-secondary); font-style: italic;">Core mathematical & physics equations.</div>
+              </div>
+              <div class="note-callout-exam">
+                <div style="font-weight: 700; font-size: 0.85rem; color: var(--hyper-accent-amber); margin-bottom: 0.25rem;"><i class="fa-solid fa-lightbulb"></i> Exam Tips & Memory Tricks</div>
+                <div style="font-size: 0.8rem; color: var(--hyper-text-secondary); font-style: italic;">Mnemonics & board exam pointers.</div>
+              </div>
+            </div>
+
+            <!-- Reading Body Content -->
+            <div class="note-reading-body" style="font-size: 0.98rem; color: var(--hyper-text-primary); line-height: 1.7; background: #FAFAFC; padding: 1.5rem; border-radius: var(--hyper-radius-sm); border: 1px solid #E2E8F0;">
+              ${this.formatMarkdown(note.content || note.text || '')}
+            </div>
           </div>
         `).join('')}
       </div>
     `;
 
-    // Render KaTeX math in note cards
     this.renderKaTeXMath(container);
 
     if (typeof hljs !== 'undefined') {
       hljs.highlightAll();
+    }
+  },
+
+  toggleBookmark(noteId, btn) {
+    const icon = document.getElementById(`bm_icon_${noteId}`);
+    if (icon) {
+      if (icon.classList.contains('fa-regular')) {
+        icon.classList.remove('fa-regular');
+        icon.classList.add('fa-solid');
+        icon.style.color = 'var(--hyper-accent-amber)';
+        if (typeof UI !== 'undefined' && UI.showToast) UI.showToast('Note bookmarked!', 'success');
+      } else {
+        icon.classList.remove('fa-solid');
+        icon.classList.add('fa-regular');
+        icon.style.color = 'inherit';
+        if (typeof UI !== 'undefined' && UI.showToast) UI.showToast('Bookmark removed.', 'info');
+      }
     }
   },
 
@@ -216,7 +250,6 @@ const NotesModule = {
       if (res && res.success && res.data && res.data.note) {
         const newNote = res.data.note;
         
-        // Prevent duplicate cards
         this.notesCache = this.notesCache.filter(n => n.id !== newNote.id);
         this.notesCache.unshift(newNote);
 
@@ -244,7 +277,7 @@ const NotesModule = {
 
   copyNote(btn) {
     const card = btn.closest('.hyper-card');
-    const content = card ? card.querySelector('.hyper-bubble-ai') : null;
+    const content = card ? card.querySelector('.note-reading-body') : null;
     if (content) {
       navigator.clipboard.writeText(content.innerText).then(() => {
         btn.innerHTML = `<i class="fa-solid fa-check"></i> Copied`;
@@ -262,6 +295,24 @@ const NotesModule = {
     const a = document.createElement('a');
     a.href = url;
     a.download = `noteX_Note_${note.subject}_${Date.now()}.md`;
+    a.click();
+    URL.revokeObjectURL(url);
+  },
+
+  downloadDOCX(noteId) {
+    const note = this.notesCache.find(n => n.id === noteId);
+    if (!note) return;
+    const htmlContent = `
+      <html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
+      <head><title>${note.subject} — ${note.chapter}</title><style>body{font-family:Arial,sans-serif;line-height:1.6;}</style></head>
+      <body><h2>${note.subject}: ${note.chapter}</h2><div>${this.formatMarkdown(note.content)}</div></body>
+      </html>
+    `;
+    const blob = new Blob(['\ufeff' + htmlContent], { type: 'application/msword' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `noteX_Note_${note.subject}_${Date.now()}.docx`;
     a.click();
     URL.revokeObjectURL(url);
   },
