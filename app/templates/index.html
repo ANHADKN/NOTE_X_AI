@@ -48,10 +48,10 @@
       </div>
       
       <ul class="hyper-nav-list">
-        <li class="hyper-nav-item" data-view="dashboard">
+        <li class="hyper-nav-item active" data-view="dashboard">
           <a href="#dashboard"><i data-lucide="layout-dashboard"></i> <span>Dashboard</span></a>
         </li>
-        <li class="hyper-nav-item active" data-view="chat">
+        <li class="hyper-nav-item" data-view="chat">
           <a href="#chat"><i data-lucide="sparkles"></i> <span>AI Chat Assistant</span></a>
         </li>
         <li class="hyper-nav-item" data-view="library">
@@ -127,6 +127,9 @@
         <input type="text" id="commandPaletteInput" class="hyper-input" placeholder="Type a command or jump to feature..." style="padding-left: 2.75rem; border-radius: var(--hyper-radius-sm); font-size: 0.95rem;">
       </div>
       <div style="display: flex; flex-direction: column; gap: 0.35rem; max-height: 320px; overflow-y: auto;">
+        <div class="hyper-btn hyper-btn-ghost" style="justify-content: flex-start;" onclick="location.hash='#dashboard'; document.getElementById('commandPaletteModal').style.display='none';">
+          <i data-lucide="layout-dashboard" style="color: var(--hyper-accent-primary); width: 18px; margin-right: 0.5rem;"></i> View Dashboard Overview
+        </div>
         <div class="hyper-btn hyper-btn-ghost" style="justify-content: flex-start;" onclick="location.hash='#chat'; document.getElementById('commandPaletteModal').style.display='none';">
           <i data-lucide="sparkles" style="color: var(--hyper-accent-cyan); width: 18px; margin-right: 0.5rem;"></i> Open AI Chat Assistant
         </div>

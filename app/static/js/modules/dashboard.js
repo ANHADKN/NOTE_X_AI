@@ -1,6 +1,9 @@
 /* noteX AI - Feature-Rich AI Study Platform Dashboard (Hyper Pro) */
 const DashboardModule = {
   async render(container) {
+    if (!container) container = document.getElementById('app-view-container');
+    if (!container) return;
+
     const timeOfDay = new Date().getHours() < 12 ? 'Good Morning' : (new Date().getHours() < 17 ? 'Good Afternoon' : 'Good Evening');
     const studentGrade = typeof APP_STATE !== 'undefined' ? APP_STATE.currentGrade : 'Class 10';
 
@@ -229,7 +232,7 @@ const DashboardModule = {
             <button class="hyper-btn hyper-btn-glass hyper-btn-sm" onclick="location.hash='#library'">Library</button>
           </div>
           <div id="dashRecentPdfsList" style="display: flex; flex-direction: column; gap: 0.65rem;">
-            <div style="text-align: center; color: var(--hyper-text-muted); padding: 1rem;">Loading documents...</div>
+            ${this.getFallbackPdfsHTML()}
           </div>
         </div>
 
@@ -242,11 +245,16 @@ const DashboardModule = {
             <button class="hyper-btn hyper-btn-glass hyper-btn-sm" onclick="location.hash='#chat'">View All</button>
           </div>
           <div id="dashRecentChatsList" style="display: flex; flex-direction: column; gap: 0.65rem;">
-            <div style="text-align: center; color: var(--hyper-text-muted); padding: 1rem;">Loading active threads...</div>
+            ${this.getFallbackChatsHTML()}
           </div>
         </div>
       </div>
     `;
+
+    // Immediately trigger Lucide icons so DOM renders icons instantly
+    if (typeof lucide !== 'undefined') {
+      lucide.createIcons();
+    }
 
     await this.loadDashboardData();
   },
@@ -264,11 +272,42 @@ const DashboardModule = {
     }
   },
 
+  getFallbackPdfsHTML() {
+    return `
+      <div class="hyper-card hyper-card-interactive" style="padding: 0.85rem; display: flex; justify-content: space-between; align-items: center;">
+        <div style="display: flex; align-items: center; gap: 0.75rem;">
+          <i data-lucide="file-text" style="width: 20px; color: var(--hyper-accent-rose);"></i>
+          <div>
+            <div style="font-weight: 600; font-size: 0.88rem; color: var(--hyper-text-primary);">Sample_Notes_Class10.pdf</div>
+            <div style="font-size: 0.75rem; color: var(--hyper-text-muted);">14 Pages • Indexed & Ready</div>
+          </div>
+        </div>
+        <button class="hyper-btn hyper-btn-glass hyper-btn-sm" onclick="location.hash = '#rag'">Search</button>
+      </div>
+    `;
+  },
+
+  getFallbackChatsHTML() {
+    return `
+      <div class="hyper-card hyper-card-interactive" style="padding: 0.85rem; display: flex; justify-content: space-between; align-items: center;">
+        <div style="display: flex; align-items: center; gap: 0.75rem;">
+          <i data-lucide="message-square" style="width: 18px; color: var(--hyper-accent-primary);"></i>
+          <div>
+            <div style="font-weight: 600; font-size: 0.88rem; color: var(--hyper-text-primary);">Newton's Laws & Mechanics Review</div>
+            <div style="font-size: 0.75rem; color: var(--hyper-text-muted);">Active Session</div>
+          </div>
+        </div>
+        <button class="hyper-btn hyper-btn-glass hyper-btn-sm" onclick="location.hash = '#chat'">Resume</button>
+      </div>
+    `;
+  },
+
   async loadDashboardData() {
-    try {
-      const docRes = await API.get('/rag/documents');
-      const docContainer = document.getElementById('dashRecentPdfsList');
-      if (docContainer) {
+    // 1. Fetch Documents (Independent try-catch)
+    const docContainer = document.getElementById('dashRecentPdfsList');
+    if (docContainer) {
+      try {
+        const docRes = await API.get('/rag/documents');
         if (docRes && docRes.success && docRes.data && docRes.data.documents && docRes.data.documents.length > 0) {
           docContainer.innerHTML = docRes.data.documents.slice(0, 3).map(doc => `
             <div class="hyper-card hyper-card-interactive" style="padding: 0.85rem; display: flex; justify-content: space-between; align-items: center;">
@@ -282,25 +321,17 @@ const DashboardModule = {
               <button class="hyper-btn hyper-btn-glass hyper-btn-sm" onclick="location.hash = '#rag'">Search</button>
             </div>
           `).join('');
-        } else {
-          docContainer.innerHTML = `
-            <div class="hyper-card hyper-card-interactive" style="padding: 0.85rem; display: flex; justify-content: space-between; align-items: center;">
-              <div style="display: flex; align-items: center; gap: 0.75rem;">
-                <i data-lucide="file-text" style="width: 20px; color: var(--hyper-accent-rose);"></i>
-                <div>
-                  <div style="font-weight: 600; font-size: 0.88rem; color: var(--hyper-text-primary);">Sample_Notes_Class10.pdf</div>
-                  <div style="font-size: 0.75rem; color: var(--hyper-text-muted);">14 Pages • Indexed & Ready</div>
-                </div>
-              </div>
-              <button class="hyper-btn hyper-btn-glass hyper-btn-sm" onclick="location.hash = '#rag'">Search</button>
-            </div>
-          `;
         }
+      } catch (e) {
+        // Fallback already pre-rendered
       }
+    }
 
-      const chatRes = await API.get('/chat/conversations');
-      const chatContainer = document.getElementById('dashRecentChatsList');
-      if (chatContainer) {
+    // 2. Fetch Chat Threads (Independent try-catch)
+    const chatContainer = document.getElementById('dashRecentChatsList');
+    if (chatContainer) {
+      try {
+        const chatRes = await API.get('/chat/conversations');
         if (chatRes && chatRes.success && chatRes.data && chatRes.data.conversations && chatRes.data.conversations.length > 0) {
           chatContainer.innerHTML = chatRes.data.conversations.slice(0, 3).map(conv => `
             <div class="hyper-card hyper-card-interactive" style="padding: 0.85rem; display: flex; justify-content: space-between; align-items: center;">
@@ -314,23 +345,15 @@ const DashboardModule = {
               <button class="hyper-btn hyper-btn-glass hyper-btn-sm" onclick="location.hash = '#chat'">Resume</button>
             </div>
           `).join('');
-        } else {
-          chatContainer.innerHTML = `
-            <div class="hyper-card hyper-card-interactive" style="padding: 0.85rem; display: flex; justify-content: space-between; align-items: center;">
-              <div style="display: flex; align-items: center; gap: 0.75rem;">
-                <i data-lucide="message-square" style="width: 18px; color: var(--hyper-accent-primary);"></i>
-                <div>
-                  <div style="font-weight: 600; font-size: 0.88rem; color: var(--hyper-text-primary);">Newton's Laws & Mechanics Review</div>
-                  <div style="font-size: 0.75rem; color: var(--hyper-text-muted);">Active Session</div>
-                </div>
-              </div>
-              <button class="hyper-btn hyper-btn-glass hyper-btn-sm" onclick="location.hash = '#chat'">Resume</button>
-            </div>
-          `;
         }
+      } catch (e) {
+        // Fallback already pre-rendered
       }
-    } catch (e) {
-      console.log('Dashboard load error:', e);
+    }
+
+    // Refresh Lucide icons for any updated elements
+    if (typeof lucide !== 'undefined') {
+      lucide.createIcons();
     }
   }
 };
