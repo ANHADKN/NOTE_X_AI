@@ -165,10 +165,10 @@ const Auth = {
         const firstLetter = (user.name || 'Student').charAt(0).toUpperCase();
         const avatarSrc = user.profile_photo;
         
-        const fallbackHTML = `<div class="ai-profile-initials">${firstLetter}</div>`;
+        const fallbackHTML = `<div class=\\'ai-profile-initials\\'>${firstLetter}</div>`;
         const innerImg = avatarSrc 
             ? `<img src="${avatarSrc}" class="ai-profile-img" alt="" onerror="this.outerHTML='${fallbackHTML}'">`
-            : fallbackHTML;
+            : `<div class="ai-profile-initials">${firstLetter}</div>`;
 
         profileSection.innerHTML = `
           <div class="ai-profile-wrapper">

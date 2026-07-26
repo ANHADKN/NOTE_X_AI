@@ -11,7 +11,7 @@ const DashboardModule = {
         <!-- Welcome Header -->
         <div class="nx30-home-header" style="display: flex; justify-content: space-between; align-items: flex-end;">
           <div>
-            <h1 style="font-size: 2.5rem; font-weight: 800; background: linear-gradient(135deg, #00C9A7, #5B6CFF); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin: 0 0 0.5rem 0;">Good Morning, User</h1>
+            <h1 style="font-size: 2.5rem; font-weight: 800; background: linear-gradient(135deg, var(--hyper-accent-emerald), var(--hyper-accent-primary)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin: 0 0 0.5rem 0;">Good Morning, User</h1>
             <p style="color: var(--hyper-text-muted); font-size: 1.1rem; margin: 0;">Welcome to your personalized AI workspace. Everything is ready.</p>
           </div>
           <div style="display: flex; gap: 1rem;">
@@ -68,13 +68,13 @@ const DashboardModule = {
                   <a href="#chat" style="font-size: 0.85rem; color: #5B6CFF; text-decoration: none;">View All</a>
                 </div>
                 <div style="display: flex; flex-direction: column; gap: 0.75rem;">
-                  <div class="recent-item" style="padding: 0.75rem; background: rgba(255,255,255,0.5); border-radius: 12px; display: flex; align-items: center; gap: 1rem; cursor: pointer;">
-                    <div style="width: 36px; height: 36px; border-radius: 8px; background: #E0E7FF; color: #5B6CFF; display: flex; align-items: center; justify-content: center;"><i data-lucide="code"></i></div>
-                    <div style="flex: 1;"><h4 style="margin: 0; font-size: 0.95rem;">React Auth Implementation</h4><p style="margin: 0; font-size: 0.8rem; color: #64748B;">2 hours ago</p></div>
+                  <div class="recent-item" style="padding: 0.75rem; background: var(--hyper-bg-elevated); border-radius: 12px; display: flex; align-items: center; gap: 1rem; cursor: pointer; transition: var(--hyper-transition-fast);">
+                    <div style="width: 36px; height: 36px; border-radius: 8px; background: var(--hyper-accent-primary-light); color: var(--hyper-accent-primary); display: flex; align-items: center; justify-content: center;"><i data-lucide="code"></i></div>
+                    <div style="flex: 1;"><h4 style="margin: 0; font-size: 0.95rem; color: var(--hyper-text-primary);">React Auth Implementation</h4><p style="margin: 0; font-size: 0.8rem; color: var(--hyper-text-muted);">2 hours ago</p></div>
                   </div>
-                  <div class="recent-item" style="padding: 0.75rem; background: rgba(255,255,255,0.5); border-radius: 12px; display: flex; align-items: center; gap: 1rem; cursor: pointer;">
-                    <div style="width: 36px; height: 36px; border-radius: 8px; background: #D1FAE5; color: #059669; display: flex; align-items: center; justify-content: center;"><i data-lucide="file-text"></i></div>
-                    <div style="flex: 1;"><h4 style="margin: 0; font-size: 0.95rem;">Q3 Marketing Plan</h4><p style="margin: 0; font-size: 0.8rem; color: #64748B;">Yesterday</p></div>
+                  <div class="recent-item" style="padding: 0.75rem; background: var(--hyper-bg-elevated); border-radius: 12px; display: flex; align-items: center; gap: 1rem; cursor: pointer; transition: var(--hyper-transition-fast);">
+                    <div style="width: 36px; height: 36px; border-radius: 8px; background: var(--hyper-accent-emerald-light); color: var(--hyper-accent-emerald); display: flex; align-items: center; justify-content: center;"><i data-lucide="file-text"></i></div>
+                    <div style="flex: 1;"><h4 style="margin: 0; font-size: 0.95rem; color: var(--hyper-text-primary);">Q3 Marketing Plan</h4><p style="margin: 0; font-size: 0.8rem; color: var(--hyper-text-muted);">Yesterday</p></div>
                   </div>
                 </div>
               </div>
@@ -85,13 +85,13 @@ const DashboardModule = {
                   <a href="#notes" style="font-size: 0.85rem; color: #5B6CFF; text-decoration: none;">View All</a>
                 </div>
                 <div style="display: flex; flex-direction: column; gap: 0.75rem;">
-                  <div class="recent-item" style="padding: 0.75rem; background: rgba(255,255,255,0.5); border-radius: 12px; display: flex; align-items: center; gap: 1rem; cursor: pointer;">
-                    <div style="width: 36px; height: 36px; border-radius: 8px; background: #FEF3C7; color: #D97706; display: flex; align-items: center; justify-content: center;"><i data-lucide="edit-3"></i></div>
-                    <div style="flex: 1;"><h4 style="margin: 0; font-size: 0.95rem;">Meeting Minutes</h4><p style="margin: 0; font-size: 0.8rem; color: #64748B;">Today, 10:00 AM</p></div>
+                  <div class="recent-item" style="padding: 0.75rem; background: var(--hyper-bg-elevated); border-radius: 12px; display: flex; align-items: center; gap: 1rem; cursor: pointer; transition: var(--hyper-transition-fast);">
+                    <div style="width: 36px; height: 36px; border-radius: 8px; background: var(--hyper-accent-amber-light); color: var(--hyper-accent-amber); display: flex; align-items: center; justify-content: center;"><i data-lucide="edit-3"></i></div>
+                    <div style="flex: 1;"><h4 style="margin: 0; font-size: 0.95rem; color: var(--hyper-text-primary);">Meeting Minutes</h4><p style="margin: 0; font-size: 0.8rem; color: var(--hyper-text-muted);">Today, 10:00 AM</p></div>
                   </div>
-                  <div class="recent-item" style="padding: 0.75rem; background: rgba(255,255,255,0.5); border-radius: 12px; display: flex; align-items: center; gap: 1rem; cursor: pointer;">
-                    <div style="width: 36px; height: 36px; border-radius: 8px; background: #FCE7F3; color: #DB2777; display: flex; align-items: center; justify-content: center;"><i data-lucide="pin"></i></div>
-                    <div style="flex: 1;"><h4 style="margin: 0; font-size: 0.95rem;">Project Ideas 2026</h4><p style="margin: 0; font-size: 0.8rem; color: #64748B;">Pinned</p></div>
+                  <div class="recent-item" style="padding: 0.75rem; background: var(--hyper-bg-elevated); border-radius: 12px; display: flex; align-items: center; gap: 1rem; cursor: pointer; transition: var(--hyper-transition-fast);">
+                    <div style="width: 36px; height: 36px; border-radius: 8px; background: var(--hyper-accent-rose-light); color: var(--hyper-accent-rose); display: flex; align-items: center; justify-content: center;"><i data-lucide="pin"></i></div>
+                    <div style="flex: 1;"><h4 style="margin: 0; font-size: 0.95rem; color: var(--hyper-text-primary);">Project Ideas 2026</h4><p style="margin: 0; font-size: 0.8rem; color: var(--hyper-text-muted);">Pinned</p></div>
                   </div>
                 </div>
               </div>
@@ -150,13 +150,13 @@ const DashboardModule = {
             <!-- Calendar / Daily Summary Widget -->
             <div class="hyper-glass-panel" style="padding: 1.5rem; border-radius: 20px;">
               <h3 style="margin: 0 0 1rem 0; font-size: 1.1rem;"><i data-lucide="calendar" style="width:16px; margin-right:5px;"></i> Daily Summary</h3>
-              <div style="background: rgba(255,255,255,0.5); padding: 1rem; border-radius: 12px; border-left: 4px solid #5B6CFF; margin-bottom: 0.75rem;">
-                <h4 style="margin: 0 0 0.25rem 0; font-size: 0.95rem;">Review React Notes</h4>
-                <p style="margin: 0; font-size: 0.8rem; color: #64748B;">Scheduled for 2:00 PM</p>
+              <div style="background: var(--hyper-bg-elevated); padding: 1rem; border-radius: 12px; border-left: 4px solid var(--hyper-accent-primary); margin-bottom: 0.75rem;">
+                <h4 style="margin: 0 0 0.25rem 0; font-size: 0.95rem; color: var(--hyper-text-primary);">Review React Notes</h4>
+                <p style="margin: 0; font-size: 0.8rem; color: var(--hyper-text-muted);">Scheduled for 2:00 PM</p>
               </div>
-              <div style="background: rgba(255,255,255,0.5); padding: 1rem; border-radius: 12px; border-left: 4px solid #00C9A7;">
-                <h4 style="margin: 0 0 0.25rem 0; font-size: 0.95rem;">Finish AI Chat module</h4>
-                <p style="margin: 0; font-size: 0.8rem; color: #64748B;">Pending task</p>
+              <div style="background: var(--hyper-bg-elevated); padding: 1rem; border-radius: 12px; border-left: 4px solid var(--hyper-accent-emerald);">
+                <h4 style="margin: 0 0 0.25rem 0; font-size: 0.95rem; color: var(--hyper-text-primary);">Finish AI Chat module</h4>
+                <p style="margin: 0; font-size: 0.8rem; color: var(--hyper-text-muted);">Pending task</p>
               </div>
             </div>
 

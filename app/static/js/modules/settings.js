@@ -160,7 +160,7 @@ const SettingsModule = {
         <div class="settings-danger-zone">
           <h4>Danger Zone</h4>
           <p style="margin-bottom: 1rem;">Permanently delete your account and all associated data.</p>
-          <button class="hyper-btn hyper-btn-primary" style="background: #EF4444; border-color: #EF4444;"><i data-lucide="trash-2"></i> Delete Account</button>
+          <button class="hyper-btn hyper-btn-primary" style="background: var(--hyper-accent-rose); border-color: var(--hyper-accent-rose);"><i data-lucide="trash-2"></i> Delete Account</button>
         </div>
       `,
       security: `

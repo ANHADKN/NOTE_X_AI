@@ -325,7 +325,7 @@ const AuthViewModule = {
     const email = document.getElementById('loginEmail').value;
     const password = document.getElementById('loginPassword').value;
     
-    btn.innerHTML = \`<i class="fa-solid fa-spinner fa-spin"></i> Authenticating...\`;
+    btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Authenticating...`;
     btn.disabled = true;
 
     try {
@@ -339,7 +339,7 @@ const AuthViewModule = {
       form.classList.add('error-shake');
       setTimeout(() => form.classList.remove('error-shake'), 500);
     } finally {
-      btn.innerHTML = \`<span>Sign In</span><i data-lucide="arrow-right"></i>\`;
+      btn.innerHTML = `<span>Sign In</span><i data-lucide="arrow-right"></i>`;
       btn.disabled = false;
       if (typeof lucide !== 'undefined') lucide.createIcons();
     }

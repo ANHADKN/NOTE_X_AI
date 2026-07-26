@@ -77,3 +77,14 @@
   --hyper-transition-normal: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
   --hyper-transition-bounce: 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
+
+/* Global Text Selection */
+::selection {
+    background-color: var(--hyper-accent-primary);
+    color: #ffffff;
+}
+
+::-moz-selection {
+    background-color: var(--hyper-accent-primary);
+    color: #ffffff;
+}
