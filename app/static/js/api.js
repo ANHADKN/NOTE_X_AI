@@ -26,28 +26,62 @@ const API = {
       headers
     };
 
-    try {
-      const response = await fetch(url, config);
-      const data = await response.json();
+    const maxRetries = options.retries !== undefined ? options.retries : 2;
+    const timeoutMs = options.timeout !== undefined ? options.timeout : 10000;
+    let attempt = 0;
 
-      if (!response.ok) {
-        // Handle 401 Unauthorized globally: redirect/prompt login instead of raw error
-        if (response.status === 401) {
-          console.warn(`[API Auth] 401 Unauthorized on ${endpoint}: ${data.message || 'Token missing/invalid'}`);
-          
-          if (!options.skipAuthRedirect) {
-            this.handleUnauthorized(data.message);
-          }
+    while (attempt <= maxRetries) {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
+      config.signal = controller.signal;
+
+      try {
+        const response = await fetch(url, config);
+        clearTimeout(timeoutId);
+        
+        let data;
+        try {
+            data = await response.json();
+        } catch(e) {
+            data = { message: "Invalid JSON response from server" };
         }
-        throw new Error(data.message || `HTTP Error ${response.status}`);
-      }
 
-      return data;
-    } catch (error) {
-      if (!options.silent) {
-        console.warn(`[API Exception] ${endpoint}:`, error.message);
+        if (!response.ok) {
+          if (response.status === 401) {
+            console.warn(`[API Auth] 401 Unauthorized on ${endpoint}: ${data.message || 'Token missing/invalid'}`);
+            if (!options.skipAuthRedirect) {
+              this.handleUnauthorized(data.message);
+            }
+          }
+          // Don't retry client errors (4xx) except maybe 429
+          if (response.status >= 400 && response.status < 500 && response.status !== 429) {
+            throw new Error(data.message || `HTTP Error ${response.status}`);
+          }
+          throw new Error(data.message || `HTTP Error ${response.status}`);
+        }
+
+        return data;
+      } catch (error) {
+        clearTimeout(timeoutId);
+        const isTimeout = error.name === 'AbortError';
+        const isClientError = error.message.includes('HTTP Error 4'); // Basic check so we don't retry 400s
+        
+        if (isClientError && !error.message.includes('429')) {
+             if (!options.silent) console.warn(`[API Client Error] ${endpoint}:`, error.message);
+             throw error;
+        }
+
+        if (attempt >= maxRetries) {
+          if (!options.silent) {
+            console.error(`[API Exception] ${endpoint} failed after ${attempt} retries:`, isTimeout ? "Timeout" : error.message);
+          }
+          throw new Error(isTimeout ? "Request timed out. Please try again." : error.message);
+        }
+        
+        attempt++;
+        if (!options.silent) console.warn(`[API Retry ${attempt}/${maxRetries}] ${endpoint}...`);
+        await new Promise(res => setTimeout(res, 1000 * attempt)); // Exponential backoff
       }
-      throw error;
     }
   },
 

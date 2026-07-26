@@ -104,14 +104,25 @@ def login():
     """Authenticate student/admin with JWT tokens."""
     try:
         data = request.get_json() or {}
-        email = data.get('email', '').strip().lower()
+        identifier = data.get('email', '').strip().lower() # we can call it identifier instead of strictly email
+        if not identifier:
+            identifier = data.get('username', '').strip().lower()
+        if not identifier:
+            identifier = data.get('phone', '').strip()
+            
         password = data.get('password', '')
 
-        if not email or not password:
-            return api_response(success=False, message="Email and password are required.", status_code=400)
+        if not identifier or not password:
+            return api_response(success=False, message="Email/Username/Phone and password are required.", status_code=400)
 
         db = mongo_manager.get_db()
-        user = db.users.find_one({"email": email}) if db is not None else IN_MEMORY_USERS.get(email)
+        user = None
+        if db is not None:
+            # Check if identifier matches email, username, or phone
+            user = db.users.find_one({"$or": [{"email": identifier}, {"username": identifier}, {"phone": identifier}]})
+        else:
+            # fallback for in memory, just check email for now
+            user = IN_MEMORY_USERS.get(identifier)
 
         if not user or not verify_password(password, user.get('password_hash', '')):
             return api_response(success=False, message="Invalid email or password.", status_code=401)
@@ -526,3 +537,274 @@ def update_class(current_user):
     except Exception as e:
         logger.error(f"Update Class Error: {str(e)}")
         return api_response(success=False, message=f"Failed to update class: {str(e)}", status_code=500)
+
+# ==========================================
+# ADVANCED SETTINGS & NEW OAUTH STUBS
+# ==========================================
+from twilio.rest import Client
+
+@auth_bp.route('/github/login', methods=['GET'])
+def github_login():
+    if not Config.GITHUB_CLIENT_ID:
+        return api_response(success=False, message="GitHub OAuth is not configured on the server.", status_code=500)
+    auth_url = "https://github.com/login/oauth/authorize"
+    params = {
+        "client_id": Config.GITHUB_CLIENT_ID,
+        "redirect_uri": "http://localhost:5000/api/auth/github/callback",
+        "scope": "user:email"
+    }
+    url = f"{auth_url}?{urlencode(params)}"
+    return redirect(url)
+
+@auth_bp.route('/github/callback', methods=['GET'])
+def github_callback():
+    code = request.args.get('code')
+    if not code: return render_template_string("<h1>GitHub Login Failed</h1><p>No code.</p>"), 400
+
+    token_url = "https://github.com/login/oauth/access_token"
+    token_data = {
+        "client_id": Config.GITHUB_CLIENT_ID,
+        "client_secret": Config.GITHUB_CLIENT_SECRET,
+        "code": code
+    }
+    headers = {"Accept": "application/json"}
+    
+    try:
+        res = requests.post(token_url, data=token_data, headers=headers)
+        res.raise_for_status()
+        token_info = res.json()
+        access_token = token_info.get('access_token')
+        
+        user_res = requests.get("https://api.github.com/user", headers={"Authorization": f"token {access_token}"})
+        user_info = user_res.json()
+        
+        email_res = requests.get("https://api.github.com/user/emails", headers={"Authorization": f"token {access_token}"})
+        emails = email_res.json()
+        
+        primary_email = next((e['email'] for e in emails if e['primary']), None)
+        if not primary_email: primary_email = emails[0]['email'] if emails else None
+        
+        if not primary_email:
+            return render_template_string("<h1>GitHub Login Failed</h1><p>No email found.</p>"), 400
+            
+        email = primary_email.lower().strip()
+        name = user_info.get('name', user_info.get('login', 'Student'))
+        github_id = str(user_info.get('id'))
+        profile_photo = user_info.get('avatar_url')
+        
+        db = mongo_manager.get_db()
+        user = db.users.find_one({"email": email}) if db is not None else None
+        
+        if not user:
+            hashed_pwd = hash_password(generate_otp())
+            user_doc = UserModel.create_user_doc(
+                name=name, email=email, password_hash=hashed_pwd,
+                student_class="Class 10", role="student", target_exam="Board Exam",
+                login_provider="github", github_id=github_id, profile_photo=profile_photo
+            )
+            user_doc["is_verified"] = True
+            db.users.insert_one(user_doc)
+            user = db.users.find_one({"email": email})
+        else:
+            db.users.update_one({"_id": user['_id']}, {"$set": {"github_id": github_id, "login_provider": "github"}})
+            
+        jwt_access_token, jwt_refresh_token = generate_tokens(str(user['_id']), email, user.get('role', 'student'), user.get('student_class'))
+        
+        html_template = """
+        <!DOCTYPE html>
+        <html><body><script>
+            localStorage.setItem('notex_token', '{{ access_token }}');
+            localStorage.setItem('notex_refresh_token', '{{ refresh_token }}');
+            window.location.href = '/#dashboard';
+        </script></body></html>
+        """
+        return render_template_string(html_template, access_token=jwt_access_token, refresh_token=jwt_refresh_token)
+    except Exception as e:
+        return render_template_string("<h1>GitHub Login Failed</h1><p>{{ error }}</p>", error=str(e)), 400
+
+@auth_bp.route('/microsoft/login', methods=['GET'])
+def microsoft_login():
+    if not Config.MICROSOFT_CLIENT_ID:
+        return api_response(success=False, message="Microsoft OAuth is not configured on the server.", status_code=500)
+    auth_url = "https://login.microsoftonline.com/common/oauth2/v2.0/authorize"
+    params = {
+        "client_id": Config.MICROSOFT_CLIENT_ID,
+        "response_type": "code",
+        "redirect_uri": "http://localhost:5000/api/auth/microsoft/callback",
+        "response_mode": "query",
+        "scope": "openid email profile User.Read",
+    }
+    url = f"{auth_url}?{urlencode(params)}"
+    return redirect(url)
+
+@auth_bp.route('/microsoft/callback', methods=['GET'])
+def microsoft_callback():
+    code = request.args.get('code')
+    if not code: return render_template_string("<h1>Microsoft Login Failed</h1><p>No code.</p>"), 400
+
+    token_url = "https://login.microsoftonline.com/common/oauth2/v2.0/token"
+    token_data = {
+        "client_id": Config.MICROSOFT_CLIENT_ID,
+        "client_secret": Config.MICROSOFT_CLIENT_SECRET,
+        "code": code,
+        "grant_type": "authorization_code",
+        "redirect_uri": "http://localhost:5000/api/auth/microsoft/callback"
+    }
+    
+    try:
+        res = requests.post(token_url, data=token_data)
+        res.raise_for_status()
+        token_info = res.json()
+        access_token = token_info.get('access_token')
+        
+        user_res = requests.get("https://graph.microsoft.com/v1.0/me", headers={"Authorization": f"Bearer {access_token}"})
+        user_info = user_res.json()
+        
+        email = user_info.get('mail') or user_info.get('userPrincipalName')
+        if not email:
+            return render_template_string("<h1>Microsoft Login Failed</h1><p>No email found.</p>"), 400
+            
+        email = email.lower().strip()
+        name = user_info.get('displayName', 'Student')
+        microsoft_id = str(user_info.get('id'))
+        
+        db = mongo_manager.get_db()
+        user = db.users.find_one({"email": email}) if db is not None else None
+        
+        if not user:
+            hashed_pwd = hash_password(generate_otp())
+            user_doc = UserModel.create_user_doc(
+                name=name, email=email, password_hash=hashed_pwd,
+                student_class="Class 10", role="student", target_exam="Board Exam",
+                login_provider="microsoft", microsoft_id=microsoft_id
+            )
+            user_doc["is_verified"] = True
+            db.users.insert_one(user_doc)
+            user = db.users.find_one({"email": email})
+        else:
+            db.users.update_one({"_id": user['_id']}, {"$set": {"microsoft_id": microsoft_id, "login_provider": "microsoft"}})
+            
+        jwt_access_token, jwt_refresh_token = generate_tokens(str(user['_id']), email, user.get('role', 'student'), user.get('student_class'))
+        
+        html_template = """
+        <!DOCTYPE html>
+        <html><body><script>
+            localStorage.setItem('notex_token', '{{ access_token }}');
+            localStorage.setItem('notex_refresh_token', '{{ refresh_token }}');
+            window.location.href = '/#dashboard';
+        </script></body></html>
+        """
+        return render_template_string(html_template, access_token=jwt_access_token, refresh_token=jwt_refresh_token)
+    except Exception as e:
+        return render_template_string("<h1>Microsoft Login Failed</h1><p>{{ error }}</p>", error=str(e)), 400
+
+@auth_bp.route('/send-phone-otp', methods=['POST'])
+def send_phone_otp():
+    try:
+        data = request.get_json() or {}
+        phone = data.get('phone')
+        if not phone: return api_response(success=False, message="Phone number required.", status_code=400)
+        
+        if Config.TWILIO_ACCOUNT_SID and Config.TWILIO_AUTH_TOKEN and Config.TWILIO_VERIFY_SERVICE_SID:
+            client = Client(Config.TWILIO_ACCOUNT_SID, Config.TWILIO_AUTH_TOKEN)
+            verification = client.verify \
+                .v2 \
+                .services(Config.TWILIO_VERIFY_SERVICE_SID) \
+                .verifications \
+                .create(to=phone, channel='sms')
+            logger.info(f"Twilio SMS sent to {phone}. Status: {verification.status}")
+            return api_response(success=True, message="SMS OTP sent successfully.", status_code=200)
+        else:
+            otp = generate_otp()
+            logger.info(f"MOCK SMS SENT TO {phone}: OTP {otp}")
+            return api_response(success=True, message="SMS OTP sent successfully (Mocked).", status_code=200)
+    except Exception as e:
+        logger.error(f"Twilio Send Error: {str(e)}")
+        return api_response(success=False, message=str(e), status_code=500)
+
+@auth_bp.route('/verify-phone-otp', methods=['POST'])
+def verify_phone_otp():
+    try:
+        data = request.get_json() or {}
+        phone = data.get('phone', '').strip()
+        otp = data.get('otp', '').strip()
+        if not phone or not otp: return api_response(success=False, message="Phone and OTP required.", status_code=400)
+        
+        if Config.TWILIO_ACCOUNT_SID and Config.TWILIO_AUTH_TOKEN and Config.TWILIO_VERIFY_SERVICE_SID:
+            client = Client(Config.TWILIO_ACCOUNT_SID, Config.TWILIO_AUTH_TOKEN)
+            verification_check = client.verify \
+                .v2 \
+                .services(Config.TWILIO_VERIFY_SERVICE_SID) \
+                .verification_checks \
+                .create(to=phone, code=otp)
+            
+            if verification_check.status == 'approved':
+                return api_response(success=True, message="Phone verified successfully.", status_code=200)
+            else:
+                return api_response(success=False, message="Invalid OTP.", status_code=400)
+        else:
+            logger.info(f"MOCK OTP VERIFIED for {phone}: {otp}")
+            return api_response(success=True, message="Phone verified successfully (Mocked).", status_code=200)
+    except Exception as e:
+        return api_response(success=False, message=str(e), status_code=500)
+
+@auth_bp.route('/user/upload-avatar', methods=['POST'])
+@token_required
+def upload_avatar(current_user):
+    try:
+        if 'file' not in request.files: return api_response(success=False, message="No file provided.", status_code=400)
+        file = request.files['file']
+        if file.filename == '': return api_response(success=False, message="No file selected.", status_code=400)
+        
+        import os
+        upload_folder = os.path.join('app', 'static', 'uploads')
+        os.makedirs(upload_folder, exist_ok=True)
+        
+        # simple random filename
+        filename = f"avatar_{current_user['_id']}_{random.randint(1000,9999)}.png"
+        file_path = os.path.join(upload_folder, filename)
+        file.save(file_path)
+        
+        avatar_url = f"/static/uploads/{filename}"
+        
+        db = mongo_manager.get_db()
+        if db is not None:
+            db.users.update_one({"_id": ObjectId(current_user['_id'])}, {"$set": {"profile_photo": avatar_url}})
+            
+        return api_response(success=True, message="Avatar uploaded.", data={"url": avatar_url}, status_code=200)
+    except Exception as e:
+        return api_response(success=False, message=str(e), status_code=500)
+
+@auth_bp.route('/check-username', methods=['POST'])
+def check_username():
+    try:
+        data = request.get_json() or {}
+        username = data.get('username', '').strip().lower()
+        if not username: return api_response(success=False, message="Username required.", status_code=400)
+        
+        db = mongo_manager.get_db()
+        if db is not None:
+            existing = db.users.find_one({"username": username})
+            if existing: return api_response(success=False, message="Username taken.", data={"available": False}, status_code=200)
+        return api_response(success=True, message="Username available.", data={"available": True}, status_code=200)
+    except Exception as e:
+        return api_response(success=False, message=str(e), status_code=500)
+
+@auth_bp.route('/user/settings', methods=['PUT'])
+@token_required
+def update_settings(current_user):
+    try:
+        data = request.get_json() or {}
+        db = mongo_manager.get_db()
+        if db is not None:
+            safe_data = {k: v for k, v in data.items() if k not in ['_id', 'email', 'password_hash', 'role', 'is_verified']}
+            db.users.update_one({"_id": ObjectId(current_user['_id'])}, {"$set": safe_data})
+        else:
+            email = current_user['email']
+            if email in IN_MEMORY_USERS:
+                for k, v in data.items():
+                    if k not in ['_id', 'email', 'password_hash', 'role', 'is_verified']:
+                        IN_MEMORY_USERS[email][k] = v
+        return api_response(success=True, message="Settings saved successfully.")
+    except Exception as e:
+        return api_response(success=False, message=str(e), status_code=500)

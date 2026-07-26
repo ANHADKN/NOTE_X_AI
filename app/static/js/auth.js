@@ -150,39 +150,65 @@ const Auth = {
   },
 
   updateUI() {
-    const user = (typeof APP_STATE !== 'undefined' && APP_STATE.user) || JSON.parse(localStorage.getItem('notex_user') || 'null');
-    const profileSection = document.getElementById('sidebarAuthProfileSection');
+    let user = (typeof APP_STATE !== 'undefined' && APP_STATE.user) || null;
+    if (!user) {
+      try {
+        user = JSON.parse(localStorage.getItem('notex_user')) || null;
+      } catch (e) {
+        user = null;
+      }
+    }
+    const profileSection = document.getElementById('premiumAiProfileComponent');
 
     if (profileSection) {
       if (user) {
         const firstLetter = (user.name || 'Student').charAt(0).toUpperCase();
+        const avatarSrc = user.profile_photo;
         
-        // Display profile photo if available, else show initials
-        const avatarHTML = user.profile_photo 
-          ? `<img src="${user.profile_photo}" alt="Profile" style="width: 32px; height: 32px; border-radius: 50%; object-fit: cover; flex-shrink: 0; border: 2px solid var(--hyper-accent-primary-light);">`
-          : `<div style="width: 32px; height: 32px; border-radius: 50%; background: linear-gradient(135deg, var(--hyper-accent-primary), var(--hyper-accent-cyan)); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.85rem; color: #fff; flex-shrink: 0;">${firstLetter}</div>`;
+        const fallbackHTML = `<div class="ai-profile-initials">${firstLetter}</div>`;
+        const innerImg = avatarSrc 
+            ? `<img src="${avatarSrc}" class="ai-profile-img" alt="" onerror="this.outerHTML='${fallbackHTML}'">`
+            : fallbackHTML;
 
         profileSection.innerHTML = `
-          <div style="display: flex; align-items: center; justify-content: space-between;">
-            <div style="display: flex; align-items: center; gap: 0.6rem; overflow: hidden;">
-              ${avatarHTML}
-              <div style="overflow: hidden;">
-                <div style="font-size: 0.82rem; font-weight: 700; color: var(--hyper-text-primary); text-overflow: ellipsis; white-space: nowrap; overflow: hidden;">${user.name || 'Student'}</div>
-                <div style="font-size: 0.72rem; color: var(--hyper-accent-cyan); font-weight: 500;">${user.student_class || 'Class 10'} • ${user.role || 'student'}</div>
+          <div class="ai-profile-wrapper">
+              <button class="ai-profile-btn" aria-label="User Menu" aria-haspopup="true">
+                  <div class="ai-profile-ring"></div>
+                  <div class="ai-profile-inner">
+                      ${innerImg}
+                  </div>
+                  <div class="ai-profile-status"></div>
+              </button>
+              
+              <div class="ai-profile-dropdown" role="menu">
+                  <div class="ai-profile-header">
+                      <span class="ai-profile-name">${user.name || 'Student'}</span>
+                      <span class="ai-profile-email">${user.email || '@' + (user.username || 'student')}</span>
+                  </div>
+                  <div style="height: 1px; background: var(--hyper-border); margin: 0.25rem 0;"></div>
+                  <a href="#settings" class="ai-profile-item" role="menuitem">
+                      <i data-lucide="settings"></i> Account Settings
+                  </a>
+                  <a href="#dashboard" class="ai-profile-item" role="menuitem">
+                      <i data-lucide="layout"></i> Workspace
+                  </a>
+                  <div style="height: 1px; background: var(--hyper-border); margin: 0.25rem 0;"></div>
+                  <button class="ai-profile-item danger" role="menuitem" onclick="Auth.clearSession()">
+                      <i data-lucide="log-out"></i> Sign Out
+                  </button>
               </div>
-            </div>
-            <button onclick="Auth.clearSession()" style="background: none; border: none; color: var(--hyper-text-muted); cursor: pointer; padding: 0.35rem;" title="Logout">
-              <i class="fa-solid fa-right-from-bracket" style="font-size: 0.85rem;"></i>
-            </button>
           </div>
         `;
       } else {
         profileSection.innerHTML = `
-          <button class="hyper-btn hyper-btn-primary hyper-btn-sm" style="width: 100%; border-radius: var(--hyper-radius-sm);" onclick="AuthModal.show('login')">
-            <i class="fa-solid fa-user-lock"></i> Login / Register
+          <button class="ai-profile-login-btn" onclick="AuthModal.show('login')">
+            <i data-lucide="user"></i> Sign In
           </button>
         `;
       }
+      
+      // Re-initialize icons inside the new component
+      if (typeof lucide !== 'undefined') lucide.createIcons();
     }
   }
 };

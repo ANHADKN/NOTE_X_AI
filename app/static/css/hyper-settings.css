@@ -1,0 +1,218 @@
+/* hyper-settings.css - Premium 11-Tab Settings Layout */
+.settings-layout {
+  display: flex;
+  gap: 2rem;
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 2rem;
+  min-height: calc(100vh - 80px);
+}
+
+.settings-sidebar {
+  width: 280px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.settings-nav-group {
+  margin-bottom: 1.5rem;
+}
+
+.settings-nav-title {
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--hyper-text-muted);
+  margin-bottom: 0.75rem;
+  padding-left: 1rem;
+}
+
+.settings-nav-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.85rem 1rem;
+  border-radius: 12px;
+  color: var(--hyper-text-secondary);
+  font-weight: 600;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  background: transparent;
+  border: none;
+  width: 100%;
+  text-align: left;
+}
+
+.settings-nav-item:hover {
+  background: rgba(99, 102, 241, 0.05);
+  color: var(--hyper-accent-primary);
+}
+[data-theme="dark"] .settings-nav-item:hover {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.settings-nav-item.active {
+  background: var(--hyper-accent-primary);
+  color: #ffffff;
+  box-shadow: 0 4px 15px rgba(99, 102, 241, 0.25);
+}
+
+.settings-nav-item i {
+  width: 18px;
+}
+
+.settings-content-area {
+  flex: 1;
+  background: var(--hyper-bg-card);
+  border: 1px solid var(--hyper-border);
+  border-radius: 24px;
+  padding: 3rem;
+  box-shadow: var(--hyper-shadow-md);
+  position: relative;
+  overflow: hidden;
+}
+
+.settings-section-title {
+  font-size: 1.75rem;
+  font-weight: 800;
+  color: var(--hyper-text-primary);
+  margin-bottom: 0.5rem;
+  letter-spacing: -0.02em;
+}
+
+.settings-section-desc {
+  color: var(--hyper-text-muted);
+  font-size: 0.95rem;
+  margin-bottom: 2.5rem;
+  line-height: 1.5;
+}
+
+/* Settings Form Controls */
+.settings-form-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.5rem 0;
+  border-bottom: 1px solid var(--hyper-border);
+}
+.settings-form-row:last-child {
+  border-bottom: none;
+}
+
+.settings-form-label {
+  flex: 1;
+  padding-right: 2rem;
+}
+.settings-form-label h4 {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--hyper-text-primary);
+  margin-bottom: 0.25rem;
+}
+.settings-form-label p {
+  font-size: 0.85rem;
+  color: var(--hyper-text-muted);
+  margin: 0;
+}
+
+.settings-form-control {
+  flex-shrink: 0;
+  width: 300px;
+}
+
+/* Toggle Switch */
+.settings-toggle {
+  position: relative;
+  display: inline-block;
+  width: 50px;
+  height: 28px;
+}
+.settings-toggle input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+.settings-toggle-slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background-color: var(--hyper-border);
+  transition: .3s;
+  border-radius: 34px;
+}
+.settings-toggle-slider:before {
+  position: absolute;
+  content: "";
+  height: 20px;
+  width: 20px;
+  left: 4px;
+  bottom: 4px;
+  background-color: white;
+  transition: .3s;
+  border-radius: 50%;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+.settings-toggle input:checked + .settings-toggle-slider {
+  background-color: var(--hyper-accent-primary);
+}
+.settings-toggle input:checked + .settings-toggle-slider:before {
+  transform: translateX(22px);
+}
+
+.settings-badge {
+  padding: 0.25rem 0.75rem;
+  border-radius: 100px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  background: rgba(99, 102, 241, 0.1);
+  color: var(--hyper-accent-primary);
+}
+
+.settings-danger-zone {
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  border-radius: 16px;
+  padding: 1.5rem;
+  background: rgba(239, 68, 68, 0.05);
+  margin-top: 2rem;
+}
+.settings-danger-zone h4 {
+  color: #EF4444;
+}
+
+/* Storage / Usage Bars */
+.settings-usage-bar {
+  height: 8px;
+  background: var(--hyper-border);
+  border-radius: 4px;
+  margin-top: 1rem;
+  overflow: hidden;
+  display: flex;
+}
+.settings-usage-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--hyper-accent-primary), var(--hyper-accent-cyan));
+}
+
+@media (max-width: 992px) {
+  .settings-layout {
+    flex-direction: column;
+  }
+  .settings-sidebar {
+    width: 100%;
+    flex-direction: row;
+    overflow-x: auto;
+    padding-bottom: 1rem;
+  }
+  .settings-nav-group {
+    display: flex;
+    margin: 0; gap: 0.5rem;
+  }
+  .settings-nav-title { display: none; }
+  .settings-nav-item { white-space: nowrap; width: auto; }
+  .settings-form-row { flex-direction: column; align-items: flex-start; gap: 1rem; }
+  .settings-form-control { width: 100%; }
+}

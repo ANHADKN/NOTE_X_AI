@@ -8,9 +8,16 @@ const CONFIG = {
   ]
 };
 
+let cachedUser = null;
+try {
+  cachedUser = JSON.parse(localStorage.getItem('notex_user'));
+} catch (e) {
+  localStorage.removeItem('notex_user');
+}
+
 const APP_STATE = {
   activeView: 'dashboard',
   currentGrade: localStorage.getItem('notex_grade') || CONFIG.DEFAULT_GRADE,
-  user: JSON.parse(localStorage.getItem('notex_user')) || null,
+  user: cachedUser,
   token: localStorage.getItem('notex_token') || null
 };

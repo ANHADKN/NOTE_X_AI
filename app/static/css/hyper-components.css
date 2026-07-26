@@ -693,3 +693,289 @@
 .hyper-toast-success { border-left: 4px solid var(--hyper-accent-emerald); }
 .hyper-toast-error { border-left: 4px solid var(--hyper-accent-rose); }
 .hyper-toast-info { border-left: 4px solid var(--hyper-accent-primary); }
+
+/* ==========================================================================
+   LOADING SKELETONS
+   ========================================================================== */
+
+.hyper-skeleton {
+    background: linear-gradient(90deg, 
+        rgba(255, 255, 255, 0.05) 25%, 
+        rgba(255, 255, 255, 0.1) 50%, 
+        rgba(255, 255, 255, 0.05) 75%);
+    background-size: 200% 100%;
+    animation: hyperShimmer 1.5s infinite linear;
+    border-radius: 4px;
+}
+
+[data-theme="light"] .hyper-skeleton {
+    background: linear-gradient(90deg, 
+        rgba(0, 0, 0, 0.05) 25%, 
+        rgba(0, 0, 0, 0.1) 50%, 
+        rgba(0, 0, 0, 0.05) 75%);
+    background-size: 200% 100%;
+}
+
+@keyframes hyperShimmer {
+    0% { background-position: -200% 0; }
+    100% { background-position: 200% 0; }
+}
+
+.hyper-skeleton-text {
+    height: 1rem;
+    margin-bottom: 0.5rem;
+    width: 100%;
+}
+
+.hyper-skeleton-title {
+    height: 1.5rem;
+    margin-bottom: 1rem;
+    width: 60%;
+}
+
+.hyper-skeleton-avatar {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+}
+
+.hyper-skeleton-card {
+    padding: 1.5rem;
+    border-radius: 16px;
+    background: var(--hyper-bg-surface);
+    border: 1px solid var(--hyper-border);
+}
+
+.hyper-skeleton-card .hyper-skeleton-text:last-child {
+    width: 80%;
+}
+
+/* ==========================================================================
+   PREMIUM AI PROFILE / AVATAR COMPONENT
+   ========================================================================== */
+
+.ai-profile-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.ai-profile-btn {
+    position: relative;
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: transparent;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    outline: none;
+    transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+    z-index: 100;
+}
+
+.ai-profile-btn:hover {
+    transform: scale(1.05);
+}
+
+.ai-profile-ring {
+    position: absolute;
+    inset: -2px;
+    border-radius: 50%;
+    background: conic-gradient(from 0deg, var(--hyper-accent-primary), var(--hyper-accent-cyan), var(--hyper-accent-primary));
+    animation: aiRingSpin 4s linear infinite;
+    z-index: 1;
+    opacity: 0.8;
+}
+
+@keyframes aiRingSpin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+.ai-profile-inner {
+    position: absolute;
+    inset: 2px;
+    border-radius: 50%;
+    background: var(--hyper-bg-surface);
+    z-index: 2;
+    overflow: hidden; /* Ensures image does not bleed */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.ai-profile-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 50%;
+}
+
+.ai-profile-initials {
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 700;
+    font-size: 1.1rem;
+    color: var(--hyper-text-primary);
+    background: linear-gradient(135deg, var(--hyper-bg-surface), var(--hyper-bg-base));
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.ai-profile-status {
+    position: absolute;
+    bottom: 0px;
+    right: 0px;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: #10b981;
+    border: 2.5px solid var(--hyper-bg-base);
+    z-index: 3;
+}
+
+.ai-profile-status::after {
+    content: '';
+    position: absolute;
+    inset: -1px;
+    border-radius: 50%;
+    border: 2px solid #10b981;
+    animation: aiPulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes aiPulse {
+    0% { transform: scale(1); opacity: 0.8; }
+    100% { transform: scale(2.5); opacity: 0; }
+}
+
+/* Glassmorphism Dropdown */
+.ai-profile-dropdown {
+    position: absolute;
+    top: calc(100% + 12px);
+    right: 0;
+    width: 240px;
+    background: rgba(255, 255, 255, 0.7);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    box-shadow: 0 16px 40px rgba(0,0,0,0.08);
+    border-radius: 16px;
+    padding: 0.75rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    z-index: 1000;
+    
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-10px) scale(0.95);
+    transition: all 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
+    transform-origin: top right;
+}
+
+[data-theme="dark"] .ai-profile-dropdown {
+    background: rgba(30, 41, 59, 0.75);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: 0 16px 40px rgba(0,0,0,0.3);
+}
+
+.ai-profile-wrapper:focus-within .ai-profile-dropdown,
+.ai-profile-wrapper:hover .ai-profile-dropdown {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0) scale(1);
+}
+
+/* Dropdown Header */
+.ai-profile-header {
+    display: flex;
+    flex-direction: column;
+    padding: 0.5rem 0.75rem 0.75rem 0.75rem;
+    border-bottom: 1px solid var(--hyper-border);
+    margin-bottom: 0.25rem;
+}
+
+.ai-profile-name {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--hyper-text-primary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.ai-profile-email {
+    font-size: 0.75rem;
+    color: var(--hyper-text-secondary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Dropdown Items */
+.ai-profile-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.6rem 0.75rem;
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: var(--hyper-text-main);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-decoration: none;
+    border: none;
+    background: transparent;
+    width: 100%;
+    text-align: left;
+}
+
+.ai-profile-item:hover {
+    background: var(--hyper-bg-hover);
+    color: var(--hyper-text-primary);
+}
+
+.ai-profile-item i {
+    width: 16px;
+    height: 16px;
+    color: var(--hyper-text-muted);
+    transition: color 0.2s ease;
+}
+
+.ai-profile-item:hover i {
+    color: var(--hyper-accent-primary);
+}
+
+.ai-profile-item.danger:hover {
+    background: rgba(239, 68, 68, 0.1);
+    color: #ef4444;
+}
+.ai-profile-item.danger:hover i {
+    color: #ef4444;
+}
+
+/* Unauthenticated State */
+.ai-profile-login-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    background: linear-gradient(135deg, var(--hyper-accent-primary), var(--hyper-accent-cyan));
+    color: #fff;
+    font-weight: 600;
+    font-size: 0.85rem;
+    border: none;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(14, 165, 233, 0.3);
+    transition: all 0.2s ease;
+}
+.ai-profile-login-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 16px rgba(14, 165, 233, 0.4);
+}

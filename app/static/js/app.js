@@ -22,6 +22,30 @@ const UI = {
   }
 };
 
+window.addEventListener('error', function(event) {
+  console.error('[Global Error]', event.error);
+  const targetContainer = document.getElementById('app-view-container');
+  if (targetContainer) {
+    targetContainer.innerHTML = `
+      <div style="text-align: center; padding: 4rem 1rem; color: var(--hyper-text-secondary); width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; background: var(--hyper-bg-base);">
+        <i data-lucide="alert-triangle" style="width: 64px; height: 64px; color: var(--hyper-accent-rose); margin-bottom: 1rem;"></i>
+        <h2 style="color: var(--hyper-text-primary); margin-bottom: 0.5rem;">Something went wrong</h2>
+        <p style="margin-bottom: 1.5rem; max-width: 400px;">We encountered an unexpected error. Don't worry, your data is safe.</p>
+        <div style="background: rgba(239, 68, 68, 0.1); padding: 1rem; border-radius: 8px; font-family: monospace; font-size: 0.85rem; color: var(--hyper-accent-rose); margin-bottom: 2rem; max-width: 600px; text-align: left; overflow: auto; border: 1px solid rgba(239, 68, 68, 0.2);">
+            ${event.message || 'Unknown Error'}
+        </div>
+        <button class="hyper-btn hyper-btn-primary" onclick="window.location.reload()">Reload Application</button>
+      </div>
+    `;
+    if (typeof lucide !== 'undefined') lucide.createIcons();
+  }
+});
+
+window.addEventListener('unhandledrejection', function(event) {
+  console.error('[Unhandled Promise Rejection]', event.reason);
+  UI.showToast("An unexpected background error occurred.", "error");
+});
+
 document.addEventListener('DOMContentLoaded', () => {
   const classSelectorBtn = document.getElementById('classSelectorBtn');
   const currentGradeLabel = document.getElementById('currentGradeLabel');
@@ -106,7 +130,7 @@ document.addEventListener('DOMContentLoaded', () => {
       APP_STATE.activeView = hash;
     }
 
-    const navItems = document.querySelectorAll('.hyper-dock-item');
+    const navItems = document.querySelectorAll('.nx30-nav-item, .hyper-dock-item');
     navItems.forEach(item => {
       if (item.getAttribute('data-view') === hash) {
         item.classList.add('active');
@@ -115,8 +139,27 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     });
 
+    const token = localStorage.getItem('notex_token');
+    
+    // Auth route guarding
+    if (!token && !['login', 'register', 'forgot-password'].includes(hash)) {
+      window.location.hash = '#login';
+      return;
+    }
+    
+    // Redirect authenticated users away from auth pages
+    if (token && ['login', 'register', 'forgot-password'].includes(hash)) {
+      window.location.hash = '#dashboard';
+      return;
+    }
+
     try {
       switch (hash) {
+        case 'login':
+        case 'register':
+        case 'forgot-password':
+          if (typeof AuthViewModule !== 'undefined') await AuthViewModule.render(targetContainer, hash);
+          break;
         case 'chat':
         case 'chatbot':
           if (typeof ChatbotModule !== 'undefined') await ChatbotModule.render(targetContainer);

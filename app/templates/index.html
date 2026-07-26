@@ -12,7 +12,7 @@
   <!-- Modern Fonts & Icons -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Inter:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Inter:wght@300;400;500;600;700&family=Poppins:wght@500;600;700;800&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   
   <!-- Lucide Icons CDN -->
@@ -32,6 +32,7 @@
   <link rel="stylesheet" href="/static/css/hyper-components.css">
   <link rel="stylesheet" href="/static/css/hyper-auth.css">
   <link rel="stylesheet" href="/static/css/hyper-dashboard.css">
+  <link rel="stylesheet" href="/static/css/hyper-settings.css">
 
   <!-- Chart.js, Canvas Confetti & Highlight.js, Lottie Player -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -43,120 +44,144 @@
 </head>
 <body>
   <!-- Scientific & Formula Animated Background Canvas -->
-  <canvas id="scienceCanvas"></canvas>
+  <canvas id="scienceCanvas" style="position: fixed; inset: 0; pointer-events: none; z-index: 0; opacity: 0.45;"></canvas>
   <div class="hyper-ambient-bg"></div>
-
-  <div class="hyper-app-wrapper">
+  <div id="nx30-particles"></div>
+  <div class="nx30-wrapper">
     
-    <!-- Premium Left Sidebar -->
-    <aside class="hyper-sidebar" id="mainSidebar">
-      <!-- Student Study Platform Navigation -->
-      <ul class="hyper-nav-list" id="studentNavList" style="margin-top: 1rem;">
-        <li class="hyper-nav-item active" data-view="dashboard">
-          <a href="#dashboard"><i data-lucide="layout-dashboard"></i> <span>Dashboard</span></a>
+    <!-- Premium 2026 Glass Sidebar -->
+    <aside class="nx30-sidebar" id="mainSidebar">
+      <ul class="nx30-nav-list" id="studentNavList">
+        <li class="nx30-nav-item active" data-view="dashboard" title="Home">
+          <a href="#dashboard"><i data-lucide="home"></i> <span class="nx30-nav-text">Home</span></a>
         </li>
-        <li class="hyper-nav-item" data-view="chat">
-          <a href="#chat"><i data-lucide="bot"></i> <span>AI Chat</span></a>
+        <li class="nx30-nav-item" data-view="chat" title="Chats">
+          <a href="#chat"><i data-lucide="message-square"></i> <span class="nx30-nav-text">Chats</span></a>
         </li>
-        <li class="hyper-nav-item" data-view="notes">
-          <a href="#notes"><i data-lucide="sticky-note"></i> <span>AI Notes</span></a>
+        <li class="nx30-nav-item" data-view="rag" title="Workspace">
+          <a href="#rag"><i data-lucide="layout"></i> <span class="nx30-nav-text">Workspace</span></a>
         </li>
-        <li class="hyper-nav-item" data-view="rag">
-          <a href="#rag"><i data-lucide="file-text"></i> <span>PDF Reader</span></a>
+        <li class="nx30-nav-item" data-view="notes" title="Files">
+          <a href="#notes"><i data-lucide="folder"></i> <span class="nx30-nav-text">Files</span></a>
         </li>
-        <li class="hyper-nav-item" data-view="flashcards">
-          <a href="#flashcards"><i data-lucide="layers"></i> <span>Flashcards</span></a>
+        <li class="nx30-nav-item" data-view="quizzes" title="Projects">
+          <a href="#quizzes"><i data-lucide="briefcase"></i> <span class="nx30-nav-text">Projects</span></a>
         </li>
-        <li class="hyper-nav-item" data-view="quizzes">
-          <a href="#quizzes"><i data-lucide="help-circle"></i> <span>AI Quiz</span></a>
+        
+        <div class="nx30-nav-divider"></div>
+        
+        <li class="nx30-nav-item" data-view="pinned" title="Pinned">
+          <a href="#pinned"><i data-lucide="pin"></i> <span class="nx30-nav-text">Pinned</span></a>
         </li>
-        <li class="hyper-nav-item" data-view="study-plan">
-          <a href="#study-plan"><i data-lucide="calendar"></i> <span>Study Planner</span></a>
+        <li class="nx30-nav-item" data-view="favorites" title="Favorites">
+          <a href="#favorites"><i data-lucide="star"></i> <span class="nx30-nav-text">Favorites</span></a>
         </li>
-        <li class="hyper-nav-item" data-view="analytics">
-          <a href="#analytics"><i data-lucide="bar-chart-3"></i> <span>Analytics</span></a>
+        <li class="nx30-nav-item" data-view="trash" title="Trash">
+          <a href="#trash"><i data-lucide="trash-2"></i> <span class="nx30-nav-text">Trash</span></a>
         </li>
-        <li class="hyper-nav-item" data-view="settings">
-          <a href="#settings"><i data-lucide="settings"></i> <span>Settings</span></a>
+      </ul>
+      
+      <!-- Bottom Section of Sidebar -->
+      <ul class="nx30-nav-list" style="margin-top: auto;">
+        <li class="nx30-nav-item" title="Storage Usage" style="pointer-events: none;">
+          <a href="#"><i data-lucide="hard-drive"></i> <span class="nx30-nav-text">45% Storage</span></a>
+        </li>
+        <li class="nx30-nav-item" data-view="settings" title="Settings">
+          <a href="#settings"><i data-lucide="settings"></i> <span class="nx30-nav-text">Settings</span></a>
         </li>
       </ul>
     </aside>
 
     <!-- Main View Shell -->
-    <main class="hyper-main-content">
-      <!-- Floating Glass Navigation Bar -->
-      <header class="hyper-float-nav" style="display:flex; justify-content:space-between; align-items:center;">
+    <main class="nx30-main-content" id="mainContentArea">
+      
+      <!-- OS Top Navbar -->
+      <header class="nx30-top-nav" id="topNavbar">
         
-        <!-- NoteX AI Logo (in Top Nav) -->
-        <div class="hyper-brand" style="padding:0; margin:0; border:none; display:flex; align-items:center; background:none;">
-          <div class="hyper-brand-logo" style="width:32px; height:32px; font-size:1rem;">𝝌</div>
-          <div class="hyper-brand-title" style="font-size:1.1rem; margin-left:0.5rem; letter-spacing:-0.03em;">noteX AI</div>
+        <!-- Animated NoteX Logo -->
+        <div class="nx30-brand">
+          <div class="nx30-brand-icon" style="background: linear-gradient(135deg, #5B6CFF, #7C5CFF); border-radius: 12px; width:36px; height:36px; display:flex; align-items:center; justify-content:center; color:white; font-size:1.2rem; box-shadow: 0 8px 24px rgba(91,108,255,0.4);">
+            𝝌
+          </div>
+          <div class="nx30-brand-text" style="font-family: 'Poppins', sans-serif; font-weight:700;">NoteX AI</div>
         </div>
 
-        <!-- Search Bar -->
-        <div class="hyper-command-trigger" onclick="document.getElementById('commandPaletteModal').style.display = 'flex'" style="margin:0; padding:0.4rem 0.75rem;">
-          <i data-lucide="search" style="width:16px; height:16px; color:var(--hyper-accent-primary);"></i>
-          <span style="font-size:0.85rem;">Search or run command...</span>
-          <span class="hyper-kbd" style="margin-left:auto;">⌘ K</span>
+        <!-- Global AI Search & Model Selector -->
+        <div class="nx30-global-search" style="display:flex; align-items:center; gap:0.75rem; background:rgba(255,255,255,0.6); padding:0.4rem; border-radius:24px; border:1px solid rgba(0,0,0,0.05);">
+          
+          <div style="position:relative; width:300px;">
+            <i data-lucide="search" class="search-icon" style="position:absolute; left:1rem; top:0.5rem; width:16px; height:16px; color:var(--hyper-text-muted);"></i>
+            <input type="text" placeholder="Workspace Search..." style="width:100%; border:none; background:transparent; padding:0.4rem 1rem 0.4rem 2.5rem; outline:none; font-family:'Inter', sans-serif; font-size:0.9rem;">
+            <div class="nx30-kbd" onclick="document.getElementById('commandPaletteModal').style.display = 'flex'" style="position:absolute; right:0.5rem; top:0.4rem; font-size:0.7rem;">⌘K</div>
+          </div>
+          
+          <div style="width:1px; height:20px; background:rgba(0,0,0,0.1);"></div>
+
+          <div style="display:flex; align-items:center; gap:0.4rem; padding:0.3rem 0.75rem; background:white; border-radius:18px; cursor:pointer; font-size:0.85rem; font-weight:600; color:#5B6CFF; box-shadow:0 2px 8px rgba(0,0,0,0.05);">
+            <i data-lucide="cpu" style="width:14px; height:14px;"></i> Claude 3.5
+            <i data-lucide="chevron-down" style="width:12px; height:12px; margin-left:0.2rem;"></i>
+          </div>
+
         </div>
 
-        <div style="display: flex; align-items: center; gap: 1rem;">
-          <!-- Notifications (Target Class / Bell) -->
-          <button id="classSelectorBtn" class="hyper-btn hyper-btn-glass hyper-btn-sm" style="border-radius:var(--hyper-radius-full);">
-            <i data-lucide="graduation-cap" style="width:15px; height:15px; color:var(--hyper-accent-primary);"></i>
-            <span id="currentGradeLabel" style="color:var(--hyper-accent-primary); font-weight:700;">Class 10</span>
-          </button>
-          <button class="hyper-btn hyper-btn-glass hyper-btn-sm" style="position:relative; border-radius:50%; width:36px; height:36px; padding:0; display:flex; align-items:center; justify-content:center;">
-            <i data-lucide="bell" style="width:16px; height:16px; color:var(--hyper-text-secondary);"></i>
-            <span style="position:absolute; top:2px; right:2px; width:8px; height:8px; background:var(--hyper-accent-rose); border-radius:50%;"></span>
+        <div class="nx30-nav-actions">
+          <button class="nx30-btn-icon" title="Quick Actions">
+            <i data-lucide="zap"></i>
           </button>
           
-          <!-- User Profile -->
-          <div id="sidebarAuthProfileSection">
-            <!-- Rendered dynamically by Auth.updateUI() -->
-          </div>
+          <button class="nx30-btn-icon has-badge" title="Notifications">
+            <i data-lucide="bell"></i>
+            <span class="nx30-badge" style="background:#00C9A7;"></span>
+          </button>
+
+          <button class="nx30-btn-icon" title="Toggle Theme" id="themeToggleBtn">
+            <i data-lucide="moon" id="themeIcon"></i>
+          </button>
+
+          <!-- Premium AI Profile Component Container -->
+          <div id="premiumAiProfileComponent" style="margin-left: 0.75rem;"></div>
         </div>
       </header>
 
       <!-- Dynamic View Viewport -->
-      <div id="app-view-container" class="hyper-view-viewport">
+      <div id="app-view-container" class="nx30-viewport">
         <!-- SPA View Module HTML Rendered Here -->
       </div>
     </main>
   </div>
 
   <!-- Raycast Style Command Palette Modal (`⌘K`) -->
-  <div id="commandPaletteModal" class="hyper-modal-backdrop" style="display: none;">
-    <div class="hyper-modal-content" style="max-width: 580px; padding: 1.25rem;">
-      <div style="position: relative; margin-bottom: 1rem;">
-        <i data-lucide="terminal" style="position: absolute; left: 1rem; top: 0.85rem; color: var(--hyper-accent-primary); width: 18px; height: 18px;"></i>
-        <input type="text" id="commandPaletteInput" class="hyper-input" placeholder="Type a command or jump to feature..." style="padding-left: 2.75rem; border-radius: var(--hyper-radius-sm); font-size: 0.95rem;">
+  <div id="commandPaletteModal" class="hyper-modal-backdrop" style="display: none; align-items: flex-start; padding-top: 10vh;">
+    <div class="hyper-modal-content nx30-cmd-palette" style="max-width: 640px; padding: 0; overflow: hidden; background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(40px); -webkit-backdrop-filter: blur(40px); border: 1px solid rgba(255, 255, 255, 0.5); box-shadow: 0 24px 64px rgba(0,0,0,0.1);">
+      <div style="position: relative; padding: 1.5rem; border-bottom: 1px solid rgba(0,0,0,0.05);">
+        <i data-lucide="search" style="position: absolute; left: 1.75rem; top: 1.65rem; color: var(--hyper-accent-primary); width: 22px; height: 22px;"></i>
+        <input type="text" id="commandPaletteInput" placeholder="What do you need?" style="width: 100%; border: none; background: transparent; padding-left: 2.75rem; font-size: 1.25rem; font-weight: 500; outline: none; color: var(--hyper-text-main);">
       </div>
-      <div style="display: flex; flex-direction: column; gap: 0.35rem; max-height: 320px; overflow-y: auto;">
-        <div class="hyper-btn hyper-btn-ghost" style="justify-content: flex-start;" onclick="location.hash='#dashboard'; document.getElementById('commandPaletteModal').style.display='none';">
-          <i data-lucide="layout-dashboard" style="color: var(--hyper-accent-primary); width: 18px; margin-right: 0.5rem;"></i> View Dashboard Overview
+      <div class="nx30-cmd-list" style="display: flex; flex-direction: column; max-height: 400px; overflow-y: auto; padding: 0.5rem;">
+        <div class="nx30-cmd-group">Suggestions</div>
+        <div class="nx30-cmd-item" onclick="location.hash='#chat'; document.getElementById('commandPaletteModal').style.display='none';">
+          <i data-lucide="sparkles" style="color: #4F7CFF;"></i> Ask AI a question
         </div>
-        <div class="hyper-btn hyper-btn-ghost" style="justify-content: flex-start;" onclick="location.hash='#chat'; document.getElementById('commandPaletteModal').style.display='none';">
-          <i data-lucide="sparkles" style="color: var(--hyper-accent-cyan); width: 18px; margin-right: 0.5rem;"></i> Open AI Chat Assistant
+        <div class="nx30-cmd-item" onclick="location.hash='#rag'; document.getElementById('commandPaletteModal').style.display='none';">
+          <i data-lucide="upload-cloud" style="color: #00C6A2;"></i> Analyze a PDF
         </div>
-        <div class="hyper-btn hyper-btn-ghost" style="justify-content: flex-start;" onclick="location.hash='#rag'; document.getElementById('commandPaletteModal').style.display='none';">
-          <i data-lucide="file-text" style="color: var(--hyper-accent-rose); width: 18px; margin-right: 0.5rem;"></i> Upload PDF & RAG Search
+        <div class="nx30-cmd-item" onclick="location.hash='#notes'; document.getElementById('commandPaletteModal').style.display='none';">
+          <i data-lucide="file-text" style="color: #8B5CF6;"></i> Generate Smart Notes
         </div>
-        <div class="hyper-btn hyper-btn-ghost" style="justify-content: flex-start;" onclick="location.hash='#notes'; document.getElementById('commandPaletteModal').style.display='none';">
-          <i data-lucide="sticky-note" style="color: var(--hyper-accent-lavender); width: 18px; margin-right: 0.5rem;"></i> Generate AI Smart Notes
+        <div class="nx30-cmd-item" onclick="location.hash='#flashcards'; document.getElementById('commandPaletteModal').style.display='none';">
+          <i data-lucide="layers" style="color: #FFB84D;"></i> Review Flashcards
         </div>
-        <div class="hyper-btn hyper-btn-ghost" style="justify-content: flex-start;" onclick="location.hash='#flashcards'; document.getElementById('commandPaletteModal').style.display='none';">
-          <i data-lucide="layers" style="color: var(--hyper-accent-amber); width: 18px; margin-right: 0.5rem;"></i> Practice Flashcards Session
+        <div class="nx30-cmd-item" onclick="location.hash='#quizzes'; document.getElementById('commandPaletteModal').style.display='none';">
+          <i data-lucide="help-circle" style="color: #FF5A76;"></i> Start a Quiz
         </div>
-        <div class="hyper-btn hyper-btn-ghost" style="justify-content: flex-start;" onclick="location.hash='#quizzes'; document.getElementById('commandPaletteModal').style.display='none';">
-          <i data-lucide="help-circle" style="color: var(--hyper-accent-emerald); width: 18px; margin-right: 0.5rem;"></i> Start AI Quiz Challenge
-        </div>
-        <div class="hyper-btn hyper-btn-ghost" style="justify-content: flex-start;" onclick="location.hash='#settings'; document.getElementById('commandPaletteModal').style.display='none';">
-          <i data-lucide="settings" style="color: var(--hyper-text-secondary); width: 18px; margin-right: 0.5rem;"></i> Open Settings & Preferences
+        <div class="nx30-cmd-group">Settings</div>
+        <div class="nx30-cmd-item" onclick="location.hash='#settings'; document.getElementById('commandPaletteModal').style.display='none';">
+          <i data-lucide="settings" style="color: #64748B;"></i> Open Preferences
         </div>
       </div>
-      <div style="display: flex; justify-content: flex-end; margin-top: 1rem; border-top: 1px solid var(--hyper-border-subtle); padding-top: 0.75rem;">
-        <button class="hyper-btn hyper-btn-glass hyper-btn-sm" onclick="document.getElementById('commandPaletteModal').style.display='none'">Close ESC</button>
+      <div style="display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.02); padding: 0.75rem 1.5rem; font-size: 0.75rem; color: #94A3B8;">
+        <span>Use <span class="nx30-kbd" style="font-size:0.65rem; padding:0.15rem 0.3rem;">↑</span> <span class="nx30-kbd" style="font-size:0.65rem; padding:0.15rem 0.3rem;">↓</span> to navigate</span>
+        <span><span class="nx30-kbd" style="font-size:0.65rem; padding:0.15rem 0.3rem;">ESC</span> to close</span>
       </div>
     </div>
   </div>
@@ -303,11 +328,32 @@
       </div>
     </div>
   </div>
+  <!-- Floating AI Assistant (VisionOS Style Orb) -->
+  <div id="nx30-floating-ai">
+    <div id="nx30-ai-chat-window" style="display: none;">
+      <div class="nx30-ai-header">
+        <i data-lucide="sparkles"></i> AI Assistant
+        <i data-lucide="x" style="margin-left: auto; cursor: pointer; width: 16px;" onclick="document.getElementById('nx30-ai-chat-window').style.display='none'"></i>
+      </div>
+      <div class="nx30-ai-messages">
+        <div class="nx30-ai-msg ai">Hello! I'm your NoteX AI assistant. How can I help you today?</div>
+      </div>
+      <div class="nx30-ai-input-area">
+        <input type="text" placeholder="Ask me anything...">
+        <button><i data-lucide="send"></i></button>
+      </div>
+    </div>
+    <div id="nx30-ai-orb" onclick="const w = document.getElementById('nx30-ai-chat-window'); w.style.display = w.style.display === 'none' ? 'flex' : 'none';">
+      <div class="orb-core"></div>
+      <div class="orb-glow"></div>
+    </div>
+  </div>
 
   <!-- JavaScript Modules -->
   <script src="/static/js/config.js"></script>
   <script src="/static/js/api.js"></script>
   <script src="/static/js/auth.js"></script>
+  <script src="/static/js/modules/auth_view.js"></script>
   <script src="/static/js/science-bg.js"></script>
   <script src="/static/js/modules/chatbot.js"></script>
   <script src="/static/js/modules/dashboard.js"></script>
