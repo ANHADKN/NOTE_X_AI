@@ -46,66 +46,83 @@
   <canvas id="scienceCanvas"></canvas>
   <div class="hyper-ambient-bg"></div>
 
-  <div class="hyper-main-wrapper-new">
+  <div class="hyper-app-wrapper">
     
-    <!-- Top Header (replaces sidebar branding and profile) -->
-    <header class="hyper-top-header">
-      <div class="hyper-brand-new">
-        <div class="hyper-brand-logo-new">𝝌</div>
-        <div class="hyper-brand-text">noteX AI</div>
-      </div>
-      
-      <div style="display: flex; align-items: center; gap: 1rem;">
-        <button id="classSelectorBtn" class="hyper-btn hyper-btn-glass hyper-btn-sm" style="border-radius: var(--hyper-radius-full);">
-          <i data-lucide="graduation-cap" style="width: 15px; height: 15px; color: var(--hyper-accent-primary);"></i> <span id="currentGradeLabel" style="color: var(--hyper-accent-primary); font-weight: 700;">Class 10</span>
-        </button>
-        <!-- Raycast Command Trigger Bar -->
-        <div class="hyper-command-trigger" onclick="document.getElementById('commandPaletteModal').style.display = 'flex'" style="margin: 0; padding: 0.4rem 0.75rem;">
-          <i data-lucide="search" style="width: 16px; height: 16px; color: var(--hyper-accent-primary);"></i>
-          <span style="font-size: 0.8rem;">Search...</span>
-          <span class="hyper-kbd" style="margin-left: 0.5rem; font-size: 0.7rem;">⌘ K</span>
-        </div>
+    <!-- Premium Left Sidebar -->
+    <aside class="hyper-sidebar" id="mainSidebar">
+      <!-- Student Study Platform Navigation -->
+      <ul class="hyper-nav-list" id="studentNavList" style="margin-top: 1rem;">
+        <li class="hyper-nav-item active" data-view="dashboard">
+          <a href="#dashboard"><i data-lucide="layout-dashboard"></i> <span>Dashboard</span></a>
+        </li>
+        <li class="hyper-nav-item" data-view="chat">
+          <a href="#chat"><i data-lucide="bot"></i> <span>AI Chat</span></a>
+        </li>
+        <li class="hyper-nav-item" data-view="notes">
+          <a href="#notes"><i data-lucide="sticky-note"></i> <span>AI Notes</span></a>
+        </li>
+        <li class="hyper-nav-item" data-view="rag">
+          <a href="#rag"><i data-lucide="file-text"></i> <span>PDF Reader</span></a>
+        </li>
+        <li class="hyper-nav-item" data-view="flashcards">
+          <a href="#flashcards"><i data-lucide="layers"></i> <span>Flashcards</span></a>
+        </li>
+        <li class="hyper-nav-item" data-view="quizzes">
+          <a href="#quizzes"><i data-lucide="help-circle"></i> <span>AI Quiz</span></a>
+        </li>
+        <li class="hyper-nav-item" data-view="study-plan">
+          <a href="#study-plan"><i data-lucide="calendar"></i> <span>Study Planner</span></a>
+        </li>
+        <li class="hyper-nav-item" data-view="analytics">
+          <a href="#analytics"><i data-lucide="bar-chart-3"></i> <span>Analytics</span></a>
+        </li>
+        <li class="hyper-nav-item" data-view="settings">
+          <a href="#settings"><i data-lucide="settings"></i> <span>Settings</span></a>
+        </li>
+      </ul>
+    </aside>
+
+    <!-- Main View Shell -->
+    <main class="hyper-main-content">
+      <!-- Floating Glass Navigation Bar -->
+      <header class="hyper-float-nav" style="display:flex; justify-content:space-between; align-items:center;">
         
-        <!-- Auth Profile Section moved here -->
-        <div id="sidebarAuthProfileSection">
-          <!-- Rendered dynamically by Auth.updateUI() -->
+        <!-- NoteX AI Logo (in Top Nav) -->
+        <div class="hyper-brand" style="padding:0; margin:0; border:none; display:flex; align-items:center; background:none;">
+          <div class="hyper-brand-logo" style="width:32px; height:32px; font-size:1rem;">𝝌</div>
+          <div class="hyper-brand-title" style="font-size:1.1rem; margin-left:0.5rem; letter-spacing:-0.03em;">noteX AI</div>
         </div>
-      </div>
-    </header>
 
-      <div id="app-view-container" style="flex-grow: 1;">
-        <!-- JS modules render views here -->
-      </div>
-      
-      <!-- Floating Bottom Dock Navigation -->
-      <nav id="floating-bottom-nav" class="hyper-bottom-dock">
-        <a href="#dashboard" class="hyper-dock-item active" data-view="dashboard">
-          <i data-lucide="layout-dashboard"></i>
-          <span class="hyper-dock-tooltip">Dashboard</span>
-        </a>
-        <a href="#chat" class="hyper-dock-item" data-view="chat">
-          <i data-lucide="bot"></i>
-          <span class="hyper-dock-tooltip">AI Chat</span>
-        </a>
-        <a href="#notes" class="hyper-dock-item" data-view="notes">
-          <i data-lucide="sticky-note"></i>
-          <span class="hyper-dock-tooltip">AI Notes</span>
-        </a>
-        <a href="#flashcards" class="hyper-dock-item" data-view="flashcards">
-          <i data-lucide="layers"></i>
-          <span class="hyper-dock-tooltip">Flashcards</span>
-        </a>
-        <a href="#quizzes" class="hyper-dock-item" data-view="quizzes">
-          <i data-lucide="help-circle"></i>
-          <span class="hyper-dock-tooltip">AI Quizzes</span>
-        </a>
-        <a href="#rag" class="hyper-dock-item" data-view="rag">
-          <i data-lucide="file-text"></i>
-          <span class="hyper-dock-tooltip">PDF Reader</span>
-        </a>
-      </nav>
+        <!-- Search Bar -->
+        <div class="hyper-command-trigger" onclick="document.getElementById('commandPaletteModal').style.display = 'flex'" style="margin:0; padding:0.4rem 0.75rem;">
+          <i data-lucide="search" style="width:16px; height:16px; color:var(--hyper-accent-primary);"></i>
+          <span style="font-size:0.85rem;">Search or run command...</span>
+          <span class="hyper-kbd" style="margin-left:auto;">⌘ K</span>
+        </div>
 
-    </div>
+        <div style="display: flex; align-items: center; gap: 1rem;">
+          <!-- Notifications (Target Class / Bell) -->
+          <button id="classSelectorBtn" class="hyper-btn hyper-btn-glass hyper-btn-sm" style="border-radius:var(--hyper-radius-full);">
+            <i data-lucide="graduation-cap" style="width:15px; height:15px; color:var(--hyper-accent-primary);"></i>
+            <span id="currentGradeLabel" style="color:var(--hyper-accent-primary); font-weight:700;">Class 10</span>
+          </button>
+          <button class="hyper-btn hyper-btn-glass hyper-btn-sm" style="position:relative; border-radius:50%; width:36px; height:36px; padding:0; display:flex; align-items:center; justify-content:center;">
+            <i data-lucide="bell" style="width:16px; height:16px; color:var(--hyper-text-secondary);"></i>
+            <span style="position:absolute; top:2px; right:2px; width:8px; height:8px; background:var(--hyper-accent-rose); border-radius:50%;"></span>
+          </button>
+          
+          <!-- User Profile -->
+          <div id="sidebarAuthProfileSection">
+            <!-- Rendered dynamically by Auth.updateUI() -->
+          </div>
+        </div>
+      </header>
+
+      <!-- Dynamic View Viewport -->
+      <div id="app-view-container" class="hyper-view-viewport">
+        <!-- SPA View Module HTML Rendered Here -->
+      </div>
+    </main>
   </div>
 
   <!-- Raycast Style Command Palette Modal (`⌘K`) -->

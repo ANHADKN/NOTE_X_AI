@@ -12,6 +12,7 @@ class Config:
     
     ENV = os.getenv('FLASK_ENV', 'development')
     DEBUG = os.getenv('FLASK_DEBUG', 'True').lower() in ('true', '1', 't')
+    TEMPLATES_AUTO_RELOAD = True
     PORT = int(os.getenv('PORT', 5000))
     SECRET_KEY = os.getenv('SECRET_KEY', 'notex_secret_key_super_secure_key_2026')
     
