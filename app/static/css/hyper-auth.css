@@ -198,28 +198,28 @@
 .auth-ai-core {
   position: relative;
   z-index: 5;
-  width: 150px;
-  height: 150px;
+  width: 202px;
+  height: 202px;
   display: flex;
   align-items: center;
   justify-content: center;
   border-radius: 50%;
   background: linear-gradient(135deg, rgba(255,255,255,1) 0%, rgba(243,248,255,1) 100%);
-  border: 2px solid rgba(255,255,255,0.8);
+  border: 2px solid rgba(255,255,255,0.9);
   box-shadow:
-    0 0 40px rgba(37,99,235,0.15),
-    0 8px 24px rgba(37,99,235,0.1),
+    0 0 60px rgba(37,99,235,0.25),
+    0 8px 32px rgba(37,99,235,0.15),
     inset 0 4px 12px rgba(255,255,255,0.9);
   animation: core-pulse 4s ease-in-out infinite alternate;
 }
 
 @keyframes core-pulse {
-  0% { box-shadow: 0 0 30px rgba(37,99,235,0.1), 0 4px 16px rgba(37,99,235,0.08), inset 0 4px 12px rgba(255,255,255,0.9); }
-  100% { box-shadow: 0 0 60px rgba(37,99,235,0.25), 0 12px 32px rgba(37,99,235,0.15), inset 0 4px 12px rgba(255,255,255,0.9); }
+  0% { box-shadow: 0 0 50px rgba(37,99,235,0.2), 0 4px 16px rgba(37,99,235,0.1), inset 0 4px 12px rgba(255,255,255,0.9); }
+  100% { box-shadow: 0 0 90px rgba(37,99,235,0.4), 0 12px 40px rgba(37,99,235,0.2), inset 0 4px 12px rgba(255,255,255,0.9); }
 }
 
 .auth-x-logo {
-  font-size: 5rem;
+  font-size: 6.75rem;
   font-family: var(--font-h);
   font-weight: 800;
   line-height: 1;
@@ -227,7 +227,7 @@
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
-  filter: drop-shadow(0 4px 12px rgba(37,99,235,0.2));
+  filter: drop-shadow(0 4px 16px rgba(37,99,235,0.3));
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
@@ -246,8 +246,9 @@
   position: absolute;
   top: 15%; left: 15%; right: 15%; bottom: 15%;
   border-radius: 50%;
-  border: 1px solid rgba(37,99,235,0.08);
-  filter: blur(2px);
+  border: 1px solid rgba(37,99,235,0.2);
+  box-shadow: 0 0 16px rgba(37,99,235,0.1);
+  filter: blur(1px);
   animation: conn-pulse 8s infinite alternate;
 }
 .auth-nodes-field::after {
@@ -255,14 +256,15 @@
   position: absolute;
   top: 25%; left: 5%; right: 5%; bottom: 25%;
   border-radius: 50%;
-  border: 1px solid rgba(139,92,246,0.06);
-  filter: blur(3px);
+  border: 1px solid rgba(139,92,246,0.15);
+  box-shadow: 0 0 16px rgba(139,92,246,0.1);
+  filter: blur(1px);
   animation: conn-pulse 12s infinite alternate-reverse;
 }
 
 @keyframes conn-pulse {
-  0% { opacity: 0.3; transform: scale(0.98); }
-  100% { opacity: 0.8; transform: scale(1.02); }
+  0% { opacity: 0.4; transform: scale(0.98); }
+  100% { opacity: 1; transform: scale(1.02); }
 }
 
 /* Premium Floating Glass Pills */
@@ -276,13 +278,13 @@
   font-family: var(--font);
   font-size: 0.8125rem;
   font-weight: 600;
-  background: rgba(255, 255, 255, 0.7);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(255, 255, 255, 0.8);
+  background: rgba(255, 255, 255, 0.75);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(255, 255, 255, 0.9);
   box-shadow: 
-    0 4px 12px rgba(0,0,0,0.04),
-    0 1px 2px rgba(0,0,0,0.02),
+    0 8px 24px rgba(37,99,235,0.06),
+    0 2px 4px rgba(37,99,235,0.04),
     inset 0 1px 0 rgba(255,255,255,1);
   color: var(--t-b);
   animation: node-float 6s ease-in-out infinite alternate;
@@ -406,10 +408,10 @@
   
   /* Premium shadow & subtle glow */
   box-shadow: 
-    0 0 0 1px rgba(37,99,235,0.05),
-    0 12px 32px rgba(15,23,42,0.05),
-    0 32px 80px rgba(15,23,42,0.05),
-    0 0 40px rgba(255,255,255,0.5) inset;
+    0 0 0 1px rgba(255,255,255,0.8),
+    0 16px 40px rgba(37,99,235,0.08),
+    0 32px 80px rgba(15,23,42,0.06),
+    0 0 60px rgba(255,255,255,0.6) inset;
     
   /* Page load fade upward */
   animation: card-fade-up 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.3s forwards;
