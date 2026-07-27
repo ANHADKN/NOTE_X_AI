@@ -4,13 +4,11 @@ const AuthViewModule = {
   async render(container, mode = 'login') {
     if (!container) return;
 
-    // Reset layout for auth view
     const sidebar = document.getElementById('mainSidebar');
     const topnav = document.getElementById('topNavbar');
     if (sidebar) sidebar.style.display = 'none';
     if (topnav) topnav.style.display = 'none';
     
-    // Ensure container takes full screen width if sidebar is hidden
     container.style.width = '100vw';
     container.style.height = '100vh';
     container.style.margin = '0';
@@ -32,43 +30,82 @@ const AuthViewModule = {
 
     container.innerHTML = `
       <div class="auth-split-layout">
-        <!-- Left Pane: AI Illustration -->
+
         <div class="auth-left-pane">
-          <div class="auth-aurora-bg"></div>
-          <div class="auth-particles" id="authParticles"></div>
+          <!-- Particles -->
+          <div class="auth-particles" id="authParticles">
+            <div class="auth-particle"></div>
+            <div class="auth-particle"></div>
+            <div class="auth-particle"></div>
+            <div class="auth-particle"></div>
+            <div class="auth-particle"></div>
+            <div class="auth-particle"></div>
+          </div>
+
+          <!-- Brand / Logo -->
           <div class="auth-brand">
-            <div class="auth-logo"><i data-lucide="brain-circuit"></i> NoteX AI</div>
+            <div class="auth-logo">
+              <div class="auth-logo-icon">𝝌</div>
+              <span class="auth-logo-text">NoteX AI</span>
+            </div>
           </div>
-          <div class="auth-hero-content">
-            <h1>Master Your Studies with Intelligence.</h1>
-            <p>Join the next generation of students using NoteX AI to analyze textbooks, generate quizzes, and boost grades effortlessly.</p>
+
+          <!-- Center Hero -->
+          <div class="auth-hero-center">
+            <div class="auth-orbit-stage">
+              <!-- Rings -->
+              <div class="auth-orbit-ring auth-orbit-ring-1"></div>
+              <div class="auth-orbit-ring auth-orbit-ring-2"></div>
+              <div class="auth-orbit-ring auth-orbit-ring-3"></div>
+
+              <!-- AI Nodes -->
+              <div class="auth-nodes-field">
+                <div class="auth-node auth-node-1"><span class="auth-node-icon">🤖</span> AI Chat</div>
+                <div class="auth-node auth-node-2"><span class="auth-node-icon">📝</span> Smart Notes</div>
+                <div class="auth-node auth-node-3"><span class="auth-node-icon">📁</span> Workspace</div>
+                <div class="auth-node auth-node-4"><span class="auth-node-icon">📂</span> Files</div>
+                <div class="auth-node auth-node-5"><span class="auth-node-icon">🔍</span> Search</div>
+                <div class="auth-node auth-node-6"><span class="auth-node-icon">🧠</span> Knowledge</div>
+                <div class="auth-node auth-node-7"><span class="auth-node-icon">📊</span> Projects</div>
+                <div class="auth-node auth-node-8"><span class="auth-node-icon">⚡</span> Automation</div>
+              </div>
+
+              <!-- Core -->
+              <div class="auth-ai-core">
+                <span class="auth-x-logo">𝝌</span>
+              </div>
+            </div>
+
+            <!-- Tagline -->
+            <div class="auth-tagline" aria-label="Think. Create. Organize. Powered by AI.">
+              <span class="auth-tagline-word">Think.</span>
+              <span class="auth-tagline-word">Create.</span>
+              <span class="auth-tagline-word">Organize.</span>
+              <span class="auth-tagline-word">Powered by AI.</span>
+            </div>
           </div>
-          <!-- Decorative Floating Cards -->
-          <div class="auth-floating-card card-1"><i data-lucide="zap"></i> Instant Notes</div>
-          <div class="auth-floating-card card-2"><i data-lucide="target"></i> Perfect Scores</div>
-          <div class="auth-floating-card card-3"><i data-lucide="sparkles"></i> AI Powered</div>
+
         </div>
         
-        <!-- Right Pane: Glass Form -->
         <div class="auth-right-pane">
           ${rightPanelContent}
         </div>
+
       </div>
     `;
 
     if (typeof lucide !== 'undefined') {
       lucide.createIcons();
     }
-
-    this.initParticles();
   },
 
   getLoginHTML() {
     return `
       <div class="auth-glass-form" id="loginForm">
         <div class="auth-form-header">
+          <div class="auth-card-logo">𝝌</div>
           <h2>Welcome Back</h2>
-          <p>Sign in to your NoteX AI account</p>
+          <p>Continue to your intelligent AI workspace.</p>
         </div>
         <form onsubmit="event.preventDefault(); AuthViewModule.handleLogin();">
           <div class="auth-input-group">
@@ -126,6 +163,7 @@ const AuthViewModule = {
     return `
       <div class="auth-glass-form" id="registerForm">
         <div class="auth-form-header">
+          <div class="auth-card-logo">𝝌</div>
           <h2>Create Account</h2>
           <p>Join NoteX AI and transform your studying</p>
         </div>
@@ -182,7 +220,7 @@ const AuthViewModule = {
           <div class="auth-form-actions" style="margin-bottom: 1.5rem;">
             <label class="auth-checkbox">
               <input type="checkbox" id="termsCheck" required />
-              <span>I agree to the <a href="#" class="auth-link">Terms</a> & <a href="#" class="auth-link">Privacy Policy</a></span>
+              <span>I agree to the <a href="#" class="auth-link">Terms</a> &amp; <a href="#" class="auth-link">Privacy Policy</a></span>
             </label>
           </div>
           
@@ -209,6 +247,7 @@ const AuthViewModule = {
       <div class="auth-glass-form" id="forgotForm">
         <button class="auth-back-btn" onclick="window.location.hash='#login'"><i data-lucide="arrow-left"></i> Back</button>
         <div class="auth-form-header" style="margin-top: 1rem;">
+          <div class="auth-card-logo">𝝌</div>
           <h2>Reset Password</h2>
           <p>We'll send you an OTP to reset your password</p>
         </div>
@@ -227,21 +266,6 @@ const AuthViewModule = {
         </form>
       </div>
     `;
-  },
-
-  initParticles() {
-    const container = document.getElementById('authParticles');
-    if (!container) return;
-    container.innerHTML = '';
-    for(let i=0; i<30; i++) {
-      const p = document.createElement('div');
-      p.className = 'auth-particle';
-      p.style.left = Math.random() * 100 + '%';
-      p.style.top = Math.random() * 100 + '%';
-      p.style.animationDelay = (Math.random() * 5) + 's';
-      p.style.animationDuration = (5 + Math.random() * 10) + 's';
-      container.appendChild(p);
-    }
   },
 
   togglePassword(id) {
@@ -358,14 +382,10 @@ const AuthViewModule = {
 
     try {
       if (typeof Auth !== 'undefined') {
-        // Assume Auth API is updated to support username and phone in a real system.
         await Auth.register(name, email, password);
-        
-        // Mock updating extra fields via settings endpoint after reg
         try {
             await API.put('/auth/user/settings', { username, phone });
         } catch(err) {}
-
         this.cleanupLayout();
         window.location.hash = '#dashboard';
       }
@@ -389,7 +409,6 @@ const AuthViewModule = {
       if (typeof Auth !== 'undefined') {
         await Auth.requestPasswordReset(email);
         UI.showToast("OTP sent. Check your email.", "success");
-        // In a real app we'd transition to OTP verify mode here.
       }
     } catch (e) {
     } finally {
@@ -404,7 +423,6 @@ const AuthViewModule = {
         window.location.href = '/api/auth/google/login';
         return;
     }
-    
     UI.showToast(`Redirecting to ${provider} OAuth...`, 'info');
     setTimeout(() => {
         window.location.href = `/api/auth/${provider.toLowerCase()}/login`;
